@@ -1,0 +1,29 @@
+.reviewEditor { margin-top: 58px; padding: 30px; border: 1px solid rgba(23,56,45,.16); border-radius: 24px; background: #fffdf7; box-shadow: 0 18px 60px rgba(23,56,45,.08); }
+.editorHeading { display: flex; justify-content: space-between; gap: 20px; }
+.editorHeading h2 { margin: 6px 0 28px; font-family: Georgia,serif; font-size: clamp(2rem,4vw,3rem); font-weight: 500; }
+.closeButton--inline { position: static; flex: 0 0 auto; }
+.reviewForm { display: grid; gap: 24px; }
+.criteriaGrid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.reviewForm label { display: grid; gap: 8px; color: #29483e; font-size: .86rem; font-weight: 800; }
+.reviewForm label > span { color: #77867f; font-weight: 500; }
+.reviewForm select, .reviewForm textarea { width: 100%; padding: 12px 13px; border: 1px solid rgba(23,56,45,.24); border-radius: 11px; color: #17382d; background: #fff; }
+.reasonFieldset { margin: 0; padding: 22px; border: 1px solid rgba(23,56,45,.15); border-radius: 18px; }
+.reasonFieldset legend { padding: 0 8px; font-family: Georgia,serif; font-size: 1.25rem; }
+.reasonFieldset > p { margin: 0 0 18px; color: #687970; font-size: .84rem; }
+.reasonGrid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+.reasonOption { min-height: 52px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid rgba(23,56,45,.14); border-radius: 12px; }
+.reasonOption.selected { background: #f2efe6; border-color: rgba(215,92,53,.45); }
+.reasonOption label { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.reasonOption input { accent-color: #d75c35; }
+.reasonOption select { width: auto; padding: 7px; font-size: .78rem; }
+.commentField { position: relative; }
+.commentField textarea { resize: vertical; min-height: 120px; }
+.commentField small { position: absolute; right: 10px; bottom: 8px; color: #78877f; font-weight: 500; }
+.reviewActions { margin-top: 20px; display: flex; gap: 10px; }
+.dangerButton { padding: 10px 16px; border: 1px solid #a33e38; border-radius: 10px; color: #a33e38; background: transparent; font-weight: 800; cursor: pointer; }
+@media (max-width: 680px) {
+  .reviewEditor { padding: 24px 16px; }
+  .criteriaGrid, .reasonGrid { grid-template-columns: 1fr; }
+  .reasonOption { align-items: stretch; flex-direction: column; }
+  .reasonOption select { width: 100%; }
+}
