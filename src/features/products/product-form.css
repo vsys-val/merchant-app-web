@@ -1,0 +1,28 @@
+.productFormPage { max-width: 900px; margin: 0 auto; padding: 54px 24px 90px; }
+.productFormPage > header { margin: 58px 0 36px; }
+.productFormPage h1 { margin: 8px 0 18px; font-size: clamp(3rem,7vw,5.6rem); text-align: left; }
+.productFormPage > header > p:last-child { max-width: 620px; color: #5d7068; font-size: 1.08rem; line-height: 1.6; }
+.productForm { display: grid; gap: 18px; }
+.productForm fieldset { margin: 0; padding: 26px; border: 1px solid rgba(23,56,45,.16); border-radius: 20px; background: #fffdf7; }
+.productForm legend { padding: 0 9px; font-family: Georgia,serif; font-size: 1.35rem; }
+.productForm label { display: grid; gap: 8px; color: #29483e; font-size: .86rem; font-weight: 800; }
+.productForm label span { color: #78877f; font-weight: 500; }
+.productForm input, .productForm select { width: 100%; padding: 13px 14px; border: 1px solid rgba(23,56,45,.24); border-radius: 11px; color: #17382d; background: #fff; }
+.productForm small { display: block; margin-top: 9px; color: #6c7d75; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.formGrid--measure { grid-template-columns: 1fr 1fr 1.4fr; }
+.fieldWide { grid-column: 1 / -1; }
+.formActions { margin-top: 8px; display: flex; justify-content: flex-end; gap: 12px; }
+.formActions .primaryButton { width: auto; margin: 0; }
+.secondaryButton { padding: 13px 20px; border: 1px solid #17382d; border-radius: 12px; color: #17382d; background: transparent; font-weight: 800; cursor: pointer; }
+.brandButton { padding: 0; border: 0; background: transparent; cursor: pointer; }
+.createButton { border-color: #d75c35; color: #fff; background: #d75c35; }
+@media (max-width: 620px) {
+  .productFormPage { padding-top: 38px; }
+  .productFormPage > header { margin-top: 42px; }
+  .productForm fieldset { padding: 20px 16px; }
+  .formGrid, .formGrid--measure { grid-template-columns: 1fr; }
+  .fieldWide { grid-column: auto; }
+  .formActions { flex-direction: column-reverse; }
+  .formActions button, .formActions .primaryButton { width: 100%; }
+}

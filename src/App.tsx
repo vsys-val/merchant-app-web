@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { AuthPanel } from "./features/auth/AuthPanel";
 import { useAuth } from "./features/auth/AuthContext";
 import { ProductDetailView } from "./features/products/ProductDetailView";
+import { ProductForm } from "./features/products/ProductForm";
 import { ProductSearch } from "./features/products/ProductSearch";
 import { ApiStatus, checkApiHealth } from "./lib/api";
+
+type View = "home" | "create";
 
 export function App() {
   const [status, setStatus] = useState<ApiStatus>("checking");
   const [showAuth, setShowAuth] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [view, setView] = useState<View>("home");
   const { user, isLoading, signOut } = useAuth();
 
   useEffect(() => {
@@ -17,31 +21,34 @@ export function App() {
     return () => controller.abort();
   }, []);
 
-  function openProduct(productId: number) {
-    setSelectedProductId(productId);
+  function goHome() {
+    setView("home");
+    setSelectedProductId(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function closeProduct() {
-    setSelectedProductId(null);
+  function openProduct(productId: number) {
+    setView("home");
+    setSelectedProductId(productId);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
     <main>
       <header className="topbar">
-        <button className="brand brandButton" type="button" onClick={closeProduct} aria-label="Merchant App — início">
-          <span className="brandMark">M</span><span>Merchant</span>
-        </button>
+        <button className="brand brandButton" type="button" onClick={goHome} aria-label="Merchant App — início"><span className="brandMark">M</span><span>Merchant</span></button>
         <nav className="accountNav" aria-label="Conta">
+          {user && <button className="loginButton createButton" type="button" onClick={() => { setSelectedProductId(null); setView("create"); }}>Cadastrar produto</button>}
           {isLoading ? <span className="accountLoading">Carregando conta…</span> : user ? (
-            <><span>Olá, {user.name}</span><button className="loginButton" type="button" onClick={signOut}>Sair</button></>
+            <><span>Olá, {user.name}</span><button className="loginButton" type="button" onClick={() => { signOut(); goHome(); }}>Sair</button></>
           ) : <button className="loginButton" type="button" onClick={() => setShowAuth(true)}>Entrar</button>}
         </nav>
       </header>
 
-      {selectedProductId ? (
-        <ProductDetailView productId={selectedProductId} onBack={closeProduct} />
+      {view === "create" && user ? (
+        <ProductForm onCancel={goHome} onCreated={openProduct} />
+      ) : selectedProductId ? (
+        <ProductDetailView productId={selectedProductId} onBack={goHome} />
       ) : (
         <>
           <section className="hero">

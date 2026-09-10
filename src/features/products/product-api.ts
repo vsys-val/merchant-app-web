@@ -5,6 +5,7 @@ export type RepurchaseIntent = "yes" | "maybe" | "no";
 export type Quality = "high" | "adequate" | "low";
 export type Expectation = "exceeded" | "met" | "not_met";
 export type ValueForMoney = "good" | "fair" | "poor";
+export type Category = "food" | "beverages" | "cleaning" | "personal_hygiene" | "household_utilities" | "other";
 
 export interface ProductPublic {
   id: number;
@@ -13,7 +14,17 @@ export interface ProductPublic {
   variant: string | null;
   quantity: number;
   unit: "g" | "ml" | "un";
-  category: string;
+  category: Category;
+  barcode: string | null;
+}
+
+export interface ProductCreateInput {
+  name: string;
+  brand: string;
+  variant: string | null;
+  quantity: number;
+  unit: "g" | "kg" | "ml" | "L" | "un";
+  category: Category;
   barcode: string | null;
 }
 
@@ -30,10 +41,7 @@ export interface Review {
 }
 
 export interface ProductListItem extends ProductPublic {
-  community_summary: {
-    total_reviews: number;
-    repurchase_intent: Record<RepurchaseIntent, number>;
-  };
+  community_summary: { total_reviews: number; repurchase_intent: Record<RepurchaseIntent, number> };
   your_repurchase_intent: RepurchaseIntent | null;
 }
 
@@ -48,29 +56,12 @@ export interface ProductDetail extends ProductPublic {
   your_review: Review | null;
 }
 
-export interface CommunityReview extends Review {
-  author_name: string;
-}
-
-export interface Page<T> {
-  items: T[];
-  page: number;
-  page_size: number;
-  total: number;
-}
-
-export interface ProductSearchInput {
-  field: SearchField;
-  value: string;
-  page?: number;
-}
+export interface CommunityReview extends Review { author_name: string; }
+export interface Page<T> { items: T[]; page: number; page_size: number; total: number; }
+export interface ProductSearchInput { field: SearchField; value: string; page?: number; }
 
 export function searchProducts(input: ProductSearchInput, token?: string | null) {
-  const params = new URLSearchParams({
-    [input.field]: input.value.trim(),
-    page: String(input.page ?? 1),
-    page_size: "20",
-  });
+  const params = new URLSearchParams({ [input.field]: input.value.trim(), page: String(input.page ?? 1), page_size: "20" });
   return apiRequest<Page<ProductListItem>>(`/api/v1/products?${params}`, {}, token);
 }
 
@@ -78,15 +69,14 @@ export function getProductDetail(productId: number, token?: string | null) {
   return apiRequest<ProductDetail>(`/api/v1/products/${productId}`, {}, token);
 }
 
-export function getCommunityReviews(
-  productId: number,
-  page = 1,
-  token?: string | null,
-) {
+export function getCommunityReviews(productId: number, page = 1, token?: string | null) {
   const params = new URLSearchParams({ page: String(page), page_size: "20" });
-  return apiRequest<Page<CommunityReview>>(
-    `/api/v1/products/${productId}/reviews?${params}`,
-    {},
-    token,
-  );
+  return apiRequest<Page<CommunityReview>>(`/api/v1/products/${productId}/reviews?${params}`, {}, token);
+}
+
+export function createProduct(input: ProductCreateInput, token: string) {
+  return apiRequest<ProductPublic>("/api/v1/products", {
+    method: "POST",
+    body: JSON.stringify(input),
+  }, token);
 }
