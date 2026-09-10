@@ -1,11 +1,11 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthPanel } from "./features/auth/AuthPanel";
 import { useAuth } from "./features/auth/AuthContext";
+import { ProductSearch } from "./features/products/ProductSearch";
 import { ApiStatus, checkApiHealth } from "./lib/api";
 
 export function App() {
   const [status, setStatus] = useState<ApiStatus>("checking");
-  const [search, setSearch] = useState("");
   const [showAuth, setShowAuth] = useState(false);
   const { user, isLoading, signOut } = useAuth();
 
@@ -16,11 +16,6 @@ export function App() {
     });
     return () => controller.abort();
   }, []);
-
-  function handleSearch(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!search.trim()) return;
-  }
 
   return (
     <main>
@@ -52,20 +47,6 @@ export function App() {
           Consulte avaliações objetivas de produtos e registre o que você
           compraria — ou evitaria — novamente.
         </p>
-
-        <form className="search" onSubmit={handleSearch}>
-          <label htmlFor="product-search">Busque por produto ou marca</label>
-          <div className="searchRow">
-            <input
-              id="product-search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Ex.: café, biscoito, marca..."
-            />
-            <button type="submit">Buscar</button>
-          </div>
-        </form>
-
         <div className="apiStatus" aria-live="polite">
           <span className={`statusDot statusDot--${status}`} />
           {status === "checking" && "Verificando conexão com a API"}
@@ -74,9 +55,11 @@ export function App() {
         </div>
       </section>
 
+      <ProductSearch />
+
       <section className="steps" aria-labelledby="how-title">
         <div>
-          <p className="sectionNumber">01</p>
+          <p className="sectionNumber">02</p>
           <h2 id="how-title">Como funciona</h2>
         </div>
         <ol>
