@@ -1,24 +1,25 @@
 import { FormEvent, useEffect, useState } from "react";
+import { AuthPanel } from "./features/auth/AuthPanel";
+import { useAuth } from "./features/auth/AuthContext";
 import { ApiStatus, checkApiHealth } from "./lib/api";
 
 export function App() {
   const [status, setStatus] = useState<ApiStatus>("checking");
   const [search, setSearch] = useState("");
+  const [showAuth, setShowAuth] = useState(false);
+  const { user, isLoading, signOut } = useAuth();
 
   useEffect(() => {
     const controller = new AbortController();
-
     checkApiHealth(controller.signal).then((online) => {
       setStatus(online ? "online" : "offline");
     });
-
     return () => controller.abort();
   }, []);
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!search.trim()) return;
-    // A navegação para os resultados será adicionada na próxima entrega.
   }
 
   return (
@@ -28,7 +29,20 @@ export function App() {
           <span className="brandMark">M</span>
           <span>Merchant</span>
         </a>
-        <button className="loginButton" type="button">Entrar</button>
+        <nav className="accountNav" aria-label="Conta">
+          {isLoading ? (
+            <span className="accountLoading">Carregando conta…</span>
+          ) : user ? (
+            <>
+              <span>Olá, {user.name}</span>
+              <button className="loginButton" type="button" onClick={signOut}>Sair</button>
+            </>
+          ) : (
+            <button className="loginButton" type="button" onClick={() => setShowAuth(true)}>
+              Entrar
+            </button>
+          )}
+        </nav>
       </header>
 
       <section className="hero">
@@ -71,6 +85,8 @@ export function App() {
           <li><strong>Registre</strong><span>Guarde sua avaliação para a próxima compra.</span></li>
         </ol>
       </section>
+
+      {showAuth && <AuthPanel onClose={() => setShowAuth(false)} />}
     </main>
   );
 }
