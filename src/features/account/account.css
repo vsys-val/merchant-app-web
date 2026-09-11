@@ -1,0 +1,29 @@
+.accountPage { max-width: 980px; margin: 0 auto; padding: 54px 24px 90px; }
+.accountHeading { margin: 58px 0 40px; }
+.accountHeading h1 { margin: 8px 0 18px; font-size: clamp(3rem,7vw,5.7rem); text-align: left; }
+.accountHeading > p:last-child { max-width: 630px; color: #5d7068; font-size: 1.08rem; line-height: 1.6; }
+.accountTabs { margin-bottom: 24px; padding: 5px; display: grid; grid-template-columns: 1fr 1fr; border-radius: 15px; background: #e7e2d7; }
+.accountTabs button { padding: 13px; border: 0; border-radius: 11px; color: #607168; background: transparent; font-weight: 800; cursor: pointer; }
+.accountTabs button.active { color: #fff; background: #17382d; box-shadow: 0 5px 15px rgba(23,56,45,.18); }
+.accountList { display: grid; gap: 14px; }
+.accountList--products { grid-template-columns: repeat(2,1fr); }
+.accountCard { overflow: hidden; border: 1px solid rgba(23,56,45,.15); border-radius: 18px; background: #fffdf7; }
+.accountCard > button { width: 100%; height: 100%; padding: 22px; border: 0; color: inherit; background: transparent; text-align: left; cursor: pointer; }
+.accountCard > button:hover .accountOpen { transform: translateX(4px); }
+.accountCardTop { display: flex; justify-content: space-between; gap: 12px; color: #7a8982; font-size: .72rem; font-weight: 800; text-transform: uppercase; }
+.accountCard h2 { margin: 15px 0 5px; font-family: Georgia,serif; font-size: 1.65rem; font-weight: 500; }
+.accountCard p { margin: 0; color: #62736b; }
+.accountCard small { display: block; margin-top: 10px; color: #7a8982; }
+.accountTags { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 7px; }
+.accountTags span { padding: 7px 10px; border-radius: 999px; color: #17382d; background: #eee9dd; font-size: .74rem; font-weight: 700; }
+.accountCard blockquote { margin: 18px 0 0; color: #40564e; font-family: Georgia,serif; font-size: 1.06rem; line-height: 1.5; }
+.accountOpen { margin-top: 20px; display: block; color: #d75c35; font-size: .8rem; transition: transform .2s ease; }
+.accountState { min-height: 45vh; display: grid; place-content: center; gap: 16px; color: #61736a; text-align: center; }
+.accountEmpty { margin-top: 0; max-width: none; padding: 40px; }
+.accountPage .pagination { align-items: center; }
+.accountPage .pagination span { color: #687970; font-size: .84rem; }
+@media (max-width: 680px) {
+  .accountPage { padding-top: 38px; }
+  .accountHeading { margin-top: 42px; }
+  .accountList--products { grid-template-columns: 1fr; }
+}
