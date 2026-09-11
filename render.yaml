@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: merchant-app-web
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://fastapi-merchant-app.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

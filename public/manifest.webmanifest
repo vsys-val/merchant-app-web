@@ -1,0 +1,24 @@
+{
+  "name": "Merchant App",
+  "short_name": "Merchant",
+  "description": "Consulte avaliações de produtos e registre o que vale comprar novamente.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2efe6",
+  "theme_color": "#17382d",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
