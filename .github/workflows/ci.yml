@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,5 +20,7 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Run tests
+        run: npm test
       - name: Type-check and build
         run: npm run build

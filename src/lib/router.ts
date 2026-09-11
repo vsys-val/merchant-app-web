@@ -6,11 +6,12 @@ export type Route =
   | { name: "create-product" }
   | { name: "product"; productId: number };
 
-function parsePath(pathname: string): Route {
-  if (pathname === "/account") return { name: "account" };
-  if (pathname === "/products/new") return { name: "create-product" };
+export function parsePath(pathname: string): Route {
+  const normalized = pathname !== "/" ? pathname.replace(/\/+$/, "") : pathname;
+  if (normalized === "/account") return { name: "account" };
+  if (normalized === "/products/new") return { name: "create-product" };
 
-  const productMatch = pathname.match(/^\/products\/(\d+)\/?$/);
+  const productMatch = normalized.match(/^\/products\/(\d+)$/);
   if (productMatch) return { name: "product", productId: Number(productMatch[1]) };
 
   return { name: "home" };
