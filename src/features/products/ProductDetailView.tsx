@@ -18,6 +18,8 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
   const [reviews, setReviews] = useState<Page<CommunityReview> | null>(null);
   const [reviewPage, setReviewPage] = useState(1);
   const [editingReview, setEditingReview] = useState(false);
+  const [reviewPendingDeletion, setReviewPendingDeletion] = useState<Review | null>(null);
+  const [isDeletingReview, setIsDeletingReview] = useState(false);
   const [error, setError] = useState("");
 
   async function load(page = 1) {
@@ -36,9 +38,12 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
   }
 
   async function removeOwnReview(review: Review) {
-    if (!token || !window.confirm("Excluir sua avaliação? Esta ação não pode ser desfeita.")) return;
-    try { await deleteReview(review.id, token); await load(); }
+    if (!token) return;
+    setError("");
+    setIsDeletingReview(true);
+    try { await deleteReview(review.id, token); setReviewPendingDeletion(null); await load(); }
     catch (caught) { setError(caught instanceof ApiError ? caught.message : "Não foi possível excluir a avaliação."); }
+    finally { setIsDeletingReview(false); }
   }
 
   if (error && !product) return <section className="detailState"><p role="alert">{error}</p><button onClick={onBack}>Voltar à busca</button></section>;
@@ -52,13 +57,26 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
       <header className="productHeading"><div><p className="eyebrow">{getCategoryLabel(product.category)}</p><h1>{product.name}</h1><p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p></div><div className="quantityBadge"><strong>{product.quantity}</strong><span>{product.unit}</span></div></header>
       <div className="summaryHeader"><div><p className="sectionNumber">01</p><h2>Resumo da comunidade</h2></div><p>Baseado em {product.community_summary.total_reviews} {product.community_summary.total_reviews === 1 ? "avaliação" : "avaliações"} de outras pessoas.</p></div>
       <div className="distributionGrid"><Distribution title="Compraria novamente?" values={product.community_summary.repurchase_intent} /><Distribution title="Qualidade" values={product.community_summary.quality} /><Distribution title="Expectativa" values={product.community_summary.expectation} /><Distribution title="Custo-benefício" values={product.community_summary.value_for_money} /></div>
-      {user ? <section className="yourReview"><p className="sectionNumber">02</p><h2>Sua experiência</h2>{product.your_review ? <><ReviewContent review={product.your_review} /><div className="reviewActions"><button className="secondaryButton" type="button" onClick={() => setEditingReview(true)}>Editar</button><button className="dangerButton" type="button" onClick={() => void removeOwnReview(product.your_review!)}>Excluir</button></div></> : <><p>Você ainda não avaliou este produto.</p><button className="primaryButton" type="button" onClick={() => setEditingReview(true)}>Avaliar produto</button></>}</section> : <section className="yourReview"><p>Entre na sua conta para registrar sua experiência com este produto.</p></section>}
+      {user ? <section className="yourReview"><p className="sectionNumber">02</p><h2>Sua experiência</h2>{product.your_review ? <><ReviewContent review={product.your_review} /><div className="reviewActions"><button className="secondaryButton" type="button" onClick={() => setEditingReview(true)}>Editar</button><button className="dangerButton" type="button" onClick={() => { setError(""); setReviewPendingDeletion(product.your_review); }}>Excluir</button></div></> : <><p>Você ainda não avaliou este produto.</p><button className="primaryButton" type="button" onClick={() => setEditingReview(true)}>Avaliar produto</button></>}</section> : <section className="yourReview"><p>Entre na sua conta para registrar sua experiência com este produto.</p></section>}
       {error && <p className="formError" role="alert">{error}</p>}
       <section className="communityReviews">
         <div className="reviewsTitle"><div><p className="sectionNumber">{user ? "03" : "02"}</p><h2>Avaliações da comunidade</h2></div><span>{reviews.total} publicadas</span></div>
         {reviews.items.length === 0 ? <div className="emptyState"><strong>Ainda não há avaliações.</strong><span>Este produto está esperando sua primeira experiência.</span></div> : reviews.items.map((review) => <article className="reviewCard" key={review.id}><div className="reviewAuthor"><strong>{review.author_name}</strong><time dateTime={review.created_at}>{new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(new Date(review.created_at))}</time></div><ReviewContent review={review} /></article>)}
         {totalPages > 1 && <div className="pagination"><button disabled={reviewPage === 1} onClick={() => void changeReviewPage(reviewPage - 1)}>Anterior</button><button disabled={reviewPage === totalPages} onClick={() => void changeReviewPage(reviewPage + 1)}>Próxima</button></div>}
       </section>
+      {reviewPendingDeletion && (
+        <div className="deleteConfirmBackdrop">
+          <section className="deleteConfirmDialog" role="dialog" aria-modal="true" aria-labelledby="delete-review-title" aria-describedby="delete-review-description">
+            <p className="eyebrow">Confirmação</p>
+            <h2 id="delete-review-title">Excluir sua avaliação?</h2>
+            <p id="delete-review-description">Esta ação não pode ser desfeita.</p>
+            <div className="deleteConfirmActions">
+              <button className="secondaryButton" type="button" autoFocus disabled={isDeletingReview} onClick={() => setReviewPendingDeletion(null)}>Cancelar</button>
+              <button className="dangerButton" type="button" disabled={isDeletingReview} onClick={() => void removeOwnReview(reviewPendingDeletion)}>{isDeletingReview ? "Excluindo..." : "Excluir avaliação"}</button>
+            </div>
+          </section>
+        </div>
+      )}
     </section>
   );
 }

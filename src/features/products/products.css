@@ -31,6 +31,13 @@
 .reviewAuthor { margin-bottom: 14px; display: flex; justify-content: space-between; gap: 16px; }
 .reviewAuthor time { color: #77867f; font-size: .8rem; }
 .detailState { min-height: 65vh; display: grid; place-content: center; gap: 18px; text-align: center; }
+.deleteConfirmBackdrop { position: fixed; inset: 0; z-index: 30; padding: 20px; display: grid; place-items: center; background: rgba(16,34,28,.62); backdrop-filter: blur(5px); }
+.deleteConfirmDialog { width: min(100%, 440px); padding: 30px; border-radius: 22px; color: #17382d; background: #fffdf7; box-shadow: 0 28px 90px rgba(10,28,22,.35); }
+.deleteConfirmDialog h2 { margin: 6px 0 10px; font-family: Georgia,serif; font-size: 2rem; font-weight: 500; }
+.deleteConfirmDialog > p:last-of-type { margin: 0; color: #66776f; line-height: 1.5; }
+.deleteConfirmActions { margin-top: 26px; display: flex; justify-content: flex-end; gap: 10px; }
+.deleteConfirmActions .secondaryButton, .deleteConfirmActions .dangerButton { width: auto; margin: 0; }
+.deleteConfirmActions button:disabled { opacity: .6; cursor: wait; }
 
 @media (max-width: 720px) {
   .productHeading { padding-block: 48px; align-items: start; }
