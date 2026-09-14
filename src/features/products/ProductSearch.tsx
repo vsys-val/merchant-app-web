@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
+import { getCategoryLabel } from "./category-labels";
 import {
   ProductListItem,
   Page,
@@ -125,7 +126,7 @@ function ProductCard({ product, onSelect }: { product: ProductListItem; onSelect
   return (
     <article className="productCard">
       <button className="productCardLink" type="button" onClick={() => onSelect(product.id)} aria-label={`Ver detalhes de ${product.name}`}>
-        <div className="productMeta"><span>{product.category.replaceAll("_", " ")}</span><span>{product.quantity} {product.unit}</span></div>
+        <div className="productMeta"><span>{getCategoryLabel(product.category)}</span><span>{product.quantity} {product.unit}</span></div>
         <h3>{product.name}</h3>
         <p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p>
         <div className="communitySignal"><strong>{product.community_summary.total_reviews}</strong><span>{product.community_summary.total_reviews === 1 ? "avaliação" : "avaliações"}</span></div>
