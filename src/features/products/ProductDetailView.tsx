@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
+import { getCategoryLabel } from "./category-labels";
 import { CommunityReview, getCommunityReviews, getProductDetail, Page, ProductDetail, Review } from "./product-api";
 import { deleteReview } from "./review-api";
 import { ReviewForm } from "./ReviewForm";
@@ -48,7 +49,7 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
   return (
     <section className="detailPage">
       <button className="backButton" type="button" onClick={onBack}>← Voltar à busca</button>
-      <header className="productHeading"><div><p className="eyebrow">{product.category.replaceAll("_", " ")}</p><h1>{product.name}</h1><p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p></div><div className="quantityBadge"><strong>{product.quantity}</strong><span>{product.unit}</span></div></header>
+      <header className="productHeading"><div><p className="eyebrow">{getCategoryLabel(product.category)}</p><h1>{product.name}</h1><p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p></div><div className="quantityBadge"><strong>{product.quantity}</strong><span>{product.unit}</span></div></header>
       <div className="summaryHeader"><div><p className="sectionNumber">01</p><h2>Resumo da comunidade</h2></div><p>Baseado em {product.community_summary.total_reviews} {product.community_summary.total_reviews === 1 ? "avaliação" : "avaliações"} de outras pessoas.</p></div>
       <div className="distributionGrid"><Distribution title="Compraria novamente?" values={product.community_summary.repurchase_intent} /><Distribution title="Qualidade" values={product.community_summary.quality} /><Distribution title="Expectativa" values={product.community_summary.expectation} /><Distribution title="Custo-benefício" values={product.community_summary.value_for_money} /></div>
       {user ? <section className="yourReview"><p className="sectionNumber">02</p><h2>Sua experiência</h2>{product.your_review ? <><ReviewContent review={product.your_review} /><div className="reviewActions"><button className="secondaryButton" type="button" onClick={() => setEditingReview(true)}>Editar</button><button className="dangerButton" type="button" onClick={() => void removeOwnReview(product.your_review!)}>Excluir</button></div></> : <><p>Você ainda não avaliou este produto.</p><button className="primaryButton" type="button" onClick={() => setEditingReview(true)}>Avaliar produto</button></>}</section> : <section className="yourReview"><p>Entre na sua conta para registrar sua experiência com este produto.</p></section>}
