@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ApiError } from "../../lib/api";
 import { useAuth } from "../auth/AuthContext";
 import { Page, ProductPublic } from "../products/product-api";
+import { getCategoryLabel } from "../products/category-labels";
 import { getOwnProducts, getOwnReviews, OwnReview } from "./account-api";
 import "./account.css";
 
@@ -75,7 +76,7 @@ export function AccountDashboard({
           {reviews.items.map((review) => (
             <article className="accountCard" key={review.id}>
               <button type="button" onClick={() => onSelectProduct(review.product.id)}>
-                <div className="accountCardTop"><span>{review.product.category.replaceAll("_", " ")}</span><time dateTime={review.updated_at}>{new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(new Date(review.updated_at))}</time></div>
+                <div className="accountCardTop"><span>{getCategoryLabel(review.product.category)}</span><time dateTime={review.updated_at}>{new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(new Date(review.updated_at))}</time></div>
                 <h2>{review.product.name}</h2>
                 <p>{review.product.brand}{review.product.variant ? ` · ${review.product.variant}` : ""}</p>
                 <div className="accountTags"><span>{intentLabels[review.repurchase_intent]}</span><span>{qualityLabels[review.quality]}</span></div>
@@ -93,7 +94,7 @@ export function AccountDashboard({
           {products.items.map((product) => (
             <article className="accountCard" key={product.id}>
               <button type="button" onClick={() => onSelectProduct(product.id)}>
-                <div className="accountCardTop"><span>{product.category.replaceAll("_", " ")}</span><span>{product.quantity} {product.unit}</span></div>
+                <div className="accountCardTop"><span>{getCategoryLabel(product.category)}</span><span>{product.quantity} {product.unit}</span></div>
                 <h2>{product.name}</h2>
                 <p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p>
                 {product.barcode && <small>GTIN {product.barcode}</small>}
