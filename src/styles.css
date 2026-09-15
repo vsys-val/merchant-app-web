@@ -21,13 +21,17 @@ main { min-height: 100vh; overflow: hidden; background: #f7f6fb; }
 .createButton:hover { background: #5539d8; }
 .accountLoading { color: #6d6a82; font-weight: 500; }
 
-.hero { position: relative; max-width: 1240px; margin: 0 auto; padding: 58px 28px 28px; display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 32px; align-items: end; }
-.hero::before { content: ""; position: absolute; z-index: 0; width: 480px; height: 480px; right: -150px; top: -250px; border-radius: 50%; background: radial-gradient(circle, #e3ddff 0 30%, rgba(227,221,255,0) 68%); }
+.hero { position: relative; max-width: 1240px; margin: 0 auto; padding: 58px 28px 28px; display: grid; grid-template-areas: "eyebrow status" "title status" "lead status"; grid-template-columns: minmax(0, 1fr) 260px; column-gap: 32px; row-gap: 0; align-items: start; }
+.hero::before { content: ""; position: absolute; z-index: 0; width: 480px; height: 480px; right: -150px; top: -250px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #e3ddff 0 30%, rgba(227,221,255,0) 68%); }
 .hero > * { position: relative; z-index: 1; }
+.hero > .eyebrow { grid-area: eyebrow; }
+.hero > h1 { grid-area: title; }
+.hero > .lead { grid-area: lead; }
+.hero > .apiStatus { grid-area: status; }
 .eyebrow, .sectionNumber { margin: 0; color: #6c4ff6; font-family: "DM Mono", monospace; font-size: .7rem; font-weight: 500; letter-spacing: .11em; text-transform: uppercase; }
 h1 { max-width: 760px; margin: 13px 0 14px; color: #19172c; font-family: "Playfair Display", Georgia, serif; font-size: clamp(2.85rem, 6vw, 5.6rem); font-weight: 700; letter-spacing: -.07em; line-height: .92; }
 .lead { max-width: 625px; margin: 0; color: #5d5b72; font-size: 1.04rem; line-height: 1.65; }
-.apiStatus { align-self: stretch; display: flex; align-items: center; gap: 9px; margin: 0; padding: 16px 18px; border: 1px solid #e5e3ee; border-radius: 16px; color: #69667e; background: rgba(255,255,255,.72); font-size: .8rem; line-height: 1.4; box-shadow: 0 12px 32px rgba(36,29,82,.05); }
+.apiStatus { align-self: center; display: flex; align-items: center; gap: 9px; margin: 0; padding: 16px 18px; border: 1px solid #e5e3ee; border-radius: 16px; color: #69667e; background: rgba(255,255,255,.72); font-size: .8rem; line-height: 1.4; box-shadow: 0 12px 32px rgba(36,29,82,.05); }
 .statusDot { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; background: #f1b22f; box-shadow: 0 0 0 4px rgba(241,178,47,.13); }
 .statusDot--online { background: #21a870; box-shadow: 0 0 0 4px rgba(33,168,112,.13); }
 .statusDot--offline { background: #dd4e61; box-shadow: 0 0 0 4px rgba(221,78,97,.13); }
@@ -59,4 +63,4 @@ h1 { max-width: 760px; margin: 13px 0 14px; color: #19172c; font-family: "Playfa
 .accountState { min-height: 68vh; display: grid; place-content: center; gap: 18px; padding: 30px; color: #615e75; text-align: center; }
 .protectedActions { display: flex; justify-content: center; gap: 10px; }
 
-@media (max-width: 760px) { .topbar { min-height: 72px; padding: 16px 18px; } .accountNav { gap: 6px; } .accountNav > span, .accountNav button:not(.createButton):not(:last-child) { display: none; } .loginButton { padding-inline: 11px; } .hero { padding: 48px 20px 18px; grid-template-columns: 1fr; gap: 20px; } .hero::before { width: 340px; height: 340px; right: -180px; top: -170px; } .apiStatus { max-width: 340px; } .steps { margin-top: 20px; padding: 35px 20px 55px; grid-template-columns: 1fr; gap: 22px; } .steps ol { grid-template-columns: 1fr; } .steps li { min-height: 0; } .steps li::before { float: right; margin: 0; } .authPanel { padding: 30px 22px; } }
+@media (max-width: 760px) { .topbar { min-height: 72px; padding: 16px 18px; } .accountNav { gap: 6px; } .accountNav > span, .accountNav button:not(.createButton):not(:last-child) { display: none; } .loginButton { padding-inline: 11px; } .hero { padding: 48px 20px 18px; grid-template-areas: "eyebrow" "title" "lead" "status"; grid-template-columns: 1fr; gap: 20px; } .hero::before { width: 340px; height: 340px; right: -180px; top: -170px; } .apiStatus { max-width: 340px; } .steps { margin-top: 20px; padding: 35px 20px 55px; grid-template-columns: 1fr; gap: 22px; } .steps ol { grid-template-columns: 1fr; } .steps li { min-height: 0; } .steps li::before { float: right; margin: 0; } .authPanel { padding: 30px 22px; } }
