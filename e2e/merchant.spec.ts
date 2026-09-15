@@ -52,11 +52,13 @@ test("busca pública, navegação e modal de acesso funcionam por teclado", asyn
   await expect(loginTrigger).toBeVisible();
   await loginTrigger.click();
 
-  const dialog = page.getByRole("dialog", { name: "Entre na sua conta" });
+  const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAccessibleName("Entre na sua conta");
   await expect(page.getByRole("button", { name: "Fechar" })).toBeFocused();
   await page.getByRole("tab", { name: "Entrar" }).press("ArrowRight");
   await expect(page.getByRole("tab", { name: "Cadastrar" })).toHaveAttribute("aria-selected", "true");
+  await expect(dialog).toHaveAccessibleName("Crie sua conta");
   await expect(dialog).toContainText("Crie sua conta");
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
