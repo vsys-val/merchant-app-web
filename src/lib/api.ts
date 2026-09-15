@@ -1,5 +1,6 @@
 const API_URL =
   import.meta.env.VITE_API_URL ?? "https://fastapi-merchant-app.onrender.com";
+const REQUEST_TIMEOUT_MS = 15_000;
 
 export type ApiStatus = "checking" | "online" | "offline";
 
@@ -34,10 +35,37 @@ export async function apiRequest<T>(
   if (options.body) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  let didTimeOut = false;
+  const abortFromCaller = () => controller.abort(options.signal?.reason);
+  if (options.signal?.aborted) abortFromCaller();
+  else options.signal?.addEventListener("abort", abortFromCaller, { once: true });
+
+  const timeout = window.setTimeout(() => {
+    didTimeOut = true;
+    controller.abort();
+  }, REQUEST_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
+  } catch (caught) {
+    if (didTimeOut) {
+      throw new ApiError(
+        "A solicitação demorou mais que o esperado. Tente novamente.",
+        408,
+        "request_timeout",
+      );
+    }
+    throw caught;
+  } finally {
+    window.clearTimeout(timeout);
+    options.signal?.removeEventListener("abort", abortFromCaller);
+  }
 
   if (!response.ok) {
     let payload: ApiErrorPayload = {};

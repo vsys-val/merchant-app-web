@@ -4,8 +4,8 @@
   "description": "Consulte avaliações de produtos e registre o que vale comprar novamente.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f2efe6",
-  "theme_color": "#17382d",
+  "background_color": "#f7f6fb",
+  "theme_color": "#6c4ff6",
   "lang": "pt-BR",
   "icons": [
     {
