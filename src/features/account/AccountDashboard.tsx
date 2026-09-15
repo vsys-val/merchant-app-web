@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 import { ApiError } from "../../lib/api";
 import { useAuth } from "../auth/AuthContext";
 import { Page, ProductPublic } from "../products/product-api";
@@ -46,6 +46,14 @@ export function AccountDashboard({
     setPage(1);
   }
 
+  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const nextTab = tab === "reviews" ? "products" : "reviews";
+    changeTab(nextTab);
+    document.getElementById(`account-tab-${nextTab}`)?.focus();
+  }
+
   if (!user || !token) {
     return <section className="accountState"><p>Sua sessão não está disponível.</p><button className="backButton" onClick={onBack}>Voltar ao início</button></section>;
   }
@@ -63,10 +71,11 @@ export function AccountDashboard({
       </header>
 
       <div className="accountTabs" role="tablist" aria-label="Minha área">
-        <button role="tab" aria-selected={tab === "reviews"} className={tab === "reviews" ? "active" : ""} onClick={() => changeTab("reviews")}>Minhas avaliações</button>
-        <button role="tab" aria-selected={tab === "products"} className={tab === "products" ? "active" : ""} onClick={() => changeTab("products")}>Meus produtos</button>
+        <button id="account-tab-reviews" role="tab" aria-selected={tab === "reviews"} aria-controls="account-tabpanel" tabIndex={tab === "reviews" ? 0 : -1} className={tab === "reviews" ? "active" : ""} onKeyDown={handleTabKeyDown} onClick={() => changeTab("reviews")}>Minhas avaliações</button>
+        <button id="account-tab-products" role="tab" aria-selected={tab === "products"} aria-controls="account-tabpanel" tabIndex={tab === "products" ? 0 : -1} className={tab === "products" ? "active" : ""} onKeyDown={handleTabKeyDown} onClick={() => changeTab("products")}>Meus produtos</button>
       </div>
 
+      <div id="account-tabpanel" role="tabpanel" aria-labelledby={`account-tab-${tab}`}>
       {error && <p className="formError" role="alert">{error}</p>}
       {!error && !current && <div className="accountState" aria-live="polite">Carregando seus registros…</div>}
 
@@ -104,6 +113,7 @@ export function AccountDashboard({
           ))}
         </div>
       )}
+      </div>
 
       {current && lastPage > 1 && (
         <div className="pagination">

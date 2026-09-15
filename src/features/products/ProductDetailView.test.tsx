@@ -1,6 +1,7 @@
 import { act } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ApiError } from "../../lib/api";
 import { ProductDetailView } from "./ProductDetailView";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -83,12 +84,34 @@ describe("ProductDetailView deletion confirmation", () => {
   }
 
   it("does not delete when the user cancels", async () => {
-    await act(async () => { button("Excluir").click(); });
+    const trigger = button("Excluir");
+    trigger.focus();
+    await act(async () => { trigger.click(); });
     expect(container.querySelector('[role="dialog"]')?.textContent).toContain("Excluir sua avaliação?");
+    expect(document.activeElement?.textContent).toBe("Cancelar");
 
     await act(async () => { button("Cancelar").click(); });
     expect(container.querySelector('[role="dialog"]')).toBeNull();
     expect(mocks.deleteReview).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it("closes with Escape and keeps keyboard focus inside the dialog", async () => {
+    const trigger = button("Excluir");
+    trigger.focus();
+    await act(async () => { trigger.click(); });
+
+    const cancel = button("Cancelar");
+    await act(async () => {
+      cancel.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true }));
+    });
+    expect(document.activeElement?.textContent).toBe("Excluir avaliação");
+
+    await act(async () => {
+      document.activeElement?.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    });
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
   });
 
   it("deletes only after explicit confirmation and reloads the product", async () => {
@@ -102,5 +125,15 @@ describe("ProductDetailView deletion confirmation", () => {
     expect(mocks.getProductDetail).toHaveBeenCalledTimes(2);
     expect(container.querySelector('[role="dialog"]')).toBeNull();
     expect(container.textContent).toContain("Você ainda não avaliou este produto.");
+  });
+
+  it("shows deletion failures inside the confirmation dialog", async () => {
+    mocks.deleteReview.mockRejectedValue(new ApiError("Falha de teste", 503));
+    await act(async () => { button("Excluir").click(); });
+    await act(async () => { button("Excluir avaliação").click(); });
+
+    const dialog = container.querySelector('[role="dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.querySelector('[role="alert"]')?.textContent).toBe("Falha de teste");
   });
 });

@@ -12,8 +12,10 @@ createRoot(document.getElementById("root")!).render(
 
 if ("serviceWorker" in navigator && import.meta.env.PROD) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {
-      // A aplicação continua funcionando normalmente sem o modo offline.
-    });
+    navigator.serviceWorker.register("/sw.js")
+      .then((registration) => registration.update())
+      .catch(() => {
+        // A aplicação continua funcionando normalmente sem o modo offline.
+      });
   });
 }
