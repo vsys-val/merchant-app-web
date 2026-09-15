@@ -1,29 +1,30 @@
-.accountPage { max-width: 980px; margin: 0 auto; padding: 54px 24px 90px; }
-.accountHeading { margin: 58px 0 40px; }
-.accountHeading h1 { margin: 8px 0 18px; font-size: clamp(3rem,7vw,5.7rem); text-align: left; }
-.accountHeading > p:last-child { max-width: 630px; color: #5d7068; font-size: 1.08rem; line-height: 1.6; }
-.accountTabs { margin-bottom: 24px; padding: 5px; display: grid; grid-template-columns: 1fr 1fr; border-radius: 15px; background: #e7e2d7; }
-.accountTabs button { padding: 13px; border: 0; border-radius: 11px; color: #607168; background: transparent; font-weight: 800; cursor: pointer; }
-.accountTabs button.active { color: #fff; background: #17382d; box-shadow: 0 5px 15px rgba(23,56,45,.18); }
-.accountList { display: grid; gap: 14px; }
-.accountList--products { grid-template-columns: repeat(2,1fr); }
-.accountCard { overflow: hidden; border: 1px solid rgba(23,56,45,.15); border-radius: 18px; background: #fffdf7; }
-.accountCard > button { width: 100%; height: 100%; padding: 22px; border: 0; color: inherit; background: transparent; text-align: left; cursor: pointer; }
+.accountPage { max-width: 1080px; margin: 0 auto; padding: 34px 28px 90px; }
+.accountHeading { position: relative; margin: 22px 0 32px; padding: 38px; overflow: hidden; border-radius: 22px; color: #fff; background: #211d3a; }
+.accountHeading::after { position: absolute; width: 290px; height: 290px; right: -105px; top: -170px; border: 1px solid rgba(255,255,255,.24); border-radius: 50%; content: ""; }
+.accountHeading > * { position: relative; z-index: 1; }
+.accountHeading .eyebrow { color: #cfc6ff; }
+.accountHeading h1 { margin: 9px 0 13px; color: #fff; font-size: clamp(2.8rem, 6vw, 4.8rem); text-align: left; }
+.accountHeading > p:last-child { max-width: 590px; margin: 0; color: #d8d3ed; font-size: 1rem; line-height: 1.6; }
+.accountTabs { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-bottom: 24px; padding: 4px; border: 1px solid #e1dff0; border-radius: 13px; background: #eeedf5; }
+.accountTabs button { min-width: 160px; padding: 11px 16px; border: 0; border-radius: 9px; color: #706d83; background: transparent; font-size: .83rem; font-weight: 800; }
+.accountTabs button.active { color: #fff; background: #6c4ff6; box-shadow: 0 5px 13px rgba(108,79,246,.22); }
+.accountList { display: grid; gap: 12px; }
+.accountList--products { grid-template-columns: repeat(2, 1fr); }
+.accountCard { overflow: hidden; border: 1px solid #e1dfeb; border-radius: 17px; background: #fff; box-shadow: 0 8px 20px rgba(31,26,66,.035); transition: border-color .18s ease, box-shadow .18s ease; }
+.accountCard:hover { border-color: #cbc2fa; box-shadow: 0 14px 26px rgba(56,45,119,.1); }
+.accountCard > button { width: 100%; height: 100%; padding: 22px; border: 0; color: inherit; background: transparent; text-align: left; }
 .accountCard > button:hover .accountOpen { transform: translateX(4px); }
-.accountCardTop { display: flex; justify-content: space-between; gap: 12px; color: #7a8982; font-size: .72rem; font-weight: 800; text-transform: uppercase; }
-.accountCard h2 { margin: 15px 0 5px; font-family: Georgia,serif; font-size: 1.65rem; font-weight: 500; }
-.accountCard p { margin: 0; color: #62736b; }
-.accountCard small { display: block; margin-top: 10px; color: #7a8982; }
-.accountTags { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 7px; }
-.accountTags span { padding: 7px 10px; border-radius: 999px; color: #17382d; background: #eee9dd; font-size: .74rem; font-weight: 700; }
-.accountCard blockquote { margin: 18px 0 0; color: #40564e; font-family: Georgia,serif; font-size: 1.06rem; line-height: 1.5; }
-.accountOpen { margin-top: 20px; display: block; color: #d75c35; font-size: .8rem; transition: transform .2s ease; }
-.accountState { min-height: 45vh; display: grid; place-content: center; gap: 16px; color: #61736a; text-align: center; }
-.accountEmpty { margin-top: 0; max-width: none; padding: 40px; }
+.accountCardTop { display: flex; justify-content: space-between; gap: 12px; color: #77738c; font-family: "DM Mono", monospace; font-size: .69rem; text-transform: uppercase; }
+.accountCardTop > span:first-child { color: #685fa0; }
+.accountCard h2 { margin: 15px 0 5px; color: #26223a; font-size: 1.27rem; letter-spacing: -.035em; }
+.accountCard p { margin: 0; color: #77738a; }
+.accountCard small { display: block; margin-top: 10px; color: #8c899b; }
+.accountTags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
+.accountTags span { padding: 6px 9px; border-radius: 7px; color: #574e88; background: #f0eef9; font-size: .72rem; font-weight: 800; }
+.accountCard blockquote { margin: 18px 0 0; color: #48445d; font-family: "Playfair Display", Georgia, serif; font-size: 1.04rem; line-height: 1.5; }
+.accountOpen { display: block; margin-top: 20px; color: #6043e8; font-size: .8rem; font-weight: 800; transition: transform .2s ease; }
+.accountState { min-height: 45vh; display: grid; place-content: center; gap: 16px; color: #676379; text-align: center; }
+.accountEmpty { max-width: none; margin-top: 0; padding: 40px; }
 .accountPage .pagination { align-items: center; }
-.accountPage .pagination span { color: #687970; font-size: .84rem; }
-@media (max-width: 680px) {
-  .accountPage { padding-top: 38px; }
-  .accountHeading { margin-top: 42px; }
-  .accountList--products { grid-template-columns: 1fr; }
-}
+.accountPage .pagination span { color: #77738a; font-size: .84rem; }
+@media (max-width: 680px) { .accountPage { padding: 22px 20px 65px; } .accountHeading { margin-top: 12px; padding: 27px; } .accountList--products { grid-template-columns: 1fr; } .accountTabs { width: 100%; } .accountTabs button { min-width: 0; } }

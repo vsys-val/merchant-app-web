@@ -1,29 +1,26 @@
-.reviewEditor { margin-top: 58px; padding: 30px; border: 1px solid rgba(23,56,45,.16); border-radius: 24px; background: #fffdf7; box-shadow: 0 18px 60px rgba(23,56,45,.08); }
+.reviewEditor { margin-top: 38px; padding: 30px; border: 1px solid #e1dfeb; border-radius: 22px; background: #fff; box-shadow: 0 16px 48px rgba(39,31,93,.08); }
 .editorHeading { display: flex; justify-content: space-between; gap: 20px; }
-.editorHeading h2 { margin: 6px 0 28px; font-family: Georgia,serif; font-size: clamp(2rem,4vw,3rem); font-weight: 500; }
+.editorHeading h2 { margin: 6px 0 28px; color: #211e34; font-family: "Playfair Display", Georgia, serif; font-size: clamp(2rem,4vw,3rem); letter-spacing: -.055em; line-height: 1; }
 .closeButton--inline { position: static; flex: 0 0 auto; }
 .reviewForm { display: grid; gap: 24px; }
 .criteriaGrid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
-.reviewForm label { display: grid; gap: 8px; color: #29483e; font-size: .86rem; font-weight: 800; }
-.reviewForm label > span { color: #77867f; font-weight: 500; }
-.reviewForm select, .reviewForm textarea { width: 100%; padding: 12px 13px; border: 1px solid rgba(23,56,45,.24); border-radius: 11px; color: #17382d; background: #fff; }
-.reasonFieldset { margin: 0; padding: 22px; border: 1px solid rgba(23,56,45,.15); border-radius: 18px; }
-.reasonFieldset legend { padding: 0 8px; font-family: Georgia,serif; font-size: 1.25rem; }
-.reasonFieldset > p { margin: 0 0 18px; color: #687970; font-size: .84rem; }
+.reviewForm label { display: grid; gap: 8px; color: #47435b; font-size: .85rem; font-weight: 800; }
+.reviewForm label > span { color: #888499; font-weight: 500; }
+.reviewForm select, .reviewForm textarea { width: 100%; padding: 12px 13px; border: 1px solid #dcd9e8; border-radius: 10px; color: #211e34; background: #fff; }
+.reviewForm select:focus, .reviewForm textarea:focus { border-color: #9e90f7; outline: 0; box-shadow: 0 0 0 4px rgba(108,79,246,.1); }
+.reasonFieldset { margin: 0; padding: 22px; border: 1px solid #e3e0ec; border-radius: 16px; }
+.reasonFieldset legend { padding: 0 8px; color: #302c44; font-family: "Playfair Display", Georgia, serif; font-size: 1.28rem; }
+.reasonFieldset > p { margin: 0 0 18px; color: #77738a; font-size: .84rem; }
 .reasonGrid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
-.reasonOption { min-height: 52px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid rgba(23,56,45,.14); border-radius: 12px; }
-.reasonOption.selected { background: #f2efe6; border-color: rgba(215,92,53,.45); }
-.reasonOption label { display: flex; align-items: center; gap: 8px; font-weight: 700; }
-.reasonOption input { accent-color: #d75c35; }
+.reasonOption { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 52px; padding: 10px 12px; border: 1px solid #e2dfeb; border-radius: 11px; }
+.reasonOption.selected { border-color: #b5a7ff; background: #f2f0ff; }
+.reasonOption label { display: flex; align-items: center; gap: 8px; }
+.reasonOption input { accent-color: #6c4ff6; }
 .reasonOption select { width: auto; padding: 7px; font-size: .78rem; }
 .commentField { position: relative; }
-.commentField textarea { resize: vertical; min-height: 120px; }
-.commentField small { position: absolute; right: 10px; bottom: 8px; color: #78877f; font-weight: 500; }
-.reviewActions { margin-top: 20px; display: flex; gap: 10px; }
-.dangerButton { padding: 10px 16px; border: 1px solid #a33e38; border-radius: 10px; color: #a33e38; background: transparent; font-weight: 800; cursor: pointer; }
-@media (max-width: 680px) {
-  .reviewEditor { padding: 24px 16px; }
-  .criteriaGrid, .reasonGrid { grid-template-columns: 1fr; }
-  .reasonOption { align-items: stretch; flex-direction: column; }
-  .reasonOption select { width: 100%; }
-}
+.commentField textarea { min-height: 120px; resize: vertical; }
+.commentField small { position: absolute; right: 10px; bottom: 8px; color: #888499; font-weight: 500; }
+.reviewActions { display: flex; gap: 10px; margin-top: 20px; }
+.dangerButton { padding: 10px 16px; border: 1px solid #c94a60; border-radius: 10px; color: #bd3049; background: transparent; font-weight: 800; }
+.dangerButton:hover:not(:disabled) { border-color: #b52b44; color: #fff; background: #bd3049; }
+@media (max-width: 680px) { .reviewEditor { margin-top: 26px; padding: 24px 16px; } .criteriaGrid, .reasonGrid { grid-template-columns: 1fr; } .reasonOption { align-items: stretch; flex-direction: column; } .reasonOption select { width: 100%; } }
