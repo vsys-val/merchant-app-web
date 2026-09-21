@@ -48,7 +48,7 @@ test("busca pública, navegação e modal de acesso funcionam por teclado", asyn
   await page.route("**/api/v1/products/3/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
 
   await page.goto("/");
-  const loginTrigger = page.getByRole("button", { name: "Entrar" });
+  const loginTrigger = page.getByRole("button", { name: "Entrar", exact: true });
   await expect(loginTrigger).toBeVisible();
   await loginTrigger.click();
 
@@ -64,9 +64,11 @@ test("busca pública, navegação e modal de acesso funcionam por teclado", asyn
   await expect(dialog).toBeHidden();
   await expect(loginTrigger).toBeFocused();
 
+  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await expect(page).toHaveURL(/\/search$/);
   await page.getByLabel("Digite produto").fill("Produto");
-  await page.getByRole("button", { name: "Buscar" }).click();
-  await expect(page.getByRole("heading", { name: "Produto de teste" })).toBeVisible();
+  await page.getByRole("button", { name: "Executar busca" }).click();
+  await expect(page.getByText("Produto de teste", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Ver detalhes de Produto de teste" }).click();
   await expect(page).toHaveURL(/\/products\/3$/);
   await expect(page.getByRole("heading", { name: "Produto de teste", level: 1 })).toBeVisible();
