@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { ArrowLeft, CaretRight, MagnifyingGlass, Package, Plus } from "@phosphor-icons/react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
 import { getCategoryLabel } from "./category-labels";
@@ -22,7 +23,7 @@ const intentLabels = {
   no: "Não compraria",
 } as const;
 
-export function ProductSearch({ onSelect }: { onSelect(productId: number): void }) {
+export function ProductSearch({ onBack, onSelect, onCreate }: { onBack(): void; onSelect(productId: number): void; onCreate(): void }) {
   const [field, setField] = useState<SearchField>("name");
   const [value, setValue] = useState("");
   const [result, setResult] = useState<Page<ProductListItem> | null>(null);
@@ -57,10 +58,7 @@ export function ProductSearch({ onSelect }: { onSelect(productId: number): void 
 
   return (
     <section className="productSearch" aria-labelledby="search-title">
-      <div className="searchIntro">
-        <p className="eyebrow">Catálogo comunitário</p>
-        <h2 id="search-title">O que você está procurando?</h2>
-      </div>
+      <header className="pageHeader"><button type="button" aria-label="Voltar ao início" onClick={onBack}><ArrowLeft size={24} /></button><h1 id="search-title">Buscar</h1></header>
       <div className="searchModes" role="group" aria-label="Pesquisar por">
         {(Object.keys(fieldLabels) as SearchField[]).map((option) => (
           <button type="button" key={option} className={field === option ? "active" : ""} onClick={() => changeField(option)}>
@@ -69,8 +67,9 @@ export function ProductSearch({ onSelect }: { onSelect(productId: number): void 
         ))}
       </div>
       <form className="search" onSubmit={handleSubmit}>
-        <label htmlFor="product-search">Digite {fieldLabels[field].toLowerCase()}</label>
+        <label className="srOnly" htmlFor="product-search">Digite {fieldLabels[field].toLowerCase()}</label>
         <div className="searchRow">
+          <MagnifyingGlass size={24} />
           <input
             id="product-search"
             value={value}
@@ -80,13 +79,14 @@ export function ProductSearch({ onSelect }: { onSelect(productId: number): void 
             placeholder={field === "barcode" ? "Ex.: 7891234567890" : field === "brand" ? "Ex.: Kibon" : "Ex.: sorvete de baunilha"}
             required
           />
-          <button type="submit" disabled={isSearching}>{isSearching ? "Buscando..." : "Buscar"}</button>
+          <button type="submit" disabled={isSearching} aria-label="Executar busca">{isSearching ? <span className="loadingLabel">Buscando...</span> : <CaretRight size={24} />}</button>
         </div>
       </form>
       {error && <p className="searchError" role="alert">{error}</p>}
       {result && (
         <SearchResults result={result} disabled={isSearching} onSelect={onSelect} onPageChange={(page) => void runSearch(page)} />
       )}
+      <button className="primaryButton createProductAction" type="button" onClick={onCreate}><Plus size={20} />Cadastrar produto</button>
     </section>
   );
 }
@@ -105,7 +105,7 @@ function SearchResults({
   }
   return (
     <div className="results" aria-live="polite">
-      <div className="resultsHeader"><strong>{result.total} {result.total === 1 ? "produto" : "produtos"}</strong><span>Página {result.page} de {lastPage}</span></div>
+      <div className="resultsHeader"><strong>Resultados</strong><span>{result.total} {result.total === 1 ? "produto" : "produtos"}</span></div>
       <div className="productGrid">
         {result.items.map((product) => <ProductCard key={product.id} product={product} onSelect={onSelect} />)}
       </div>
@@ -126,12 +126,9 @@ function ProductCard({ product, onSelect }: { product: ProductListItem; onSelect
   return (
     <article className="productCard">
       <button className="productCardLink" type="button" onClick={() => onSelect(product.id)} aria-label={`Ver detalhes de ${product.name}`}>
-        <div className="productMeta"><span>{getCategoryLabel(product.category)}</span><span>{product.quantity} {product.unit}</span></div>
-        <h3>{product.name}</h3>
-        <p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p>
-        <div className="communitySignal"><strong>{product.community_summary.total_reviews}</strong><span>{product.community_summary.total_reviews === 1 ? "avaliação" : "avaliações"}</span></div>
-        {product.community_summary.total_reviews > 0 && <p className={`intent intent--${leadingIntent}`}>{intentLabels[leadingIntent]} · {distribution[leadingIntent].toFixed(0)}%</p>}
-        <span className="openDetail">Ver detalhes →</span>
+        <span className="productPlaceholder"><Package size={34} weight="duotone" /></span>
+        <span className="productCardCopy"><strong>{product.name}</strong><span>{product.brand}{product.variant ? ` · ${product.variant}` : ""} · {product.quantity} {product.unit}</span><span className="productCategory">{getCategoryLabel(product.category)}</span>{product.your_repurchase_intent ? <span className={`intent intent--${product.your_repurchase_intent}`}>{intentLabels[product.your_repurchase_intent]}</span> : product.community_summary.total_reviews > 0 ? <span className={`intent intent--${leadingIntent}`}>{intentLabels[leadingIntent]} · {distribution[leadingIntent].toFixed(0)}%</span> : <span className="unreviewed">Ainda sem avaliações</span>}</span>
+        <CaretRight size={19} />
       </button>
     </article>
   );

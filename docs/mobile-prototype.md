@@ -1,6 +1,10 @@
 # Protótipo mobile do Merchant
 
-Esta prévia transforma a direção visual escolhida em um fluxo interativo separado da aplicação publicada. Ela usa somente dados locais e não faz requisições à API.
+Esta prévia transforma a direção visual escolhida em um fluxo interativo separado, com dados locais, para comparação e testes de estados extremos.
+
+## Integração na aplicação
+
+A direção validada já foi incorporada à aplicação principal. As rotas `/`, `/search`, `/products/:id`, `/account` e `/products/new` usam os contratos reais da API e compartilham a navegação mobile. A avaliação real também segue as três etapas da prévia: experiência, motivos e conferência.
 
 ## Executar
 
@@ -26,4 +30,4 @@ Os controles no fim da página permitem simular falhas. Recarregar a página res
 
 ## Limites
 
-As imagens de produtos foram recortadas da arte conceitual e existem apenas para validar a composição. A implementação final precisará de uma fonte própria de imagens do catálogo. A autenticação, persistência e integração com a API pertencem à fase seguinte.
+As imagens de produtos foram recortadas da arte conceitual e existem apenas na prévia. A aplicação integrada usa placeholders até existir uma fonte própria de imagens do catálogo. Os controles de falha continuam exclusivos da prévia.

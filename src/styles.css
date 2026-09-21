@@ -64,3 +64,42 @@ h1 { max-width: 760px; margin: 13px 0 14px; color: #19172c; font-family: "Playfa
 .protectedActions { display: flex; justify-content: center; gap: 10px; }
 
 @media (max-width: 760px) { .topbar { min-height: 72px; padding: 16px 18px; } .accountNav { gap: 6px; } .accountNav > span, .accountNav button:not(.createButton):not(:last-child) { display: none; } .loginButton { padding-inline: 11px; } .hero { padding: 48px 20px 18px; grid-template-areas: "eyebrow" "title" "lead" "status"; grid-template-columns: 1fr; gap: 20px; } .hero::before { width: 340px; height: 340px; right: -180px; top: -170px; } .apiStatus { max-width: 340px; } .steps { margin-top: 20px; padding: 35px 20px 55px; grid-template-columns: 1fr; gap: 22px; } .steps ol { grid-template-columns: 1fr; } .steps li { min-height: 0; } .steps li::before { float: right; margin: 0; } .authPanel { padding: 30px 22px; } }
+
+/* Mobile application shell — production version of the validated memory-first prototype. */
+:root { --merchant-purple: #591bc4; --merchant-paper: #fcfbf9; --merchant-muted: #777483; --merchant-line: #e3e0e5; background: #f0eef4; }
+body { background: #f0eef4; }
+.appViewport { min-height: 100vh; }
+.appShell { position: relative; width: min(100%, 440px); min-height: 100dvh; margin: 0 auto; color: #171226; background: var(--merchant-paper); box-shadow: 0 10px 60px rgba(33,16,53,.08); }
+.appContent { min-height: calc(100dvh - 76px); padding: 18px 22px 104px; overflow: visible; background: transparent; }
+.homeHeader { padding: 29px 22px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.wordmark { padding: 0; display: grid; gap: 3px; border: 0; color: #291356; background: transparent; font-size: 2.35rem; font-weight: 800; letter-spacing: -.065em; line-height: 1.05; text-align: left; }
+.wordmark span { color: var(--merchant-muted); font-size: .84rem; font-weight: 500; letter-spacing: -.015em; }
+.avatarButton { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; color: #514665; background: #e9e3f0; }
+.searchLaunch { width: 100%; min-height: 58px; margin: 0 0 9px; padding: 14px; display: flex; align-items: center; gap: 14px; border: 1px solid #d9d4df; border-radius: 13px; color: #5b536a; background: transparent; font-size: 1rem; text-align: left; }
+.connectionStatus { min-height: 24px; margin-bottom: 20px; display: flex; align-items: center; gap: 7px; color: #777182; font-size: .7rem; }
+.connectionStatus > span { width: 7px; height: 7px; border-radius: 50%; background: #d99a20; }
+.connectionStatus--online > span { background: #279364; }.connectionStatus--offline > span { background: #bd3049; }
+.memorySection > h1, .memorySection > h2 { max-width: none; margin: 0; color: #16112b; font-family: inherit; font-size: 1.35rem; font-weight: 800; letter-spacing: -.035em; line-height: 1.2; }
+.memorySection > p, .visitorWelcome > p { margin: 5px 0 0; color: var(--merchant-muted); font-size: .88rem; line-height: 1.45; }
+.recentSection { margin-top: 24px; }
+.memoryRow { width: 100%; min-height: 152px; padding: 14px 0; display: flex; align-items: center; gap: 17px; border: 0; border-bottom: 1px solid var(--merchant-line); color: inherit; background: transparent; text-align: left; }
+.productPlaceholder { width: 86px; height: 116px; flex: 0 0 86px; display: grid; place-items: center; border-radius: 12px; color: #806e91; background: #f1edf5; }
+.memoryCopy { min-width: 0; display: flex; flex: 1; flex-direction: column; gap: 6px; }
+.memoryCopy > strong { font-size: 1.05rem; letter-spacing: -.025em; line-height: 1.25; }
+.memoryCopy > span:not(.intentBadge):not(.memoryComment) { color: var(--merchant-muted); font-size: .82rem; }
+.intentBadge { max-width: 100%; padding: 8px 9px; display: flex; align-items: center; gap: 7px; border-radius: 11px; font-size: .76rem; font-weight: 800; line-height: 1.3; }
+.intentBadge svg { flex: 0 0 auto; }.intentBadge--yes { color: #286345; background: #eaf4ec; }.intentBadge--no { color: #b41c2b; background: #fce8eb; }.intentBadge--maybe { color: #5c596b; background: #efeded; }
+.memoryComment { color: var(--merchant-muted); font-size: .8rem; line-height: 1.4; }
+.visitorWelcome { min-height: 52vh; padding: 40px 4px; display: flex; align-items: center; flex-direction: column; gap: 15px; justify-content: center; text-align: center; }.visitorWelcome > svg { color: #6c5389; }.visitorWelcome h1 { max-width: 330px; margin: 0; color: #201531; font-family: inherit; font-size: 1.75rem; letter-spacing: -.04em; line-height: 1.15; }
+.bottomNavigation { position: fixed; z-index: 15; bottom: 0; left: 50%; width: min(100%, 440px); padding: 7px 10px max(9px, env(safe-area-inset-bottom)); display: flex; transform: translateX(-50%); border-top: 1px solid var(--merchant-line); background: rgba(252,251,249,.98); }
+.bottomNavigation button { position: relative; min-height: 58px; padding: 4px 2px 8px; display: flex; flex: 1; align-items: center; flex-direction: column; gap: 4px; border: 0; color: #777181; background: transparent; font-size: .7rem; }
+.bottomNavigation button.active { color: var(--merchant-purple); font-weight: 800; }.bottomNavigation button.active::after { position: absolute; bottom: 0; width: 52px; height: 3px; border-radius: 2px; background: var(--merchant-purple); content: ""; }
+.pageState { min-height: 55vh; padding: 30px 5px; display: grid; place-content: center; gap: 18px; color: #6b6377; text-align: center; }
+.signOutButton { width: min(100% - 40px, 400px); margin: 14px auto 105px; padding: 12px; display: block; border: 0; color: #6d5d7b; background: transparent; font-weight: 700; }
+.srOnly { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.primaryButton { border-radius: 12px; background: var(--merchant-purple); box-shadow: none; }.primaryButton:hover:not(:disabled) { background: #451398; }
+.secondaryButton { border: 0; border-radius: 12px; color: var(--merchant-purple); background: #eee8f6; }
+.formError { color: #ac1c30; background: #fce9ec; }
+.emptyState { border: 0; background: transparent; }
+@media (min-width: 600px) { .appShell { margin-top: 16px; min-height: calc(100dvh - 16px); border: 1px solid #e3dfe9; border-radius: 24px 24px 0 0; } }
+@media (max-width: 359px) { .appContent, .homeHeader { padding-left: 16px; padding-right: 16px; }.wordmark { font-size: 2.1rem; }.productPlaceholder { width: 76px; flex-basis: 76px; }.memoryRow { gap: 12px; }.bottomNavigation button { font-size: .65rem; } }

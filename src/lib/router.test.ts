@@ -4,6 +4,7 @@ import { parsePath } from "./router";
 describe("parsePath", () => {
   it("reconhece as rotas públicas e protegidas", () => {
     expect(parsePath("/")).toEqual({ name: "home" });
+    expect(parsePath("/search")).toEqual({ name: "search" });
     expect(parsePath("/account")).toEqual({ name: "account" });
     expect(parsePath("/products/new")).toEqual({ name: "create-product" });
   });

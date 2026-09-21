@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 
 export type Route =
   | { name: "home" }
+  | { name: "search" }
   | { name: "account" }
   | { name: "create-product" }
   | { name: "product"; productId: number };
 
 export function parsePath(pathname: string): Route {
   const normalized = pathname !== "/" ? pathname.replace(/\/+$/, "") : pathname;
+  if (normalized === "/search") return { name: "search" };
   if (normalized === "/account") return { name: "account" };
   if (normalized === "/products/new") return { name: "create-product" };
 
