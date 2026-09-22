@@ -11,7 +11,8 @@
     "prototype:dev": "vite --open /mobile-preview.html",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test e2e/merchant.spec.ts",
+    "test:e2e:production": "playwright test e2e/production.spec.ts"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
