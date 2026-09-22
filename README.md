@@ -47,15 +47,19 @@ npm run typecheck
 npm run build
 npx playwright install chromium
 npm run test:e2e
+npm run test:e2e:production # requer PLAYWRIGHT_BASE_URL
 ```
 
-Os testes E2E interceptam a API e usam dados simulados: não criam registros no ambiente publicado. O CI executa testes unitários, E2E, verificação de tipos e build em todo pull request e em alterações da `main`.
+Os testes E2E locais interceptam a API e usam dados simulados: não criam registros no ambiente publicado. O CI executa testes unitários, E2E, verificação de tipos e build em todo pull request e em alterações da `main`.
+
+Depois de um merge, o job `production-smoke` espera o Render expor em `build-info.json` exatamente o SHA enviado à `main`. Em seguida, valida a API e a jornada pública na URL de produção em Desktop Chrome e Pixel 7. Falhas preservam screenshots e traces como artefatos do GitHub Actions.
 
 ## Rotas
 
 | Rota | Acesso | Função |
 |---|---|---|
-| `/` | Público | Busca e catálogo |
+| `/` | Público | Início e lembranças pessoais |
+| `/search` | Público | Busca e catálogo |
 | `/products/:id` | Público | Detalhe e avaliações |
 | `/products/new` | Autenticado | Cadastro de produto |
 | `/account` | Autenticado | Produtos e avaliações do usuário |
