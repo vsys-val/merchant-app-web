@@ -24,6 +24,7 @@ O Merchant responde, no corredor do mercado, à pergunta *"eu compraria isto de 
 - Cadastro de produtos com categoria, quantidade, unidade e GTIN opcional.
 - Criação, edição e exclusão da avaliação pessoal.
 - Área do usuário com produtos cadastrados e avaliações próprias.
+- Painel administrativo com métricas de uso, catálogo, operação da API e erros do navegador.
 - URLs compartilháveis e rotas protegidas.
 - PWA com manifesto, instalação e fallback offline básico.
 - Interface responsiva, navegação por teclado e modais acessíveis.
@@ -76,6 +77,7 @@ Depois de um merge, o job `production-smoke` espera o Render expor em `build-inf
 | `/products/new` | Autenticado | Cadastro de produto |
 | `/products/:id/edit` | Autenticado | Correção de produto próprio, enquanto ninguém mais o avaliou |
 | `/account` | Autenticado | Produtos e avaliações do usuário |
+| `/admin` | Administração | Painel com o estado geral do produto; o acesso é definido por `ADMIN_EMAILS` na API |
 
 ## Organização
 
@@ -84,12 +86,18 @@ Depois de um merge, o job `production-smoke` espera o Render expor em `build-inf
 | `src/features/auth` | Autenticação e sessão |
 | `src/features/products` | Busca, detalhe, cadastro e avaliações |
 | `src/features/account` | Área pessoal |
+| `src/features/admin` | Painel administrativo e gráficos acessíveis |
+| `src/lib/analytics.ts` | Eventos de uso em lote, sem dados pessoais |
 | `src/lib` | HTTP, roteamento e comportamento compartilhado |
 | `e2e` | Fluxos reais de navegador com API simulada |
 | `public` | Manifesto, ícones e service worker |
 | `.github/workflows` | Integração contínua |
 
 Mais decisões estão em [docs/architecture.md](docs/architecture.md). A relação entre telas, histórias e requisitos está em [docs/jornadas-e-telas.md](docs/jornadas-e-telas.md).
+
+## Privacidade das métricas
+
+A interface envia eventos de uso para a própria API, sem ferramentas de terceiros. Os eventos nunca contêm texto digitado, e-mail ou query string. Nada é enviado com *Do Not Track*, em navegadores automatizados (testes) nem fora do build de produção. Detalhes em [ADR-0012](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0012-painel-e-instrumentacao-propria.md).
 
 ## Limites atuais
 
