@@ -7,7 +7,8 @@ export type Route =
   | { name: "create-product" }
   | { name: "product"; productId: number };
 
-export function parsePath(pathname: string): Route {
+export function parsePath(path: string): Route {
+  const pathname = path.split(/[?#]/, 1)[0] || "/";
   const normalized = pathname !== "/" ? pathname.replace(/\/+$/, "") : pathname;
   if (normalized === "/search") return { name: "search" };
   if (normalized === "/account") return { name: "account" };

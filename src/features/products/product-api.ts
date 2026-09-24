@@ -1,6 +1,5 @@
 import { apiRequest } from "../../lib/api";
 
-export type SearchField = "name" | "brand" | "barcode";
 export type RepurchaseIntent = "yes" | "maybe" | "no";
 export type Quality = "high" | "adequate" | "low";
 export type Expectation = "exceeded" | "met" | "not_met";
@@ -58,10 +57,31 @@ export interface ProductDetail extends ProductPublic {
 
 export interface CommunityReview extends Review { author_name: string; }
 export interface Page<T> { items: T[]; page: number; page_size: number; total: number; }
-export interface ProductSearchInput { field: SearchField; value: string; page?: number; }
+/** Nome, marca e categoria combinam com E; o código de barras é exclusivo. */
+export interface ProductFilters {
+  name?: string;
+  brand?: string;
+  category?: Category;
+  barcode?: string;
+}
 
-export function searchProducts(input: ProductSearchInput, token?: string | null) {
-  const params = new URLSearchParams({ [input.field]: input.value.trim(), page: String(input.page ?? 1), page_size: "20" });
+export function filtersToParams(filters: ProductFilters, page = 1) {
+  const params = new URLSearchParams();
+  const entries: Array<[keyof ProductFilters, string | undefined]> = filters.barcode?.trim()
+    ? [["barcode", filters.barcode]]
+    : [["name", filters.name], ["brand", filters.brand], ["category", filters.category]];
+  for (const [key, value] of entries) {
+    const trimmed = value?.trim();
+    if (trimmed) params.set(key, trimmed);
+  }
+  if (page > 1) params.set("page", String(page));
+  return params;
+}
+
+export function searchProducts(filters: ProductFilters, page = 1, token?: string | null) {
+  const params = filtersToParams(filters, page);
+  params.set("page", String(page));
+  params.set("page_size", "20");
   return apiRequest<Page<ProductListItem>>(`/api/v1/products?${params}`, {}, token);
 }
 

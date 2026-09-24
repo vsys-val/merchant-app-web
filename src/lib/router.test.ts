@@ -14,6 +14,11 @@ describe("parsePath", () => {
     expect(parsePath("/products/42/")).toEqual({ name: "product", productId: 42 });
   });
 
+  it("ignora a query string ao identificar a rota", () => {
+    expect(parsePath("/search?name=cafe&category=food")).toEqual({ name: "search" });
+    expect(parsePath("/products/42?origem=busca")).toEqual({ name: "product", productId: 42 });
+  });
+
   it("trata caminhos desconhecidos e IDs inválidos como início", () => {
     expect(parsePath("/nao-existe")).toEqual({ name: "home" });
     expect(parsePath("/products/abc")).toEqual({ name: "home" });

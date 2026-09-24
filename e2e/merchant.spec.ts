@@ -66,7 +66,7 @@ test("busca pública, navegação e modal de acesso funcionam por teclado", asyn
 
   await page.getByRole("button", { name: "Buscar", exact: true }).click();
   await expect(page).toHaveURL(/\/search$/);
-  await page.getByLabel("Digite produto").fill("Produto");
+  await page.getByLabel("Nome do produto").fill("Produto");
   await page.getByRole("button", { name: "Executar busca" }).click();
   await expect(page.getByText("Produto de teste", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Ver detalhes de Produto de teste" }).click();
@@ -140,4 +140,40 @@ test("cadastro exige o código enviado por e-mail antes de entrar", async ({ pag
   await expect(dialog).toBeHidden();
   await expect(page.getByRole("heading", { name: "Lembrete para você" })).toBeVisible();
   expect(verifications).toEqual([{ email: "ana@example.com", code: "482913" }]);
+});
+
+test("filtros combinados sobrevivem à ida ao produto e à volta", async ({ page }) => {
+  const searches: string[] = [];
+  await mockPublicApi(page);
+  await page.route("**/api/v1/products?**", (route) => {
+    searches.push(new URL(route.request().url()).search);
+    return route.fulfill({
+      json: {
+        items: [{ ...product, community_summary: { total_reviews: 0, repurchase_intent: { yes: 0, maybe: 0, no: 0 } }, your_repurchase_intent: null }],
+        page: 1,
+        page_size: 20,
+        total: 1,
+      },
+    });
+  });
+  await page.route("**/api/v1/products/3", (route) => route.fulfill({ json: { ...product, your_review: null } }));
+  await page.route("**/api/v1/products/3/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
+
+  await page.goto("/search");
+  await page.getByLabel("Nome do produto").fill("Produto");
+  await page.getByLabel("Marca").fill("Marca teste");
+  await page.getByRole("group", { name: "Categoria" }).getByRole("button", { name: "Alimentos" }).click();
+
+  await expect(page).toHaveURL(/\/search\?name=Produto&brand=Marca\+teste&category=food$/);
+  await expect(page.getByText("“Produto” · marca “Marca teste” · Alimentos")).toBeVisible();
+  expect(searches.at(-1)).toContain("name=Produto&brand=Marca+teste&category=food");
+
+  await page.getByRole("button", { name: "Ver detalhes de Produto de teste" }).click();
+  await expect(page).toHaveURL(/\/products\/3$/);
+  await page.getByRole("button", { name: "← Voltar à busca" }).click();
+
+  await expect(page).toHaveURL(/category=food/);
+  await expect(page.getByLabel("Nome do produto")).toHaveValue("Produto");
+  await expect(page.getByRole("button", { name: "Alimentos" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("Produto de teste", { exact: true })).toBeVisible();
 });
