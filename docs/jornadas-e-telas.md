@@ -46,6 +46,7 @@ flowchart LR
 | Detalhe | `/products/:id` · `ProductDetailView` | US04, US05, US11 | RF05, RF11, RF12 | carregando · não encontrado · com/sem avaliação própria · comunidade vazia · paginação | `ProductDetailView.test.tsx`, e2e |
 | Avaliação | `ReviewForm` | US09, US10 | RF08, RF09 | etapa 1 · etapa 2 · conferência · validação por etapa · erro ao salvar | cobertos pela API (T18–T21) |
 | Cadastro de produto | `/products/new` · `ProductForm` | US06 | RF06 | formulário · salvando · duplicata com atalho para o produto existente · erro de validação | `ProductForm.test.tsx`; API (T08–T11) |
+| Correção de produto | `/products/:id/edit` · `ProductEditView` + `ProductForm` | US07 | RF07 | carregando · bloqueado (avaliado por outra pessoa) · formulário preenchido · nada alterado · duplicata · bloqueio durante a edição · erro | `ProductEditView.test.tsx`; e2e (Meus produtos → corrigir → salvar) |
 | Minha área | `/account` · `AccountDashboard` | US13 | RF14 | carregando · vazio · lista · paginação · erro | cobertos pela API (T28) |
 
 ## Decisões de UX e sua origem
@@ -60,6 +61,9 @@ flowchart LR
 | Nome, marca e categoria **combinados**; código de barras em modo separado | Espelha a regra da API (E entre filtros; GTIN exclusivo) e evita combinações que retornariam erro | RF04, RN14 |
 | Chips de categoria que buscam ao toque, incluindo "Todas" | Navegar por categoria sem digitar é o caminho mais curto no corredor; permite explorar o catálogo | RF04 |
 | Filtros na URL (`/search?name=…&category=…`) | A busca sobrevive à ida ao produto e à volta, ao recarregar e ao compartilhar o link | Rotas compartilháveis |
+| Correção aberta a partir de **Meus produtos** | É o único lugar em que a interface sabe que o produto é da pessoa; o detalhe público não expõe o responsável | RF07, RNF02 |
+| Bloqueio avisado **antes** do formulário | Para quem está logado, o resumo comunitário já exclui a própria avaliação: qualquer avaliação contada é de outra pessoa. Evita preencher algo que a API recusaria | RN13, [ADR-0005](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0005-bloqueio-de-edicao-apos-avaliacao.md) |
+| Só os campos alterados vão no PATCH; quantidade e unidade sempre juntas | Respeita o contrato parcial e deixa a API normalizar a medida | Contrato: Editar produto |
 | Confirmação de conta **por código dentro do próprio modal**, e confirmar já autentica | Não obriga a trocar de aplicativo nem abrir link no PWA; digitar 6 dígitos no celular é rápido; o teclado numérico e o preenchimento automático (`one-time-code`) reduzem erros | [ADR-0011](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0011-confirmacao-de-conta-por-codigo.md) |
 | Mensagens de reenvio e de recuperação no condicional ("se existir uma conta...") | A API não revela quais e-mails estão cadastrados, e a interface também não | RN31 |
 | Confirmação modal para excluir avaliação, com foco no "Cancelar" | Ação irreversível: o padrão seguro é não excluir | RN28 (sem histórico) |
@@ -73,7 +77,6 @@ A API oferece mais do que a interface usa hoje. As lacunas são deliberadas e es
 
 | Capacidade da API | Situação na interface | Roadmap |
 |---|---|---|
-| Corrigir produto (RF07) | Sem tela | Agora |
 | Excluir produto (RF13) | Sem tela | Próximo |
 
 ## Critérios de qualidade de interface

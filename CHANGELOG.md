@@ -11,6 +11,7 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 - Confirmação de conta com código de 6 dígitos enviado por e-mail, com reenvio limitado a um por minuto.
 - Recuperação de senha por código ("Esqueci minha senha").
 - Atalho "Ver produto já cadastrado" quando o cadastro de produto é duplicado.
+- Correção de produto pelo responsável a partir de "Meus produtos", com aviso antecipado quando outra pessoa já avaliou o item.
 
 ### Alterado
 
@@ -19,6 +20,7 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 ### Corrigido
 
 - Em telas estreitas, o campo de busca e o botão voltam a ficar na mesma linha.
+- "(opcional)" deixa de quebrar linha nos rótulos de variante e código GTIN.
 
 ## [0.3.0] - 2026-09-15
 

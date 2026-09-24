@@ -14,9 +14,11 @@ const qualityLabels = { high: "Qualidade alta", adequate: "Qualidade adequada", 
 export function AccountDashboard({
   onBack,
   onSelectProduct,
+  onEditProduct,
 }: {
   onBack(): void;
   onSelectProduct(productId: number): void;
+  onEditProduct(productId: number): void;
 }) {
   const { token, user } = useAuth();
   const [tab, setTab] = useState<Tab>("reviews");
@@ -101,13 +103,16 @@ export function AccountDashboard({
         products.items.length === 0 ? <Empty text="Você ainda não cadastrou nenhum produto." /> :
         <div className="accountList accountList--products">
           {products.items.map((product) => (
-            <article className="accountCard" key={product.id}>
+            <article className="accountCard accountCard--editable" key={product.id}>
               <button type="button" onClick={() => onSelectProduct(product.id)}>
                 <div className="accountCardTop"><span>{getCategoryLabel(product.category)}</span><span>{product.quantity} {product.unit}</span></div>
                 <h2>{product.name}</h2>
                 <p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p>
                 {product.barcode && <small>GTIN {product.barcode}</small>}
                 <strong className="accountOpen">Abrir produto →</strong>
+              </button>
+              <button type="button" className="accountEdit" onClick={() => onEditProduct(product.id)} aria-label={`Corrigir ${product.name}`}>
+                Corrigir cadastro
               </button>
             </article>
           ))}

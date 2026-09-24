@@ -1,7 +1,14 @@
 import { FormEvent, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
-import { Category, createProduct, ProductCreateInput } from "./product-api";
+import {
+  Category,
+  createProduct,
+  ProductCreateInput,
+  ProductPatchInput,
+  ProductPublic,
+  updateProduct,
+} from "./product-api";
 import "./product-form.css";
 
 const categories: Array<{ value: Category; label: string }> = [
@@ -15,23 +22,48 @@ const categories: Array<{ value: Category; label: string }> = [
 
 type Unit = ProductCreateInput["unit"];
 
+function formatQuantity(value: number) {
+  return String(value).replace(".", ",");
+}
+
+/** Na correção, só os campos alterados vão para a API. */
+export function buildProductPatch(initial: ProductPublic, current: ProductCreateInput): ProductPatchInput {
+  const patch: ProductPatchInput = {};
+  if (current.name.trim() !== initial.name) patch.name = current.name;
+  if (current.brand.trim() !== initial.brand) patch.brand = current.brand;
+  if (current.variant !== initial.variant) patch.variant = current.variant;
+  if (current.category !== initial.category) patch.category = current.category;
+  if (current.barcode !== initial.barcode) patch.barcode = current.barcode;
+  // A API normaliza a medida a partir do par; os dois seguem juntos.
+  if (current.quantity !== initial.quantity || current.unit !== initial.unit) {
+    patch.quantity = current.quantity;
+    patch.unit = current.unit;
+  }
+  return patch;
+}
+
 export function ProductForm({
+  initial,
   onCancel,
-  onCreated,
+  onSaved,
   onOpenExisting,
 }: {
+  /** Presente na correção de um produto já cadastrado. */
+  initial?: ProductPublic;
   onCancel(): void;
-  onCreated(productId: number): void;
+  onSaved(productId: number): void;
   onOpenExisting(productId: number): void;
 }) {
   const { token } = useAuth();
-  const [name, setName] = useState("");
-  const [brand, setBrand] = useState("");
-  const [variant, setVariant] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [unit, setUnit] = useState<Unit>("g");
-  const [category, setCategory] = useState<Category>("food");
-  const [barcode, setBarcode] = useState("");
+  const isEditing = initial !== undefined;
+  const [name, setName] = useState(initial?.name ?? "");
+  const [brand, setBrand] = useState(initial?.brand ?? "");
+  const [variant, setVariant] = useState(initial?.variant ?? "");
+  const [quantity, setQuantity] = useState(initial ? formatQuantity(initial.quantity) : "");
+  const [unit, setUnit] = useState<Unit>(initial?.unit ?? "g");
+  const [category, setCategory] = useState<Category>(initial?.category ?? "food");
+  const [barcode, setBarcode] = useState(initial?.barcode ?? "");
+  const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [existingProductId, setExistingProductId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,24 +71,45 @@ export function ProductForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!token) {
-      setError("Entre na sua conta para cadastrar um produto.");
+      setError(isEditing ? "Entre na sua conta para corrigir o produto." : "Entre na sua conta para cadastrar um produto.");
       return;
     }
 
+    const input: ProductCreateInput = {
+      name,
+      brand,
+      variant: variant.trim() || null,
+      quantity: Number(quantity.replace(",", ".")),
+      unit,
+      category,
+      barcode: barcode.trim() || null,
+    };
     setError("");
+    setNotice("");
     setExistingProductId(null);
+    if (initial) {
+      const patch = buildProductPatch(initial, input);
+      if (Object.keys(patch).length === 0) {
+        setNotice("Nada foi alterado.");
+        return;
+      }
+      setIsSubmitting(true);
+      try {
+        const product = await updateProduct(initial.id, patch, token);
+        onSaved(product.id);
+      } catch (caught) {
+        setError(caught instanceof ApiError ? caught.message : "Não foi possível salvar a correção.");
+        setExistingProductId(getExistingProductId(caught));
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const product = await createProduct({
-        name,
-        brand,
-        variant: variant.trim() || null,
-        quantity: Number(quantity.replace(",", ".")),
-        unit,
-        category,
-        barcode: barcode.trim() || null,
-      }, token);
-      onCreated(product.id);
+      const product = await createProduct(input, token);
+      onSaved(product.id);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "Não foi possível cadastrar o produto.");
       setExistingProductId(getExistingProductId(caught));
@@ -69,12 +122,14 @@ export function ProductForm({
     <section className="productFormPage">
       <button className="backButton" type="button" onClick={onCancel}>← Cancelar</button>
       <header>
-        <p className="eyebrow">Novo item do catálogo</p>
-        <h1>Cadastrar produto</h1>
-        <p>Informe o que aparece na embalagem. A API padronizará quantidade e unidade automaticamente.</p>
+        <p className="eyebrow">{isEditing ? "Seu cadastro" : "Novo item do catálogo"}</p>
+        <h1>{isEditing ? "Corrigir produto" : "Cadastrar produto"}</h1>
+        <p>{isEditing
+          ? "Ajuste o que estiver diferente da embalagem. Depois que outra pessoa avaliar este produto, ele não poderá mais ser corrigido."
+          : "Informe o que aparece na embalagem. A API padronizará quantidade e unidade automaticamente."}</p>
       </header>
 
-      <form className="productForm" onSubmit={handleSubmit}>
+      <form className="productForm" onSubmit={handleSubmit} onChange={() => setNotice("")}>
         <fieldset>
           <legend>Identificação</legend>
           <div className="formGrid">
@@ -84,7 +139,7 @@ export function ProductForm({
             <label>Marca
               <input minLength={1} maxLength={80} value={brand} onChange={(event) => setBrand(event.target.value)} placeholder="Ex.: Marca X" required />
             </label>
-            <label>Variante <span>(opcional)</span>
+            <label><span className="fieldLabel">Variante <small>(opcional)</small></span>
               <input maxLength={80} value={variant} onChange={(event) => setVariant(event.target.value)} placeholder="Ex.: Baunilha" />
             </label>
           </div>
@@ -113,12 +168,13 @@ export function ProductForm({
 
         <fieldset>
           <legend>Código de barras</legend>
-          <label>Código GTIN <span>(opcional)</span>
+          <label><span className="fieldLabel">Código GTIN <small>(opcional)</small></span>
             <input inputMode="numeric" pattern="([0-9]{8}|[0-9]{12}|[0-9]{13}|[0-9]{14})" maxLength={14} value={barcode} onChange={(event) => setBarcode(event.target.value)} placeholder="8, 12, 13 ou 14 dígitos" />
           </label>
           <small>O dígito verificador será validado pela API.</small>
         </fieldset>
 
+        {notice && <p className="formNotice" role="status">{notice}</p>}
         {error && (
           <div className="formError" role="alert">
             <p>{error}</p>
@@ -131,7 +187,7 @@ export function ProductForm({
         )}
         <div className="formActions">
           <button type="button" className="secondaryButton" onClick={onCancel}>Cancelar</button>
-          <button type="submit" className="primaryButton" disabled={isSubmitting}>{isSubmitting ? "Salvando..." : "Cadastrar produto"}</button>
+          <button type="submit" className="primaryButton" disabled={isSubmitting}>{isSubmitting ? "Salvando..." : isEditing ? "Salvar correção" : "Cadastrar produto"}</button>
         </div>
       </form>
     </section>

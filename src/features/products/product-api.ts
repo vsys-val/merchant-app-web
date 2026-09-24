@@ -94,6 +94,16 @@ export function getCommunityReviews(productId: number, page = 1, token?: string 
   return apiRequest<Page<CommunityReview>>(`/api/v1/products/${productId}/reviews?${params}`, {}, token);
 }
 
+/** Campos ausentes são mantidos; `null` em variante ou código remove o valor. */
+export type ProductPatchInput = Partial<ProductCreateInput>;
+
+export function updateProduct(productId: number, input: ProductPatchInput, token: string) {
+  return apiRequest<ProductPublic>(`/api/v1/products/${productId}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  }, token);
+}
+
 export function createProduct(input: ProductCreateInput, token: string) {
   return apiRequest<ProductPublic>("/api/v1/products", {
     method: "POST",

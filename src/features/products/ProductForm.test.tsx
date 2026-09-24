@@ -25,7 +25,7 @@ describe("ProductForm duplicate handling", () => {
     document.body.append(container);
     root = createRoot(container);
     await act(async () => {
-      root.render(<ProductForm onCancel={vi.fn()} onCreated={onCreated} onOpenExisting={onOpenExisting} />);
+      root.render(<ProductForm onCancel={vi.fn()} onSaved={onCreated} onOpenExisting={onOpenExisting} />);
     });
   });
 

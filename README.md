@@ -74,6 +74,7 @@ Depois de um merge, o job `production-smoke` espera o Render expor em `build-inf
 | `/search` | Público | Busca e catálogo; aceita `name`, `brand`, `category`, `barcode` e `page` na query |
 | `/products/:id` | Público | Detalhe e avaliações |
 | `/products/new` | Autenticado | Cadastro de produto |
+| `/products/:id/edit` | Autenticado | Correção de produto próprio, enquanto ninguém mais o avaliou |
 | `/account` | Autenticado | Produtos e avaliações do usuário |
 
 ## Organização
@@ -93,7 +94,7 @@ Mais decisões estão em [docs/architecture.md](docs/architecture.md). A relaç�
 ## Limites atuais
 
 - Não há edição de perfil nem imagens de produtos. Confirmação de conta e recuperação de senha dependem de o backend ter um provedor de e-mail configurado.
-- Produtos não podem ser editados ou excluídos pela interface.
+- Produtos podem ser corrigidos pelo responsável, mas ainda não excluídos pela interface.
 - O modo offline cobre o shell já visitado; operações e dados dependem da API.
 - A sessão usa token no `localStorage`, uma opção simples para o MVP que exige disciplina contra XSS e deve ser reavaliada antes de ampliar o risco da aplicação.
 
