@@ -177,3 +177,35 @@ test("filtros combinados sobrevivem à ida ao produto e à volta", async ({ page
   await expect(page.getByRole("button", { name: "Alimentos" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByText("Produto de teste", { exact: true })).toBeVisible();
 });
+
+test("responsável corrige o produto a partir de Meus produtos", async ({ page }) => {
+  const patches: unknown[] = [];
+  let current = { ...product, variant: null as string | null };
+  await page.addInitScript(() => localStorage.setItem("merchant.access-token", "e2e-token"));
+  await page.route("**/api/v1/users/me", (route) => route.fulfill({ json: { id: 1, name: "Pessoa teste", email: "qa@example.com", email_verified: true } }));
+  await page.route("**/api/v1/users/me/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
+  await page.route("**/api/v1/users/me/products?**", (route) => route.fulfill({ json: { items: [current], page: 1, page_size: 20, total: 1 } }));
+  await page.route("**/api/v1/products/3/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
+  await page.route("**/api/v1/products/3", async (route) => {
+    if (route.request().method() === "PATCH") {
+      patches.push(route.request().postDataJSON());
+      current = { ...current, ...route.request().postDataJSON() };
+      return route.fulfill({ json: current });
+    }
+    return route.fulfill({ json: { ...current, your_review: null } });
+  });
+
+  await page.goto("/account");
+  await page.getByRole("tab", { name: "Meus produtos" }).click();
+  await page.getByRole("button", { name: "Corrigir Produto de teste" }).click();
+
+  await expect(page).toHaveURL(/\/products\/3\/edit$/);
+  await expect(page.getByRole("heading", { name: "Corrigir produto" })).toBeVisible();
+  await expect(page.getByLabel("Quantidade")).toHaveValue("1500");
+  await page.getByLabel("Variante").fill("Baunilha");
+  await page.getByRole("button", { name: "Salvar correção" }).click();
+
+  await expect(page).toHaveURL(/\/products\/3$/);
+  await expect(page.getByText("Marca teste · Baunilha")).toBeVisible();
+  expect(patches).toEqual([{ variant: "Baunilha" }]);
+});

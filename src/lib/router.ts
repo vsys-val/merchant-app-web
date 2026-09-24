@@ -5,7 +5,8 @@ export type Route =
   | { name: "search" }
   | { name: "account" }
   | { name: "create-product" }
-  | { name: "product"; productId: number };
+  | { name: "product"; productId: number }
+  | { name: "edit-product"; productId: number };
 
 export function parsePath(path: string): Route {
   const pathname = path.split(/[?#]/, 1)[0] || "/";
@@ -14,6 +15,8 @@ export function parsePath(path: string): Route {
   if (normalized === "/account") return { name: "account" };
   if (normalized === "/products/new") return { name: "create-product" };
 
+  const editMatch = normalized.match(/^\/products\/(\d+)\/edit$/);
+  if (editMatch) return { name: "edit-product", productId: Number(editMatch[1]) };
   const productMatch = normalized.match(/^\/products\/(\d+)$/);
   if (productMatch) return { name: "product", productId: Number(productMatch[1]) };
 

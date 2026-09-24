@@ -86,3 +86,6 @@
 .categoryFilter button[aria-pressed="true"] { border-color: var(--merchant-purple); color: #fff; background: var(--merchant-purple); }
 .categoryFilter button:disabled { cursor: wait; }
 .pagination span { align-self: center; color: #6b687d; font-size: .8rem; }
+.lockedProduct { max-width: 520px; margin: 0 auto; }
+.lockedProduct h1 { margin: 0; color: #211e34; font-size: 1.6rem; letter-spacing: -.035em; }
+.lockedProduct p:not(.eyebrow) { margin: 0; line-height: 1.55; }

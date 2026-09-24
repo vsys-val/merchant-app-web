@@ -34,3 +34,8 @@
 .accountTabs { width: 100%; margin-bottom: 18px; border: 0; background: #f0ecf5; }.accountTabs button { min-width: 0; min-height: 42px; padding: 8px 4px; }.accountTabs button.active { color: var(--merchant-purple); background: #fff; box-shadow: 0 1px 5px rgba(37,25,68,.08); }
 .accountList, .accountList--products { display: block; }.accountCard { overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }.accountCard:hover { border-color: transparent; box-shadow: none; }.accountCard > button { min-height: 138px; padding: 18px 0; border-bottom: 1px solid var(--merchant-line); }.accountCardTop { font-family: inherit; font-size: .66rem; }.accountCard h2 { margin: 10px 0 4px; font-size: 1.08rem; }.accountCard p { font-size: .82rem; }.accountTags { margin-top: 12px; }.accountCard blockquote { margin-top: 13px; font-family: inherit; font-size: .86rem; }.accountOpen { margin-top: 13px; color: var(--merchant-purple); }
 .accountState { min-height: 38vh; }.accountEmpty { padding: 34px 4px; }
+.accountCard > button.accountEdit { width: auto; height: auto; min-height: 44px; margin: 12px 0 0; padding: 9px 14px; border: 1px solid #ddd8e6; border-radius: 10px; color: #4a4560; background: #fff; font-size: .82rem; font-weight: 800; }
+.accountCard > button.accountEdit:hover { border-color: #cbc2fa; color: var(--merchant-purple, #591bc4); }
+/* Card com ação de correção: o divisor fica depois do botão, fechando o item inteiro. */
+.accountCard--editable { padding-bottom: 18px; border-bottom: 1px solid var(--merchant-line); }
+.accountCard--editable > button:first-child { min-height: 0; padding-bottom: 0; border-bottom: 0; }
