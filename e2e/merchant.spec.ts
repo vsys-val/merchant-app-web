@@ -100,3 +100,44 @@ test("exclusão exige confirmação e atualiza o detalhe", async ({ page }) => {
   await expect(page.getByText("Você ainda não avaliou este produto.")).toBeVisible();
   expect(deleteRequests).toBe(1);
 });
+
+test("cadastro exige o código enviado por e-mail antes de entrar", async ({ page }) => {
+  let verified = false;
+  const verifications: unknown[] = [];
+  await mockPublicApi(page);
+  await page.route("**/api/v1/users/me/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
+  await page.route("**/api/v1/users/me", (route) => route.fulfill(
+    verified
+      ? { json: { id: 5, name: "Ana", email: "ana@example.com", email_verified: true } }
+      : { status: 401, json: { error: { code: "invalid_authentication", message: "Autenticação ausente, inválida ou expirada.", details: null } } },
+  ));
+  await page.route("**/api/v1/users", (route) => route.fulfill({
+    status: 201,
+    json: { id: 5, name: "Ana", email: "ana@example.com", email_verified: false },
+  }));
+  await page.route("**/api/v1/auth/email-verification", async (route) => {
+    verifications.push(route.request().postDataJSON());
+    verified = true;
+    await route.fulfill({ json: { access_token: "verified-token", token_type: "bearer", expires_in: 86400 } });
+  });
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page.getByRole("tab", { name: "Cadastrar" }).click();
+  await page.getByLabel("Nome público").fill("Ana");
+  await page.getByLabel("E-mail").fill("ana@example.com");
+  await page.getByLabel("Senha").fill("frase secreta exclusiva");
+  await page.getByRole("button", { name: "Criar conta" }).click();
+
+  const dialog = page.getByRole("dialog", { name: "Confirme seu e-mail" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("status")).toHaveText("Enviamos um código de 6 dígitos para ana@example.com.");
+  await expect(dialog.getByRole("button", { name: /Reenviar código em \d+ s/ })).toBeDisabled();
+
+  await dialog.getByLabel("Código de 6 dígitos").fill("482913");
+  await dialog.getByRole("button", { name: "Confirmar e entrar" }).click();
+
+  await expect(dialog).toBeHidden();
+  await expect(page.getByRole("heading", { name: "Lembrete para você" })).toBeVisible();
+  expect(verifications).toEqual([{ email: "ana@example.com", code: "482913" }]);
+});

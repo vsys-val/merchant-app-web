@@ -4,6 +4,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  email_verified: boolean;
 }
 
 export interface LoginInput {
@@ -32,6 +33,34 @@ export function register(input: RegisterInput) {
   return apiRequest<User>("/api/v1/users", {
     method: "POST",
     body: JSON.stringify(input),
+  });
+}
+
+export function verifyEmail(email: string, code: string) {
+  return apiRequest<TokenResponse>("/api/v1/auth/email-verification", {
+    method: "POST",
+    body: JSON.stringify({ email, code }),
+  });
+}
+
+export function resendVerification(email: string) {
+  return apiRequest<void>("/api/v1/auth/email-verification/resend", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function requestPasswordReset(email: string) {
+  return apiRequest<void>("/api/v1/auth/password-reset", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function confirmPasswordReset(email: string, code: string, newPassword: string) {
+  return apiRequest<void>("/api/v1/auth/password-reset/confirm", {
+    method: "POST",
+    body: JSON.stringify({ email, code, new_password: newPassword }),
   });
 }
 

@@ -103,3 +103,7 @@ body { background: #f0eef4; }
 .emptyState { border: 0; background: transparent; }
 @media (min-width: 600px) { .appShell { margin-top: 16px; min-height: calc(100dvh - 16px); border: 1px solid #e3dfe9; border-radius: 24px 24px 0 0; } }
 @media (max-width: 359px) { .appContent, .homeHeader { padding-left: 16px; padding-right: 16px; }.wordmark { font-size: 2.1rem; }.productPlaceholder { width: 76px; flex-basis: 76px; }.memoryRow { gap: 12px; }.bottomNavigation button { font-size: .65rem; } }
+.authNotice { margin: 18px 0 16px; padding: 12px; border-radius: 10px; color: #33306b; background: #f0edff; font-size: .87rem; line-height: 1.45; }
+.authForm .codeInput { font-family: "DM Mono", monospace; font-size: 1.35rem; letter-spacing: .4em; text-align: center; }
+.linkButton { min-height: 44px; padding: 8px; border: 0; color: #5a3fe0; background: transparent; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.linkButton:disabled { color: #8d89a0; text-decoration: none; }

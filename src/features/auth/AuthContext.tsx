@@ -14,6 +14,7 @@ interface AuthContextValue {
   token: string | null;
   isLoading: boolean;
   signIn(email: string, password: string): Promise<void>;
+  signInWithToken(accessToken: string): void;
   signOut(): void;
 }
 
@@ -48,6 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(response.access_token);
   }
 
+  function signInWithToken(accessToken: string) {
+    saveToken(accessToken);
+    setToken(accessToken);
+  }
+
   function signOut() {
     removeToken();
     setToken(null);
@@ -55,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const value = useMemo(
-    () => ({ user, token, isLoading, signIn, signOut }),
+    () => ({ user, token, isLoading, signIn, signInWithToken, signOut }),
     [user, token, isLoading],
   );
 

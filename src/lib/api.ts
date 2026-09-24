@@ -83,7 +83,8 @@ export async function apiRequest<T>(
     );
   }
 
-  if (response.status === 204) return undefined as T;
+  // 202 (pedido aceito, como envio de e-mail) e 204 não têm corpo nesta API.
+  if (response.status === 202 || response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
 

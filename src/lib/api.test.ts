@@ -48,6 +48,11 @@ describe("apiRequest", () => {
     await expect(apiRequest<void>("/api/v1/reviews/1", { method: "DELETE" })).resolves.toBeUndefined();
   });
 
+  it("aceita respostas 202 sem corpo", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 202 })));
+    await expect(apiRequest<void>("/api/v1/auth/password-reset", { method: "POST", body: "{}" })).resolves.toBeUndefined();
+  });
+
   it("interrompe solicitações que excedem o tempo limite", async () => {
     vi.useFakeTimers();
     vi.stubGlobal("fetch", vi.fn((_url: string, options?: RequestInit) => new Promise((_resolve, reject) => {

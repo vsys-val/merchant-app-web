@@ -18,9 +18,11 @@ type Unit = ProductCreateInput["unit"];
 export function ProductForm({
   onCancel,
   onCreated,
+  onOpenExisting,
 }: {
   onCancel(): void;
   onCreated(productId: number): void;
+  onOpenExisting(productId: number): void;
 }) {
   const { token } = useAuth();
   const [name, setName] = useState("");
@@ -31,6 +33,7 @@ export function ProductForm({
   const [category, setCategory] = useState<Category>("food");
   const [barcode, setBarcode] = useState("");
   const [error, setError] = useState("");
+  const [existingProductId, setExistingProductId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -41,6 +44,7 @@ export function ProductForm({
     }
 
     setError("");
+    setExistingProductId(null);
     setIsSubmitting(true);
     try {
       const product = await createProduct({
@@ -55,6 +59,7 @@ export function ProductForm({
       onCreated(product.id);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "Não foi possível cadastrar o produto.");
+      setExistingProductId(getExistingProductId(caught));
     } finally {
       setIsSubmitting(false);
     }
@@ -114,7 +119,16 @@ export function ProductForm({
           <small>O dígito verificador será validado pela API.</small>
         </fieldset>
 
-        {error && <p className="formError" role="alert">{error}</p>}
+        {error && (
+          <div className="formError" role="alert">
+            <p>{error}</p>
+            {existingProductId !== null && (
+              <button type="button" className="secondaryButton" onClick={() => onOpenExisting(existingProductId)}>
+                Ver produto já cadastrado
+              </button>
+            )}
+          </div>
+        )}
         <div className="formActions">
           <button type="button" className="secondaryButton" onClick={onCancel}>Cancelar</button>
           <button type="submit" className="primaryButton" disabled={isSubmitting}>{isSubmitting ? "Salvando..." : "Cadastrar produto"}</button>
@@ -122,4 +136,10 @@ export function ProductForm({
       </form>
     </section>
   );
+}
+
+function getExistingProductId(caught: unknown): number | null {
+  if (!(caught instanceof ApiError) || caught.code !== "product_conflict") return null;
+  const details = caught.details as { existing_product_id?: unknown } | null | undefined;
+  return typeof details?.existing_product_id === "number" ? details.existing_product_id : null;
 }
