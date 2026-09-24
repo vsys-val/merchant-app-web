@@ -45,7 +45,7 @@ flowchart LR
 | Busca | `/search` · `ProductSearch` | US03, US04 | RF03, RF04 | sem busca · buscando · vazio · resultados paginados · erro | e2e |
 | Detalhe | `/products/:id` · `ProductDetailView` | US04, US05, US11 | RF05, RF11, RF12 | carregando · não encontrado · com/sem avaliação própria · comunidade vazia · paginação | `ProductDetailView.test.tsx`, e2e |
 | Avaliação | `ReviewForm` | US09, US10 | RF08, RF09 | etapa 1 · etapa 2 · conferência · validação por etapa · erro ao salvar | cobertos pela API (T18–T21) |
-| Cadastro de produto | `/products/new` · `ProductForm` | US06 | RF06 | formulário · salvando · duplicata · erro de validação | cobertos pela API (T08–T11) |
+| Cadastro de produto | `/products/new` · `ProductForm` | US06 | RF06 | formulário · salvando · duplicata com atalho para o produto existente · erro de validação | `ProductForm.test.tsx`; API (T08–T11) |
 | Minha área | `/account` · `AccountDashboard` | US13 | RF14 | carregando · vazio · lista · paginação · erro | cobertos pela API (T28) |
 
 ## Decisões de UX e sua origem
@@ -69,7 +69,6 @@ A API oferece mais do que a interface usa hoje. As lacunas são deliberadas e es
 | Capacidade da API | Situação na interface | Roadmap |
 |---|---|---|
 | Filtro por categoria e busca combinada (RF04) | Um campo por vez | Agora |
-| Levar ao produto existente em duplicata (`existing_product_id`) | Só mostra a mensagem | Agora |
 | Corrigir produto (RF07) | Sem tela | Agora |
 | Excluir produto (RF13) | Sem tela | Próximo |
 

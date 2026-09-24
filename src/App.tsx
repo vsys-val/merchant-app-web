@@ -46,7 +46,7 @@ export function App() {
            route.name === "home" ? <HomeView status={status} onSearch={() => navigate("/search")} onProduct={openProduct} onLogin={() => setShowAuth(true)} /> :
            route.name === "search" ? <ProductSearch onBack={goHome} onSelect={openProduct} onCreate={() => user ? navigate("/products/new") : setShowAuth(true)} /> :
            route.name === "account" && user ? <AccountDashboard onBack={goHome} onSelectProduct={openProduct} /> :
-           route.name === "create-product" && user ? <ProductForm onCancel={() => navigate("/search")} onCreated={openProduct} /> :
+           route.name === "create-product" && user ? <ProductForm onCancel={() => navigate("/search")} onCreated={openProduct} onOpenExisting={openProduct} /> :
            route.name === "product" ? <ProductDetailView productId={route.productId} onBack={() => navigate("/search")} /> : null}
         </main>
 
