@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { CheckCircle, ClockCounterClockwise, House, MagnifyingGlass, MinusCircle, Package, UserCircle, XCircle } from "@phosphor-icons/react";
 import { AccountDashboard } from "./features/account/AccountDashboard";
+import { AdminDashboard } from "./features/admin/AdminDashboard";
 import { getOwnReviews, OwnReview } from "./features/account/account-api";
 import { AuthPanel } from "./features/auth/AuthPanel";
 import { useAuth } from "./features/auth/AuthContext";
@@ -28,7 +29,19 @@ export function App() {
   const goHome = () => navigate("/");
   const goSearch = () => navigate(`/search${lastSearch}`);
   const openProduct = (productId: number) => navigate(`/products/${productId}`);
-  const protectedRoute = route.name === "account" || route.name === "create-product" || route.name === "edit-product";
+  const protectedRoute = route.name === "account" || route.name === "create-product" || route.name === "edit-product" || route.name === "admin";
+
+  // O painel ocupa a tela inteira, fora da coluna do app.
+  if (route.name === "admin") {
+    return (
+      <>
+        {isLoading ? <main className="adminPage adminState" aria-live="polite">Verificando sua sessão…</main>
+          : user ? <AdminDashboard onBack={goHome} />
+          : <main className="adminPage adminState"><p>Entre com uma conta de administração.</p><button className="primaryButton" type="button" onClick={() => setShowAuth(true)}>Entrar</button></main>}
+        {showAuth && <AuthPanel onClose={() => setShowAuth(false)} />}
+      </>
+    );
+  }
 
   return (
     <div className="appViewport">
@@ -49,7 +62,7 @@ export function App() {
            protectedRoute && !user ? <ProtectedPrompt onBack={goHome} onLogin={() => setShowAuth(true)} /> :
            route.name === "home" ? <HomeView status={status} onSearch={() => navigate("/search")} onProduct={openProduct} onLogin={() => setShowAuth(true)} /> :
            route.name === "search" ? <ProductSearch onBack={goHome} onSelect={openProduct} onCreate={() => user ? navigate("/products/new") : setShowAuth(true)} onQueryChange={setLastSearch} /> :
-           route.name === "account" && user ? <AccountDashboard onBack={goHome} onSelectProduct={openProduct} onEditProduct={(productId) => navigate(`/products/${productId}/edit`)} /> :
+           route.name === "account" && user ? <AccountDashboard onBack={goHome} onSelectProduct={openProduct} onEditProduct={(productId) => navigate(`/products/${productId}/edit`)} onOpenAdmin={() => navigate("/admin")} /> :
            route.name === "create-product" && user ? <ProductForm onCancel={goSearch} onSaved={openProduct} onOpenExisting={openProduct} /> :
            route.name === "edit-product" && user ? <ProductEditView productId={route.productId} onBack={() => navigate("/account")} onSaved={openProduct} onOpenExisting={openProduct} /> :
            route.name === "product" ? <ProductDetailView productId={route.productId} onBack={goSearch} /> : null}
