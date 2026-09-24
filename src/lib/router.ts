@@ -6,13 +6,15 @@ export type Route =
   | { name: "account" }
   | { name: "create-product" }
   | { name: "product"; productId: number }
-  | { name: "edit-product"; productId: number };
+  | { name: "edit-product"; productId: number }
+  | { name: "admin" };
 
 export function parsePath(path: string): Route {
   const pathname = path.split(/[?#]/, 1)[0] || "/";
   const normalized = pathname !== "/" ? pathname.replace(/\/+$/, "") : pathname;
   if (normalized === "/search") return { name: "search" };
   if (normalized === "/account") return { name: "account" };
+  if (normalized === "/admin") return { name: "admin" };
   if (normalized === "/products/new") return { name: "create-product" };
 
   const editMatch = normalized.match(/^\/products\/(\d+)\/edit$/);

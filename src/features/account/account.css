@@ -39,3 +39,4 @@
 /* Card com ação de correção: o divisor fica depois do botão, fechando o item inteiro. */
 .accountCard--editable { padding-bottom: 18px; border-bottom: 1px solid var(--merchant-line); }
 .accountCard--editable > button:first-child { min-height: 0; padding-bottom: 0; border-bottom: 0; }
+.adminLink { margin-top: 12px; display: inline-block; color: #fff; font-size: .85rem; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }

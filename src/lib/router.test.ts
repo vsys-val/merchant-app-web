@@ -7,6 +7,7 @@ describe("parsePath", () => {
     expect(parsePath("/search")).toEqual({ name: "search" });
     expect(parsePath("/account")).toEqual({ name: "account" });
     expect(parsePath("/products/new")).toEqual({ name: "create-product" });
+    expect(parsePath("/admin")).toEqual({ name: "admin" });
   });
 
   it("extrai o ID numérico do produto", () => {

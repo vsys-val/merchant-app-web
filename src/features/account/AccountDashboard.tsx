@@ -15,10 +15,12 @@ export function AccountDashboard({
   onBack,
   onSelectProduct,
   onEditProduct,
+  onOpenAdmin,
 }: {
   onBack(): void;
   onSelectProduct(productId: number): void;
   onEditProduct(productId: number): void;
+  onOpenAdmin?(): void;
 }) {
   const { token, user } = useAuth();
   const [tab, setTab] = useState<Tab>("reviews");
@@ -70,6 +72,7 @@ export function AccountDashboard({
         <p className="eyebrow">Sua memória de compras</p>
         <h1>Olá, {user.name}.</h1>
         <p>Aqui ficam os produtos que você cadastrou e as experiências que registrou.</p>
+        {user.is_admin && <a className="adminLink" href="/admin" onClick={(event) => { event.preventDefault(); onOpenAdmin?.(); }}>Abrir painel administrativo →</a>}
       </header>
 
       <div className="accountTabs" role="tablist" aria-label="Minha área">

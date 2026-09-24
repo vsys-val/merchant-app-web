@@ -6,6 +6,8 @@ export default defineConfig(({ mode }) => {
   const commit = env.VITE_BUILD_SHA || env.RENDER_GIT_COMMIT || "local";
 
   return {
+    // O mesmo SHA de build-info.json, disponível no código para os eventos de uso.
+    define: { __BUILD_COMMIT__: JSON.stringify(commit) },
     plugins: [
       react(),
       {

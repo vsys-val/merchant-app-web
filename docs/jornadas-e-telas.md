@@ -32,9 +32,10 @@ flowchart LR
   H -. sem sessão .-> L["Modal de acesso<br/>entrar · cadastrar"]
   N -. sem sessão .-> L
   A -. sem sessão .-> L
+  A -. administração .-> ADM["/admin<br/>painel 🛡️"]
 ```
 
-🔒 exige sessão. Sem sessão, a rota mostra um convite para entrar em vez dos dados.
+🔒 exige sessão. Sem sessão, a rota mostra um convite para entrar em vez dos dados. 🛡️ exige uma conta de administração; o atalho aparece em Minha área só para ela.
 
 ## Telas
 
@@ -48,6 +49,7 @@ flowchart LR
 | Cadastro de produto | `/products/new` · `ProductForm` | US06 | RF06 | formulário · salvando · duplicata com atalho para o produto existente · erro de validação | `ProductForm.test.tsx`; API (T08–T11) |
 | Correção de produto | `/products/:id/edit` · `ProductEditView` + `ProductForm` | US07 | RF07 | carregando · bloqueado (avaliado por outra pessoa) · formulário preenchido · nada alterado · duplicata · bloqueio durante a edição · erro | `ProductEditView.test.tsx`; e2e (Meus produtos → corrigir → salvar) |
 | Minha área | `/account` · `AccountDashboard` | US13 | RF14 | carregando · vazio · lista · paginação · erro | cobertos pela API (T28) |
+| Painel administrativo | `/admin` · `AdminDashboard` | US16 | RF19, RF20 | sem sessão · sem permissão (sem chamar a API) · carregando · erro com tentar de novo · sem dados no período · 7/30/90 dias · claro/escuro | `AdminDashboard.test.tsx`, `analytics.test.ts`; e2e `admin.spec.ts` (desktop e mobile) |
 
 ## Decisões de UX e sua origem
 
@@ -69,6 +71,10 @@ flowchart LR
 | Confirmação modal para excluir avaliação, com foco no "Cancelar" | Ação irreversível: o padrão seguro é não excluir | RN28 (sem histórico) |
 | Cor **e** ícone **e** texto no status de recompra | Não depender só de cor (acessibilidade) | `design-qa.md` |
 | Navegação inferior com 3 destinos | Alcance do polegar no celular; arquitetura de informação validada no protótipo | [Protótipo mobile](mobile-prototype.md) |
+| Painel com **meta e estado** ao lado de cada métrica (ícone + texto, nunca só cor) | Um número sem referência não diz se está bom; as metas vêm da visão de produto | [ADR-0012](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0012-painel-e-instrumentacao-propria.md) |
+| Cada gráfico tem uma **tabela equivalente** e tooltip por teclado | Leitores de tela e quem precisa do número exato; o gráfico sozinho não basta | Acessibilidade |
+| Painel em largura total, fora da navegação do app | É uma ferramenta de trabalho no desktop, não um fluxo de compra; no celular vira uma coluna | US16 |
+| Eventos só com escalares e sem texto digitado | Métricas sem coletar dados pessoais | RN36, RNF08 |
 | Leitor de código pela câmera **ausente** | Fora do escopo desta versão; a CSP também bloqueia a câmera | [Roadmap](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/roadmap.md) |
 
 ## Lacunas conhecidas

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
 import { useModalDialog } from "../../lib/useModalDialog";
+import { track } from "../../lib/analytics";
 import { getCategoryLabel } from "./category-labels";
 import { CommunityReview, getCommunityReviews, getProductDetail, Page, ProductDetail, Review } from "./product-api";
 import { deleteReview } from "./review-api";
@@ -35,11 +36,18 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
   async function load(page = 1) {
     const [detail, reviewResult] = await Promise.all([getProductDetail(productId, token), getCommunityReviews(productId, page, token)]);
     setProduct(detail); setReviews(reviewResult); setReviewPage(page);
+    return detail;
   }
 
   useEffect(() => {
     setError(""); setProduct(null); setEditingReview(false);
-    load().catch((caught) => setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar o produto."));
+    load()
+      .then((detail) => track("product_viewed", {
+        product_id: detail.id,
+        own_review: detail.your_review !== null,
+        community_reviews: detail.community_summary.total_reviews,
+      }))
+      .catch((caught) => setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar o produto."));
   }, [productId, token]);
 
   async function changeReviewPage(page: number) {
