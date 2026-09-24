@@ -73,3 +73,16 @@
 .yourReview { margin-top: 30px; padding: 22px; border-radius: 16px; background: var(--merchant-purple); }.reviewContent > p { font-family: inherit; font-size: .95rem; }.reviewTags { gap: 5px; }.reviewActions { margin-top: 17px; }
 .communityReviews { margin-top: 34px; }.reviewCard { padding: 19px 0; }.reviewAuthor { font-size: .83rem; }.detailState { min-height: 55vh; }
 @media (max-width: 359px) { .distributionGrid { grid-template-columns: 1fr; }.productHeading { flex-direction: column; }.quantityBadge { width: 70px; height: 70px; } }
+.search .brandFilter { margin: 14px 0 7px 2px; color: #47435b; font-size: .82rem; font-weight: 800; }
+.search .brandFilter small { color: #888499; font-size: inherit; font-weight: 500; }
+.search .brandInput { min-height: 48px; padding: 11px 13px; border: 1px solid #d9d3df; border-radius: 12px; background: #fff; }
+.search .brandInput:focus { border-color: #9e90f7; box-shadow: 0 0 0 4px rgba(108,79,246,.1); }
+/* A linha de busca permanece horizontal em qualquer largura: campo e botão lado a lado. */
+.search .searchRow { flex-direction: row; }
+.search .searchRow button { width: auto; flex: 0 0 auto; }
+.categoryFilter { margin: 14px -2px 0; padding: 2px 2px 6px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.categoryFilter::-webkit-scrollbar { display: none; }
+.categoryFilter button { flex: 0 0 auto; min-height: 40px; padding: 8px 14px; border: 1px solid #ddd8e6; border-radius: 999px; color: #5b566a; background: #fff; font-size: .82rem; font-weight: 700; white-space: nowrap; }
+.categoryFilter button[aria-pressed="true"] { border-color: var(--merchant-purple); color: #fff; background: var(--merchant-purple); }
+.categoryFilter button:disabled { cursor: wait; }
+.pagination span { align-self: center; color: #6b687d; font-size: .8rem; }

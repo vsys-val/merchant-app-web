@@ -6,6 +6,8 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- Busca combinando nome, marca e categoria, com chips de categoria e modo separado para código de barras.
+- Filtros da busca na URL: a busca é restaurada ao voltar de um produto, ao recarregar e ao abrir um link.
 - Confirmação de conta com código de 6 dígitos enviado por e-mail, com reenvio limitado a um por minuto.
 - Recuperação de senha por código ("Esqueci minha senha").
 - Atalho "Ver produto já cadastrado" quando o cadastro de produto é duplicado.
@@ -13,6 +15,10 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 ### Alterado
 
 - O cliente HTTP aceita respostas `202 Accepted` sem corpo.
+
+### Corrigido
+
+- Em telas estreitas, o campo de busca e o botão voltam a ficar na mesma linha.
 
 ## [0.3.0] - 2026-09-15
 

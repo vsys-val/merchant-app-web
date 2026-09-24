@@ -33,7 +33,7 @@ test("produção conecta à API e mantém a jornada pública principal", async (
 
   await page.getByRole("button", { name: "Buscar", exact: true }).click();
   await expect(page).toHaveURL(/\/search$/);
-  await page.getByLabel("Digite produto").fill("merchant-smoke-produto-inexistente-9f3d");
+  await page.getByLabel("Nome do produto").fill("merchant-smoke-produto-inexistente-9f3d");
   await page.getByRole("button", { name: "Executar busca" }).click();
   await expect(page.getByText("Nenhum produto encontrado.", { exact: true })).toBeVisible({ timeout: 30_000 });
 });

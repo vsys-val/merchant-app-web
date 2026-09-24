@@ -13,6 +13,8 @@ import { Route, useRouter } from "./lib/router";
 export function App() {
   const [status, setStatus] = useState<ApiStatus>("checking");
   const [showAuth, setShowAuth] = useState(false);
+  // Última busca, para voltar a ela a partir do produto ou da navegação.
+  const [lastSearch, setLastSearch] = useState("");
   const { user, isLoading, signOut } = useAuth();
   const { route, navigate } = useRouter();
 
@@ -23,6 +25,7 @@ export function App() {
   }, []);
 
   const goHome = () => navigate("/");
+  const goSearch = () => navigate(`/search${lastSearch}`);
   const openProduct = (productId: number) => navigate(`/products/${productId}`);
   const protectedRoute = route.name === "account" || route.name === "create-product";
 
@@ -44,13 +47,13 @@ export function App() {
           {isLoading && protectedRoute ? <PageState>Verificando sua sessão…</PageState> :
            protectedRoute && !user ? <ProtectedPrompt onBack={goHome} onLogin={() => setShowAuth(true)} /> :
            route.name === "home" ? <HomeView status={status} onSearch={() => navigate("/search")} onProduct={openProduct} onLogin={() => setShowAuth(true)} /> :
-           route.name === "search" ? <ProductSearch onBack={goHome} onSelect={openProduct} onCreate={() => user ? navigate("/products/new") : setShowAuth(true)} /> :
+           route.name === "search" ? <ProductSearch onBack={goHome} onSelect={openProduct} onCreate={() => user ? navigate("/products/new") : setShowAuth(true)} onQueryChange={setLastSearch} /> :
            route.name === "account" && user ? <AccountDashboard onBack={goHome} onSelectProduct={openProduct} /> :
-           route.name === "create-product" && user ? <ProductForm onCancel={() => navigate("/search")} onCreated={openProduct} onOpenExisting={openProduct} /> :
-           route.name === "product" ? <ProductDetailView productId={route.productId} onBack={() => navigate("/search")} /> : null}
+           route.name === "create-product" && user ? <ProductForm onCancel={goSearch} onCreated={openProduct} onOpenExisting={openProduct} /> :
+           route.name === "product" ? <ProductDetailView productId={route.productId} onBack={goSearch} /> : null}
         </main>
 
-        {route.name !== "create-product" && <BottomNavigation route={route} navigate={navigate} requireAccount={() => user ? navigate("/account") : setShowAuth(true)} />}
+        {route.name !== "create-product" && <BottomNavigation route={route} navigate={navigate} goSearch={goSearch} requireAccount={() => user ? navigate("/account") : setShowAuth(true)} />}
       </div>
       {user && route.name === "account" && <button className="signOutButton" type="button" onClick={() => { signOut(); goHome(); }}>Sair da conta</button>}
       {showAuth && <AuthPanel onClose={() => setShowAuth(false)} />}
@@ -105,10 +108,10 @@ function EmptyMemory({ onSearch }: { onSearch(): void }) {
   return <div className="emptyState"><strong>Suas experiências vão aparecer aqui.</strong><span>Encontre um produto que você já experimentou.</span><button className="primaryButton" onClick={onSearch}>Buscar produto</button></div>;
 }
 
-function BottomNavigation({ route, navigate, requireAccount }: { route: Route; navigate(path: string): void; requireAccount(): void }) {
+function BottomNavigation({ route, navigate, goSearch, requireAccount }: { route: Route; navigate(path: string): void; goSearch(): void; requireAccount(): void }) {
   const items = [
     { key: "home", label: "Início", icon: House, action: () => navigate("/") },
-    { key: "search", label: "Buscar", icon: MagnifyingGlass, action: () => navigate("/search") },
+    { key: "search", label: "Buscar", icon: MagnifyingGlass, action: goSearch },
     { key: "account", label: "Minhas avaliações", icon: ClockCounterClockwise, action: requireAccount },
   ];
   const active = route.name === "product" || route.name === "create-product" ? "search" : route.name;
