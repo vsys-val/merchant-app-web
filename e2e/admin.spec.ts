@@ -26,7 +26,9 @@ test("administração vê os indicadores e troca o período", async ({ page }) =
 
   await page.getByRole("button", { name: "Últimos 7 dias" }).click();
   await expect(page.getByRole("button", { name: "Últimos 7 dias" })).toHaveAttribute("aria-pressed", "true");
-  expect(requested).toEqual(["30", "7"]);
+  // No servidor de desenvolvimento, o StrictMode monta o efeito duas vezes: a primeira
+  // consulta é abortada, mas às vezes já chegou à rota simulada. Importa a ordem dos períodos.
+  expect([...new Set(requested)]).toEqual(["30", "7"]);
 
   const requests = page.locator("figure", { hasText: "Requisições por dia" });
   await requests.getByText("Ver tabela").click();
