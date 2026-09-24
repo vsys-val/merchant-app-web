@@ -4,6 +4,18 @@
 
 Frontend responsivo e instalável do [Merchant App](https://merchant-app-web.onrender.com), um guia comunitário para consultar experiências objetivas sobre produtos e lembrar o que vale — ou não — comprar novamente.
 
+## Produto
+
+O Merchant responde, no corredor do mercado, à pergunta *"eu compraria isto de novo?"*. Ele mostra a experiência do próprio usuário em destaque e a da comunidade ao lado, com avaliações estruturadas em vez de notas.
+
+| Documento | Onde |
+|---|---|
+| Visão de produto, personas e métricas | [visao-produto.md](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/visao-produto.md) |
+| Histórias de usuário e critérios de aceite | [historias-usuario.md](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/historias-usuario.md) |
+| Decisões de produto (ADRs) | [decisoes/](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/README.md) |
+| Rastreabilidade requisito → teste → tela | [rastreabilidade.md](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/rastreabilidade.md) |
+| **Jornadas, telas e decisões de UX** | [docs/jornadas-e-telas.md](docs/jornadas-e-telas.md) |
+
 ## Funcionalidades
 
 - Cadastro, login, persistência de sessão e saída.
@@ -76,7 +88,7 @@ Depois de um merge, o job `production-smoke` espera o Render expor em `build-inf
 | `public` | Manifesto, ícones e service worker |
 | `.github/workflows` | Integração contínua |
 
-Mais decisões estão em [docs/architecture.md](docs/architecture.md).
+Mais decisões estão em [docs/architecture.md](docs/architecture.md). A relação entre telas, histórias e requisitos está em [docs/jornadas-e-telas.md](docs/jornadas-e-telas.md).
 
 ## Limites atuais
 
