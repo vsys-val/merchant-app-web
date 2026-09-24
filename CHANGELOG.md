@@ -2,6 +2,18 @@
 
 Este projeto segue [Semantic Versioning](https://semver.org/).
 
+## [Não lançado]
+
+### Adicionado
+
+- Confirmação de conta com código de 6 dígitos enviado por e-mail, com reenvio limitado a um por minuto.
+- Recuperação de senha por código ("Esqueci minha senha").
+- Atalho "Ver produto já cadastrado" quando o cadastro de produto é duplicado.
+
+### Alterado
+
+- O cliente HTTP aceita respostas `202 Accepted` sem corpo.
+
 ## [0.3.0] - 2026-09-15
 
 ### Adicionado

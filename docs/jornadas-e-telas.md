@@ -41,7 +41,7 @@ flowchart LR
 | Tela | Rota / componente | Histórias | Requisitos | Estados tratados | Testes |
 |---|---|---|---|---|---|
 | Início | `/` · `HomeView` em `App.tsx` | US12 | RF14, RF15 | visitante · carregando · sem avaliações · com lembretes · erro · API offline | e2e `merchant.spec.ts`, `production.spec.ts` |
-| Modal de acesso | `AuthPanel` | US01, US02 | RF01, RF02 | login · cadastro · enviando · erro da API | e2e (teclado, foco, Esc) |
+| Modal de acesso | `AuthPanel` | US01, US02, US14, US15 | RF01, RF02, RF16–RF18 | login · cadastro · confirmação por código · reenvio com contagem de 60 s · esqueci a senha · nova senha · e-mail indisponível · erro da API | `AuthPanel.test.tsx`; e2e (teclado, foco, Esc, cadastro com código) |
 | Busca | `/search` · `ProductSearch` | US03, US04 | RF03, RF04 | sem busca · buscando · vazio · resultados paginados · erro | e2e |
 | Detalhe | `/products/:id` · `ProductDetailView` | US04, US05, US11 | RF05, RF11, RF12 | carregando · não encontrado · com/sem avaliação própria · comunidade vazia · paginação | `ProductDetailView.test.tsx`, e2e |
 | Avaliação | `ReviewForm` | US09, US10 | RF08, RF09 | etapa 1 · etapa 2 · conferência · validação por etapa · erro ao salvar | cobertos pela API (T18–T21) |
@@ -57,6 +57,8 @@ flowchart LR
 | "Sua experiência" antes de "Avaliações da comunidade" | A opinião própria é o sinal mais forte para a recompra | [ADR-0006](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0006-avaliacao-pessoal-separada.md) |
 | Card da busca mostra **a sua** intenção ou, sem ela, a intenção predominante da comunidade | Responde "compro de novo?" sem abrir o produto | [ADR-0002](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0002-intencao-de-recompra-como-resumo.md) |
 | Aviso "Sua avaliação será pública com seu nome de exibição" na conferência | Consentimento informado sobre a autoria pública | [ADR-0009](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0009-leitura-publica-escrita-autenticada.md) |
+| Confirmação de conta **por código dentro do próprio modal**, e confirmar já autentica | Não obriga a trocar de aplicativo nem abrir link no PWA; digitar 6 dígitos no celular é rápido; o teclado numérico e o preenchimento automático (`one-time-code`) reduzem erros | [ADR-0011](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0011-confirmacao-de-conta-por-codigo.md) |
+| Mensagens de reenvio e de recuperação no condicional ("se existir uma conta...") | A API não revela quais e-mails estão cadastrados, e a interface também não | RN31 |
 | Confirmação modal para excluir avaliação, com foco no "Cancelar" | Ação irreversível: o padrão seguro é não excluir | RN28 (sem histórico) |
 | Cor **e** ícone **e** texto no status de recompra | Não depender só de cor (acessibilidade) | `design-qa.md` |
 | Navegação inferior com 3 destinos | Alcance do polegar no celular; arquitetura de informação validada no protótipo | [Protótipo mobile](mobile-prototype.md) |

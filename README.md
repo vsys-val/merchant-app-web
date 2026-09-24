@@ -18,7 +18,7 @@ O Merchant responde, no corredor do mercado, à pergunta *"eu compraria isto de 
 
 ## Funcionalidades
 
-- Cadastro, login, persistência de sessão e saída.
+- Cadastro com confirmação de e-mail por código, login, recuperação de senha, persistência de sessão e saída.
 - Busca por nome, marca ou código de barras, com paginação.
 - Detalhe do produto com indicadores da comunidade.
 - Cadastro de produtos com categoria, quantidade, unidade e GTIN opcional.
@@ -92,7 +92,7 @@ Mais decisões estão em [docs/architecture.md](docs/architecture.md). A relaç�
 
 ## Limites atuais
 
-- Não há recuperação de senha, edição de perfil ou imagens de produtos.
+- Não há edição de perfil nem imagens de produtos. Confirmação de conta e recuperação de senha dependem de o backend ter um provedor de e-mail configurado.
 - Produtos não podem ser editados ou excluídos pela interface.
 - O modo offline cobre o shell já visitado; operações e dados dependem da API.
 - A sessão usa token no `localStorage`, uma opção simples para o MVP que exige disciplina contra XSS e deve ser reavaliada antes de ampliar o risco da aplicação.
