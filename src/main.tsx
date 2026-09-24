@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { AuthProvider } from "./features/auth/AuthContext";
+import { startAnalytics } from "./lib/analytics";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -19,3 +20,5 @@ if ("serviceWorker" in navigator && import.meta.env.PROD) {
       });
   });
 }
+
+startAnalytics(typeof __BUILD_COMMIT__ === "string" ? __BUILD_COMMIT__ : "local");

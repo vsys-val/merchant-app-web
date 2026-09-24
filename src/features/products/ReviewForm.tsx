@@ -1,5 +1,6 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ApiError } from "../../lib/api";
+import { track } from "../../lib/analytics";
 import { useAuth } from "../auth/AuthContext";
 import { Review } from "./product-api";
 import { Aspect, createReview, ReviewInput, updateReview } from "./review-api";
@@ -21,6 +22,7 @@ type Choice = { value: string; label: string };
 export function ReviewForm({ productId, initial, onCancel, onSaved }: { productId: number; initial?: Review | null; onCancel(): void; onSaved(): void }) {
   const { token } = useAuth();
   const [step, setStep] = useState(1);
+  useEffect(() => { track("review_step_viewed", { step, editing: Boolean(initial) }); }, [step]);
   const [repurchase, setRepurchase] = useState(initial?.repurchase_intent ?? "");
   const [quality, setQuality] = useState(initial?.quality ?? "");
   const [expectation, setExpectation] = useState(initial?.expectation ?? "");
@@ -53,7 +55,11 @@ export function ReviewForm({ productId, initial, onCancel, onSaved }: { productI
       reasons: Object.entries(reasons).map(([aspect, perception]) => ({ aspect: aspect as Aspect, perception })), comment: comment.trim() || null,
     };
     setError(""); setIsSubmitting(true);
-    try { if (initial) await updateReview(initial.id, input, token); else await createReview(productId, input, token); onSaved(); }
+    try {
+      if (initial) await updateReview(initial.id, input, token); else await createReview(productId, input, token);
+      track("review_saved", { editing: Boolean(initial) });
+      onSaved();
+    }
     catch (caught) { setError(caught instanceof ApiError ? caught.message : "Não foi possível salvar sua avaliação."); }
     finally { setIsSubmitting(false); }
   }

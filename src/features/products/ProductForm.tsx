@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
+import { track } from "../../lib/analytics";
 import {
   Category,
   createProduct,
@@ -96,6 +97,7 @@ export function ProductForm({
       setIsSubmitting(true);
       try {
         const product = await updateProduct(initial.id, patch, token);
+        track("product_edit_saved", { fields: Object.keys(patch).length });
         onSaved(product.id);
       } catch (caught) {
         setError(caught instanceof ApiError ? caught.message : "Não foi possível salvar a correção.");
@@ -107,10 +109,13 @@ export function ProductForm({
     }
 
     setIsSubmitting(true);
+    track("product_create_submitted", { barcode: input.barcode !== null });
     try {
       const product = await createProduct(input, token);
+      track("product_created", { category: product.category });
       onSaved(product.id);
     } catch (caught) {
+      if (caught instanceof ApiError && caught.code === "product_conflict") track("product_create_conflict");
       setError(caught instanceof ApiError ? caught.message : "Não foi possível cadastrar o produto.");
       setExistingProductId(getExistingProductId(caught));
     } finally {

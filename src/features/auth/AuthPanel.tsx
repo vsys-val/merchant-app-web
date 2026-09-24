@@ -1,6 +1,7 @@
 import { FormEvent, KeyboardEvent, useEffect, useState } from "react";
 import { ApiError } from "../../lib/api";
 import { useModalDialog } from "../../lib/useModalDialog";
+import { track } from "../../lib/analytics";
 import { useAuth } from "./AuthContext";
 import {
   confirmPasswordReset,
@@ -81,6 +82,7 @@ export function AuthPanel({ onClose }: AuthPanelProps) {
         onClose();
       } else if (mode === "register") {
         const user = await register({ name, email, password });
+        track("signup_completed", { verification_required: user.email_verified === false });
         // API anterior à confirmação não envia o campo: a conta já nasce ativa.
         if (user.email_verified !== false) {
           await signIn(email, password);

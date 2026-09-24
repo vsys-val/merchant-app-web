@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowLeft, CaretRight, MagnifyingGlass, Package, Plus } from "@phosphor-icons/react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
+import { track } from "../../lib/analytics";
 import { categoryLabels, getCategoryLabel } from "./category-labels";
 import {
   Category,
@@ -97,7 +98,17 @@ export function ProductSearch({
     window.history.replaceState(null, "", `/search${query}`);
     onQueryChange?.(query);
     try {
-      setResult(await searchProducts(filters, page, token));
+      const found = await searchProducts(filters, page, token);
+      setResult(found);
+      // Só indica quais filtros foram usados; o texto digitado não sai do navegador.
+      track("search_performed", {
+        mode: filters.barcode !== undefined ? "barcode" : "text",
+        name: Boolean(filters.name?.trim()),
+        brand: Boolean(filters.brand?.trim()),
+        category: filters.category ?? null,
+        results: found.total,
+        page,
+      });
       setSearched(filters);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "Não foi possível pesquisar agora.");
