@@ -29,8 +29,12 @@ export interface RouteRow {
   max_ms: number;
 }
 
+export interface AlertCheck { key: string; label: string; ok: boolean; value: number | null; threshold: string; detail: string; }
+
 export interface AdminOverview {
   generated_at: string;
+  /** Guarda-corpos da última hora; ausente em APIs anteriores aos alertas. */
+  alerts?: { status: "ok" | "alert"; evaluated_at: string; window_minutes: number; checks: AlertCheck[] };
   window_days: number;
   timezone: string;
   system: {

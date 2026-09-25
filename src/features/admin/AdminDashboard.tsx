@@ -98,6 +98,7 @@ export function AdminDashboard({ onBack }: { onBack(): void }) {
 function Overview({ data }: { data: AdminOverview }) {
   const { system, totals, product, catalog, technical, frontend } = data;
   const labels = data.daily.map((day) => formatDay(day.date));
+  const violated = data.alerts?.checks.filter((check) => !check.ok) ?? [];
   const databaseUp = system.database.status === "available";
   const sameVersion = system.api_commit !== null && webCommit !== "local";
 
@@ -118,7 +119,19 @@ function Overview({ data }: { data: AdminOverview }) {
             <span><strong>E-mail {system.email_delivery === "disabled" ? "desligado" : "ativo"}</strong>
               <small>{system.email_delivery === "disabled" ? "confirmação de conta inativa" : system.email_delivery}</small></span>
           </li>
+          {data.alerts && (
+            <li className={violated.length ? "bad" : "good"}>
+              {violated.length ? <WarningCircle size={18} weight="fill" /> : <CheckCircle size={18} weight="fill" />}
+              <span><strong>{violated.length ? `${violated.length} ${violated.length === 1 ? "alerta ativo" : "alertas ativos"}` : "Sem alertas"}</strong>
+                <small>última hora · {data.alerts.checks.length} verificações</small></span>
+            </li>
+          )}
         </ul>
+        {violated.length > 0 && (
+          <ul className="alertList" aria-label="Alertas ativos">
+            {violated.map((check) => <li key={check.key}><strong>{check.label}</strong> <span>{check.detail} Limite: {check.threshold}.</span></li>)}
+          </ul>
+        )}
       </section>
 
       <section aria-labelledby="product-title">

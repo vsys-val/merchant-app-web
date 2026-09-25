@@ -21,6 +21,7 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 - Painel: parcela de buscas respondidas só com produtos parecidos.
 - Leitura de código de barras pela câmera na busca e no cadastro de produto (EAN-13, EAN-8 e UPC-A), com leitor nativo quando existe e ZXing carregado sob demanda.
 - Painel: aberturas do leitor, leituras concluídas e parcela sem câmera disponível.
+- Painel: alertas da última hora em "Saúde agora" (banco, erros 5xx, p95 da busca e erros no navegador), com a lista dos guarda-corpos violados.
 
 ### Alterado
 
