@@ -43,7 +43,7 @@ flowchart LR
 |---|---|---|---|---|---|
 | Início | `/` · `HomeView` em `App.tsx` | US12 | RF14, RF15 | visitante · carregando · sem avaliações · com lembretes · erro · API offline | e2e `merchant.spec.ts`, `production.spec.ts` |
 | Modal de acesso | `AuthPanel` | US01, US02, US14, US15 | RF01, RF02, RF16–RF18 | login · cadastro · confirmação por código · reenvio com contagem de 60 s · esqueci a senha · nova senha · e-mail indisponível · erro da API | `AuthPanel.test.tsx`; e2e (teclado, foco, Esc, cadastro com código) |
-| Busca | `/search` · `ProductSearch` | US03, US04 | RF03, RF04 | sem busca · buscando · vazio (com os filtros aplicados) · resultados paginados · termo curto · código inválido · erro · restaurada da URL | `ProductSearch.test.tsx`; e2e (filtros combinados e volta do produto) |
+| Busca | `/search` · `ProductSearch` | US03, US04 | RF03, RF04, RN42 | sem busca · buscando · vazio (com os filtros aplicados) · só parecidos (aviso) · resultados paginados · termo curto · código inválido · erro · restaurada da URL | `ProductSearch.test.tsx`; e2e (filtros combinados e volta do produto) |
 | Detalhe | `/products/:id` · `ProductDetailView` | US04, US05, US11 | RF05, RF11, RF12, RN41 | carregando · não encontrado · com/sem avaliação própria · comunidade vazia · destaques só de elogios ou só de críticas · paginação | `ProductDetailView.test.tsx`, e2e |
 | Avaliação | `ReviewForm` | US09, US10 | RF08, RF09 | etapa 1 · etapa 2 · conferência · validação por etapa · erro ao salvar | cobertos pela API (T18–T21) |
 | Cadastro de produto | `/products/new` · `ProductForm` | US06 | RF06 | formulário · salvando · duplicata com atalho para o produto existente · erro de validação | `ProductForm.test.tsx`; API (T08–T11) |
@@ -61,6 +61,7 @@ flowchart LR
 | Card da busca mostra **a sua** intenção ou, sem ela, a intenção predominante da comunidade | Responde "compro de novo?" sem abrir o produto | [ADR-0002](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0002-intencao-de-recompra-como-resumo.md) |
 | Aviso "Sua avaliação será pública com seu nome de exibição" na conferência | Consentimento informado sobre a autoria pública | [ADR-0009](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0009-leitura-publica-escrita-autenticada.md) |
 | Nome, marca e categoria **combinados**; código de barras em modo separado | Espelha a regra da API (E entre filtros; GTIN exclusivo) e evita combinações que retornariam erro | RF04, RN14 |
+| Resultados **parecidos** só quando não há exato, sempre com aviso e convite para cadastrar | Um erro de digitação não deve parecer "produto inexistente" (evita duplicatas), mas a pessoa precisa saber que não é o que digitou | RN42, [ADR-0013](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0013-busca-no-banco-com-trigramas.md) |
 | Chips de categoria que buscam ao toque, incluindo "Todas" | Navegar por categoria sem digitar é o caminho mais curto no corredor; permite explorar o catálogo | RF04 |
 | Filtros na URL (`/search?name=…&category=…`) | A busca sobrevive à ida ao produto e à volta, ao recarregar e ao compartilhar o link | Rotas compartilháveis |
 | Correção aberta a partir de **Meus produtos** | É o único lugar em que a interface sabe que o produto é da pessoa; o detalhe público não expõe o responsável | RF07, RNF02 |

@@ -17,6 +17,8 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 - O commit do build é embutido no bundle e aparece no painel.
 - "O que a comunidade destaca" no detalhe do produto: os aspectos mais elogiados e mais criticados, com a contagem de avaliações.
 - Motivos de cada avaliação (ex.: "+ Sabor", "− Preço") visíveis na lista da comunidade e em "Sua experiência".
+- Busca tolerante a erros de digitação: sem resultado exato, a lista mostra os produtos parecidos com o aviso "Nada exato para …" e o convite para cadastrar.
+- Painel: parcela de buscas respondidas só com produtos parecidos.
 
 ### Alterado
 
