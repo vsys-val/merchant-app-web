@@ -44,6 +44,8 @@ describe("AdminDashboard", () => {
     expect(tile("Buscas com resultado")?.textContent).toContain("Fora da meta");
     expect(tile("Abandono da avaliação")?.textContent).toContain("Fora da meta");
     expect(tile("Latência p95")?.textContent).toContain("≤ 400 ms");
+    expect(tile("Leitor de código de barras")?.textContent).toContain("75%");
+    expect(tile("Leitor de código de barras")?.textContent).toContain("20 aberturas · 10% sem câmera disponível");
     expect(container.textContent).toContain("E-mail desligado");
     expect(container.textContent).toContain("API · abc1234");
   });

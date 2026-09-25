@@ -57,6 +57,8 @@ export interface AdminOverview {
     reviews_per_active_user: number | null;
     review_funnel: { steps: Array<{ step: string; sessions: number }>; abandonment_pct: number | null; target_abandonment_pct: number };
     product_creation: { submitted: number; created: number; conflicts: number; conflict_pct: number | null; target_conflict_pct: number };
+    /** Ausente em APIs anteriores ao leitor de código de barras. */
+    barcode_scanner?: { opened: number; detected_pct: number | null; camera_unavailable_pct: number | null };
     signups_completed: number;
   };
   catalog: {

@@ -37,6 +37,7 @@ export function overviewFixture(days = 7): AdminOverview {
         target_abandonment_pct: 30,
       },
       product_creation: { submitted: 10, created: 9, conflicts: 1, conflict_pct: 10.0, target_conflict_pct: 10 },
+      barcode_scanner: { opened: 20, detected_pct: 75.0, camera_unavailable_pct: 10.0 },
       signups_completed: 5,
     },
     catalog: {
