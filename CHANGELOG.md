@@ -19,9 +19,12 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 - Motivos de cada avaliação (ex.: "+ Sabor", "− Preço") visíveis na lista da comunidade e em "Sua experiência".
 - Busca tolerante a erros de digitação: sem resultado exato, a lista mostra os produtos parecidos com o aviso "Nada exato para …" e o convite para cadastrar.
 - Painel: parcela de buscas respondidas só com produtos parecidos.
+- Leitura de código de barras pela câmera na busca e no cadastro de produto (EAN-13, EAN-8 e UPC-A), com leitor nativo quando existe e ZXing carregado sob demanda.
+- Painel: aberturas do leitor, leituras concluídas e parcela sem câmera disponível.
 
 ### Alterado
 
+- `Permissions-Policy` libera a câmera para a própria origem (`camera=(self)`).
 - Os rótulos dos aspectos ficam em um único módulo, usado pelo formulário de avaliação, pelo detalhe e pelo painel.
 - O cliente HTTP aceita respostas `202 Accepted` sem corpo.
 

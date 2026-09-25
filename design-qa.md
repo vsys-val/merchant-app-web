@@ -12,7 +12,7 @@
 
 No actionable P0, P1, or P2 mismatch remains.
 
-The visual hierarchy, product density, background, purple accent, search prominence, product imagery, semantic repurchase colors, typography scale and fixed bottom navigation follow the selected concept. The implementation intentionally uses “Avaliações recentes” and “Minhas avaliações” because the current domain records reviews rather than purchases. It introduces “Início” because the agreed mobile information architecture has three destinations. The scanner is absent because camera scanning is outside this version's functional scope.
+The visual hierarchy, product density, background, purple accent, search prominence, product imagery, semantic repurchase colors, typography scale and fixed bottom navigation follow the selected concept. The implementation intentionally uses “Avaliações recentes” and “Minhas avaliações” because the current domain records reviews rather than purchases. It introduces “Início” because the agreed mobile information architecture has three destinations. Camera barcode scanning was added later as a full-screen reader opened from the barcode search mode and the GTIN field (ADR-0014 in the API repository).
 
 ### Required fidelity surfaces
 
