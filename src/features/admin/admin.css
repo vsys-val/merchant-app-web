@@ -55,6 +55,9 @@
 .healthStrip li span { display: grid; gap: 3px; }
 .healthStrip small { color: var(--ink-2); font-size: .8rem; }
 .healthStrip .good svg { color: var(--good-mark); } .healthStrip .bad svg { color: var(--critical); } .healthStrip .warn svg { color: var(--warning-mark); }
+.alertList { margin: 10px 0 0; padding: 12px 16px 12px 34px; display: grid; gap: 6px; border: 1px solid var(--critical); border-radius: 14px; background: var(--surface-1); }
+.alertList li { color: var(--ink-1); font-size: .88rem; line-height: 1.4; }
+.alertList span { color: var(--ink-2); }
 .statGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
 .statTile { padding: 16px; display: grid; align-content: start; gap: 4px; border: 1px solid var(--ring); border-radius: 14px; background: var(--surface-1); }
 .statTile h3 { margin: 0; color: var(--ink-2); font-size: .82rem; font-weight: 600; line-height: 1.35; }

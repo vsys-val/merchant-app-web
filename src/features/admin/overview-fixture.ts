@@ -8,6 +8,16 @@ export function overviewFixture(days = 7): AdminOverview {
   });
   return {
     generated_at: "2026-09-24T15:00:00Z",
+    alerts: {
+      status: "alert",
+      evaluated_at: "2026-09-24T15:00:00+00:00",
+      window_minutes: 60,
+      checks: [
+        { key: "database", label: "Banco de dados", ok: true, value: null, threshold: "disponível", detail: "Respondendo." },
+        { key: "errors_5xx", label: "Erros 5xx", ok: false, value: 10, threshold: "< 5%", detail: "3 de 30 requisições." },
+        { key: "search_p95", label: "Latência p95 da busca", ok: true, value: 200, threshold: "≤ 800 ms", detail: "≤ 200 ms em 25 buscas." },
+      ],
+    },
     window_days: days,
     timezone: "America/Sao_Paulo",
     system: {

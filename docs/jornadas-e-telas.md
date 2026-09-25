@@ -50,7 +50,7 @@ flowchart LR
 | Correção de produto | `/products/:id/edit` · `ProductEditView` + `ProductForm` | US07 | RF07 | carregando · bloqueado (avaliado por outra pessoa) · formulário preenchido · nada alterado · duplicata · bloqueio durante a edição · erro | `ProductEditView.test.tsx`; e2e (Meus produtos → corrigir → salvar) |
 | Minha área | `/account` · `AccountDashboard` | US13 | RF14 | carregando · vazio · lista · paginação · erro | cobertos pela API (T28) |
 | Leitor de código de barras | `BarcodeScanner` (busca e cadastro) | US03, US06 | RF04, RN43 | abrindo a câmera · lendo · lido (fecha e preenche) · sem permissão (com "Tentar de novo") · sem câmera · navegador sem suporte · erro | `gtin.test.ts`, `scanner.test.ts`, `BarcodeScanner.test.tsx`; e2e `barcode.spec.ts` com câmera falsa |
-| Painel administrativo | `/admin` · `AdminDashboard` | US16 | RF19, RF20 | sem sessão · sem permissão (sem chamar a API) · carregando · erro com tentar de novo · sem dados no período · 7/30/90 dias · claro/escuro | `AdminDashboard.test.tsx`, `analytics.test.ts`; e2e `admin.spec.ts` (desktop e mobile) |
+| Painel administrativo | `/admin` · `AdminDashboard` | US16 | RF19, RF20 | sem sessão · sem permissão (sem chamar a API) · carregando · erro com tentar de novo · sem dados no período · com ou sem alertas ativos · 7/30/90 dias · claro/escuro | `AdminDashboard.test.tsx`, `analytics.test.ts`; e2e `admin.spec.ts` (desktop e mobile) |
 
 ## Decisões de UX e sua origem
 
@@ -75,6 +75,7 @@ flowchart LR
 | Navegação inferior com 3 destinos | Alcance do polegar no celular; arquitetura de informação validada no protótipo | [Protótipo mobile](mobile-prototype.md) |
 | "O que a comunidade destaca" com **contagens** ("2 de 3") e não percentuais; no máximo 3 aspectos por lado | Com poucas avaliações, "67%" sugere uma precisão que não existe; 3 itens cabem no celular sem rolar | RN41, [ADR-0003](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0003-motivos-estruturados-obrigatorios.md) |
 | Motivos com sinal **+ / −**, cor e texto para leitor de tela ("positivo"/"negativo") | Não depender só de verde e vermelho | Acessibilidade |
+| Alertas no topo do painel, com **o limite violado por extenso** | Quem abre o painel durante um incidente precisa saber primeiro o que está errado, e não procurar em gráficos | [ADR-0015](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0015-alertas-com-github-actions.md) |
 | Painel com **meta e estado** ao lado de cada métrica (ícone + texto, nunca só cor) | Um número sem referência não diz se está bom; as metas vêm da visão de produto | [ADR-0012](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0012-painel-e-instrumentacao-propria.md) |
 | Cada gráfico tem uma **tabela equivalente** e tooltip por teclado | Leitores de tela e quem precisa do número exato; o gráfico sozinho não basta | Acessibilidade |
 | Painel em largura total, fora da navegação do app | É uma ferramenta de trabalho no desktop, não um fluxo de compra; no celular vira uma coluna | US16 |
