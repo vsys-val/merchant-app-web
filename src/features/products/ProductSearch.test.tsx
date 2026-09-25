@@ -142,4 +142,20 @@ describe("ProductSearch filters", () => {
       null,
     );
   });
+
+  it("avisa quando só há produtos parecidos com o termo", async () => {
+    const product = {
+      id: 5, name: "Arroz integral", brand: "Tio João", variant: null, quantity: 1, unit: "un", category: "food", barcode: null,
+      community_summary: { total_reviews: 0, repurchase_intent: { yes: 0, maybe: 0, no: 0 } }, your_repurchase_intent: null,
+    };
+    mocks.searchProducts.mockResolvedValue({ items: [product], page: 1, page_size: 20, total: 1, approximate: true });
+    await mount();
+    fill(nameInput(), "arros");
+    await submit();
+
+    const notice = container.querySelector('[role="status"]');
+    expect(notice?.textContent).toBe("Nada exato para “arros”.Mostrando o mais parecido. Se não for este, cadastre o produto.");
+    expect(container.querySelector(".resultsHeader")).toBeNull();
+    expect(container.textContent).toContain("Arroz integral");
+  });
 });

@@ -108,3 +108,7 @@
 .reasonTags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
 .reasonTag { padding: 5px 8px; border-radius: 7px; font-size: .72rem; font-weight: 700; }
 @media (max-width: 359px) { .highlightColumns { grid-template-columns: 1fr; } }
+
+/* Busca sem resultado exato: itens parecidos, com aviso explícito. */
+.approximateNotice { margin-bottom: 12px; padding: 12px 14px; display: grid; gap: 3px; border: 1px solid #f1dfae; border-radius: 12px; color: #6b4a00; background: #fff8e6; font-size: .8rem; line-height: 1.4; }
+.approximateNotice strong { color: #4d3500; font-size: .88rem; }

@@ -52,7 +52,7 @@ export interface AdminOverview {
   daily: DailyPoint[];
   product: {
     north_star: { label: string; value: number | null; own_review_views: number; weekly_active_users: number; target: number };
-    searches: { total: number; with_results_pct: number | null; barcode_pct: number | null; target_with_results_pct: number };
+    searches: { total: number; with_results_pct: number | null; barcode_pct: number | null; approximate_pct?: number | null; target_with_results_pct: number };
     activation: { cohort: number; activated: number; pct: number | null; target_pct: number };
     reviews_per_active_user: number | null;
     review_funnel: { steps: Array<{ step: string; sessions: number }>; abandonment_pct: number | null; target_abandonment_pct: number };
