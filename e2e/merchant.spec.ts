@@ -74,6 +74,46 @@ test("busca pública, navegação e modal de acesso funcionam por teclado", asyn
   await expect(page.getByRole("heading", { name: "Produto de teste", level: 1 })).toBeVisible();
 });
 
+test("detalhe mostra o que a comunidade elogia e critica", async ({ page }) => {
+  const reviewed = {
+    ...product,
+    community_summary: {
+      total_reviews: 3,
+      repurchase_intent: { yes: 66.7, maybe: 0, no: 33.3 },
+      quality: { high: 66.7, adequate: 33.3, low: 0 },
+      expectation: { exceeded: 0, met: 100, not_met: 0 },
+      value_for_money: { good: 33.3, fair: 33.3, poor: 33.3 },
+      reasons: [
+        { aspect: "taste", positive: 2, negative: 1 },
+        { aspect: "price", positive: 0, negative: 2 },
+        { aspect: "packaging", positive: 1, negative: 0 },
+      ],
+    },
+    your_review: null,
+  };
+  await page.route("**/api/v1/products/3", (route) => route.fulfill({ json: reviewed }));
+  await page.route("**/api/v1/products/3/reviews?**", (route) => route.fulfill({
+    json: {
+      items: [{
+        id: 9, author_name: "Ana", repurchase_intent: "no", quality: "adequate", expectation: "met", value_for_money: "poor",
+        reasons: [{ aspect: "taste", perception: "negative" }, { aspect: "price", perception: "negative" }],
+        comment: null, created_at: "2026-09-20T12:00:00Z", updated_at: "2026-09-20T12:00:00Z",
+      }],
+      page: 1, page_size: 20, total: 1,
+    },
+  }));
+
+  await page.goto("/products/3");
+  const highlights = page.getByRole("region", { name: "O que a comunidade destaca" });
+  await expect(highlights).toBeVisible();
+  await expect(highlights.locator(".highlightColumn--positive li").first()).toHaveText("Sabor2 de 3 avaliações");
+  await expect(highlights.locator(".highlightColumn--negative li").first()).toHaveText("Preço2 de 3 avaliações");
+  await expect(page.getByRole("list", { name: "Motivos" })).toContainText("Preço (negativo)");
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBe(0);
+});
+
 test("exclusão exige confirmação e atualiza o detalhe", async ({ page }) => {
   let deleted = false;
   let deleteRequests = 0;
