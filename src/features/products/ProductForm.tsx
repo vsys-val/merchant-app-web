@@ -10,6 +10,8 @@ import {
   ProductPublic,
   updateProduct,
 } from "./product-api";
+import { Barcode } from "@phosphor-icons/react";
+import { BarcodeScanner } from "../barcode/BarcodeScanner";
 import "./product-form.css";
 
 const categories: Array<{ value: Category; label: string }> = [
@@ -64,6 +66,7 @@ export function ProductForm({
   const [unit, setUnit] = useState<Unit>(initial?.unit ?? "g");
   const [category, setCategory] = useState<Category>(initial?.category ?? "food");
   const [barcode, setBarcode] = useState(initial?.barcode ?? "");
+  const [isScanning, setIsScanning] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [existingProductId, setExistingProductId] = useState<number | null>(null);
@@ -176,6 +179,7 @@ export function ProductForm({
           <label><span className="fieldLabel">Código GTIN <small>(opcional)</small></span>
             <input inputMode="numeric" pattern="([0-9]{8}|[0-9]{12}|[0-9]{13}|[0-9]{14})" maxLength={14} value={barcode} onChange={(event) => setBarcode(event.target.value)} placeholder="8, 12, 13 ou 14 dígitos" />
           </label>
+          <button className="secondaryButton scanButton" type="button" onClick={() => setIsScanning(true)}><Barcode size={22} />Ler com a câmera</button>
           <small>O dígito verificador será validado pela API.</small>
         </fieldset>
 
@@ -195,6 +199,9 @@ export function ProductForm({
           <button type="submit" className="primaryButton" disabled={isSubmitting}>{isSubmitting ? "Salvando..." : isEditing ? "Salvar correção" : "Cadastrar produto"}</button>
         </div>
       </form>
+      {isScanning && (
+        <BarcodeScanner context="product_form" onClose={() => setIsScanning(false)} onDetected={(code) => { setIsScanning(false); setBarcode(code); }} />
+      )}
     </section>
   );
 }

@@ -20,7 +20,8 @@ export type EventName =
   | "product_created"
   | "product_create_conflict"
   | "product_edit_saved"
-  | "signup_completed";
+  | "signup_completed"
+  | "barcode_scan";
 
 type Properties = Record<string, string | number | boolean | null>;
 

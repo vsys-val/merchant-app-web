@@ -147,6 +147,10 @@ function Overview({ data }: { data: AdminOverview }) {
           <StatTile label="Avaliações por usuário ativo"
             value={product.reviews_per_active_user === null ? "—" : product.reviews_per_active_user.toLocaleString("pt-BR")}
             detail={`${product.signups_completed} cadastros concluídos no período`} />
+          {product.barcode_scanner && (
+            <StatTile label="Leitor de código de barras · leituras concluídas" value={pct(product.barcode_scanner.detected_pct)}
+              detail={`${numberFormat.format(product.barcode_scanner.opened)} aberturas · ${pct(product.barcode_scanner.camera_unavailable_pct)} sem câmera disponível`} />
+          )}
         </div>
         <div className="chartGrid">
           <LineChart title="Uso por dia" subtitle="Sessões anônimas e usuários autenticados com ao menos um evento" labels={labels}

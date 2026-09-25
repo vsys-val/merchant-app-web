@@ -19,7 +19,7 @@ O Merchant responde, no corredor do mercado, à pergunta *"eu compraria isto de 
 ## Funcionalidades
 
 - Cadastro com confirmação de e-mail por código, login, recuperação de senha, persistência de sessão e saída.
-- Busca combinando nome, marca e categoria, ou por código de barras, com paginação e filtros na URL.
+- Busca combinando nome, marca e categoria, ou por código de barras digitado ou lido pela câmera, com paginação e filtros na URL.
 - Detalhe do produto com indicadores da comunidade e os aspectos mais elogiados e criticados.
 - Cadastro de produtos com categoria, quantidade, unidade e GTIN opcional.
 - Criação, edição e exclusão da avaliação pessoal.
@@ -86,6 +86,7 @@ Depois de um merge, o job `production-smoke` espera o Render expor em `build-inf
 | `src/features/auth` | Autenticação e sessão |
 | `src/features/products` | Busca, detalhe, cadastro e avaliações |
 | `src/features/account` | Área pessoal |
+| `src/features/barcode` | Leitura de código de barras pela câmera (nativo ou ZXing) |
 | `src/features/admin` | Painel administrativo e gráficos acessíveis |
 | `src/lib/analytics.ts` | Eventos de uso em lote, sem dados pessoais |
 | `src/lib` | HTTP, roteamento e comportamento compartilhado |

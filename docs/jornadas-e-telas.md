@@ -49,6 +49,7 @@ flowchart LR
 | Cadastro de produto | `/products/new` · `ProductForm` | US06 | RF06 | formulário · salvando · duplicata com atalho para o produto existente · erro de validação | `ProductForm.test.tsx`; API (T08–T11) |
 | Correção de produto | `/products/:id/edit` · `ProductEditView` + `ProductForm` | US07 | RF07 | carregando · bloqueado (avaliado por outra pessoa) · formulário preenchido · nada alterado · duplicata · bloqueio durante a edição · erro | `ProductEditView.test.tsx`; e2e (Meus produtos → corrigir → salvar) |
 | Minha área | `/account` · `AccountDashboard` | US13 | RF14 | carregando · vazio · lista · paginação · erro | cobertos pela API (T28) |
+| Leitor de código de barras | `BarcodeScanner` (busca e cadastro) | US03, US06 | RF04, RN43 | abrindo a câmera · lendo · lido (fecha e preenche) · sem permissão (com "Tentar de novo") · sem câmera · navegador sem suporte · erro | `gtin.test.ts`, `scanner.test.ts`, `BarcodeScanner.test.tsx`; e2e `barcode.spec.ts` com câmera falsa |
 | Painel administrativo | `/admin` · `AdminDashboard` | US16 | RF19, RF20 | sem sessão · sem permissão (sem chamar a API) · carregando · erro com tentar de novo · sem dados no período · 7/30/90 dias · claro/escuro | `AdminDashboard.test.tsx`, `analytics.test.ts`; e2e `admin.spec.ts` (desktop e mobile) |
 
 ## Decisões de UX e sua origem
@@ -78,7 +79,9 @@ flowchart LR
 | Cada gráfico tem uma **tabela equivalente** e tooltip por teclado | Leitores de tela e quem precisa do número exato; o gráfico sozinho não basta | Acessibilidade |
 | Painel em largura total, fora da navegação do app | É uma ferramenta de trabalho no desktop, não um fluxo de compra; no celular vira uma coluna | US16 |
 | Eventos só com escalares e sem texto digitado | Métricas sem coletar dados pessoais | RN36, RNF08 |
-| Leitor de código pela câmera **ausente** | Fora do escopo desta versão; a CSP também bloqueia a câmera | [Roadmap](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/roadmap.md) |
+| Leitor de código pela câmera em **tela cheia**, que fecha sozinho ao ler e já pesquisa | No corredor, a pessoa segura o produto com uma mão: menos toques, sem digitar 13 dígitos | [ADR-0014](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0014-leitura-de-codigo-de-barras-pela-camera.md) |
+| Só aceita GTIN com dígito verificador válido; "Digitar o código" sempre visível | Leitura parcial não vira busca errada; câmera negada ou ausente nunca bloqueia a tarefa | RN43 |
+| ZXing carregado **só ao abrir** o leitor | Quem não usa a câmera não paga pelo download | [ADR-0014](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0014-leitura-de-codigo-de-barras-pela-camera.md) |
 
 ## Lacunas conhecidas
 
