@@ -15,17 +15,10 @@ import {
   SimpleTable,
   StatTile,
 } from "./charts";
+import { getAspectLabel } from "../products/aspect-labels";
 import "./admin.css";
 
 const PERIODS = [7, 30, 90] as const;
-
-const aspectLabels: Record<string, string> = {
-  taste: "Sabor", fragrance: "Cheiro ou fragrância", texture_consistency: "Textura ou consistência",
-  effectiveness_performance: "Eficácia ou desempenho", quantity_yield: "Quantidade ou rendimento",
-  ease_of_use_preparation: "Facilidade de uso ou preparo", packaging: "Embalagem",
-  durability_preservation: "Durabilidade ou conservação", composition_ingredients: "Composição ou ingredientes",
-  safety_tolerance: "Segurança ou tolerância", price: "Preço", other: "Outro",
-};
 
 const webCommit = typeof __BUILD_COMMIT__ === "string" ? __BUILD_COMMIT__ : "local";
 
@@ -199,7 +192,7 @@ function Overview({ data }: { data: AdminOverview }) {
             <figcaption><h3>Motivos citados</h3><p>Percepções por aspecto em todas as avaliações</p></figcaption>
             {catalog.aspects.length === 0
               ? <p className="emptyChart">Nenhum motivo registrado ainda.</p>
-              : <DivergingBars rows={catalog.aspects.map((row) => ({ label: aspectLabels[row.aspect] ?? row.aspect, positive: row.positive, negative: row.negative }))} />}
+              : <DivergingBars rows={catalog.aspects.map((row) => ({ label: getAspectLabel(row.aspect), positive: row.positive, negative: row.negative }))} />}
           </figure>
           <figure className="chartCard">
             <figcaption><h3>Compraria de novo?</h3><p>Todas as avaliações</p></figcaption>

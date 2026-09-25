@@ -1,4 +1,5 @@
 import { apiRequest } from "../../lib/api";
+import type { Aspect } from "./review-api";
 
 export type RepurchaseIntent = "yes" | "maybe" | "no";
 export type Quality = "high" | "adequate" | "low";
@@ -33,7 +34,7 @@ export interface Review {
   quality: Quality;
   expectation: Expectation;
   value_for_money: ValueForMoney;
-  reasons: Array<{ aspect: string; perception: "positive" | "negative" }>;
+  reasons: Array<{ aspect: Aspect; perception: "positive" | "negative" }>;
   comment: string | null;
   created_at: string;
   updated_at: string;
@@ -51,9 +52,13 @@ export interface ProductDetail extends ProductPublic {
     quality: Record<Quality, number>;
     expectation: Record<Expectation, number>;
     value_for_money: Record<ValueForMoney, number>;
+    /** Avaliações que citam cada aspecto; os mais citados primeiro. Ausente em APIs anteriores. */
+    reasons?: AspectMentions[];
   };
   your_review: Review | null;
 }
+
+export interface AspectMentions { aspect: Aspect; positive: number; negative: number; }
 
 export interface CommunityReview extends Review { author_name: string; }
 export interface Page<T> { items: T[]; page: number; page_size: number; total: number; }

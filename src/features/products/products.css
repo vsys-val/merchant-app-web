@@ -89,3 +89,22 @@
 .lockedProduct { max-width: 520px; margin: 0 auto; }
 .lockedProduct h1 { margin: 0; color: #211e34; font-size: 1.6rem; letter-spacing: -.035em; }
 .lockedProduct p:not(.eyebrow) { margin: 0; line-height: 1.55; }
+
+/* Motivos agregados da comunidade e motivos de cada avaliação. */
+.communityHighlights { margin-top: 9px; padding: 15px; border: 1px solid #e2dfeb; border-radius: 16px; background: white; }
+.communityHighlights h3 { margin: 0 0 13px; color: #2d2941; font-size: .87rem; letter-spacing: -.02em; }
+.highlightColumns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.highlightColumn h4 { margin: 0 0 10px; display: flex; align-items: center; gap: 6px; color: #403b57; font-size: .76rem; }
+.highlightSign { width: 18px; height: 18px; display: inline-grid; place-items: center; border-radius: 5px; font-weight: 800; line-height: 1; }
+.highlightColumn--positive .highlightSign, .reasonTag--positive { color: #087453; background: #e5f8ef; }
+.highlightColumn--negative .highlightSign, .reasonTag--negative { color: #b82c44; background: #ffebef; }
+.highlightColumn ul, .reasonTags { margin: 0; padding: 0; list-style: none; }
+.highlightColumn li + li { margin-top: 10px; }
+.highlightColumn li > div:first-child { margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; color: #726f83; font-size: .72rem; }
+.highlightColumn li strong { flex-shrink: 0; color: #403b57; font-family: "DM Mono", monospace; font-weight: 500; }
+.highlightColumn--positive .bar span { background: #1d9a6c; }
+.highlightColumn--negative .bar span { background: #d2475f; }
+.highlightEmpty { margin: 0; color: var(--merchant-muted); font-size: .72rem; }
+.reasonTags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+.reasonTag { padding: 5px 8px; border-radius: 7px; font-size: .72rem; font-weight: 700; }
+@media (max-width: 359px) { .highlightColumns { grid-template-columns: 1fr; } }

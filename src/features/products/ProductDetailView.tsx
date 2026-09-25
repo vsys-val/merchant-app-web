@@ -3,8 +3,9 @@ import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
 import { useModalDialog } from "../../lib/useModalDialog";
 import { track } from "../../lib/analytics";
+import { getAspectLabel } from "./aspect-labels";
 import { getCategoryLabel } from "./category-labels";
-import { CommunityReview, getCommunityReviews, getProductDetail, Page, ProductDetail, Review } from "./product-api";
+import { AspectMentions, CommunityReview, getCommunityReviews, getProductDetail, Page, ProductDetail, Review } from "./product-api";
 import { deleteReview } from "./review-api";
 import { ReviewForm } from "./ReviewForm";
 import "./products.css";
@@ -75,6 +76,7 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
       <header className="productHeading"><div><p className="eyebrow">{getCategoryLabel(product.category)}</p><h1>{product.name}</h1><p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p></div><div className="quantityBadge"><strong>{product.quantity}</strong><span>{product.unit}</span></div></header>
       <div className="summaryHeader"><div><p className="sectionNumber">01</p><h2>Resumo da comunidade</h2></div><p>Baseado em {product.community_summary.total_reviews} {product.community_summary.total_reviews === 1 ? "avaliação" : "avaliações"} de outras pessoas.</p></div>
       <div className="distributionGrid"><Distribution title="Compraria novamente?" values={product.community_summary.repurchase_intent} /><Distribution title="Qualidade" values={product.community_summary.quality} /><Distribution title="Expectativa" values={product.community_summary.expectation} /><Distribution title="Custo-benefício" values={product.community_summary.value_for_money} /></div>
+      <CommunityHighlights reasons={product.community_summary.reasons ?? []} total={product.community_summary.total_reviews} />
       {user ? <section className="yourReview"><p className="sectionNumber">02</p><h2>Sua experiência</h2>{product.your_review ? <><ReviewContent review={product.your_review} /><div className="reviewActions"><button className="secondaryButton" type="button" onClick={() => setEditingReview(true)}>Editar</button><button className="dangerButton" type="button" onClick={() => { setDeleteError(""); setReviewPendingDeletion(product.your_review); }}>Excluir</button></div></> : <><p>Você ainda não avaliou este produto.</p><button className="primaryButton" type="button" onClick={() => setEditingReview(true)}>Avaliar produto</button></>}</section> : <section className="yourReview"><p>Entre na sua conta para registrar sua experiência com este produto.</p></section>}
       {error && <p className="formError" role="alert">{error}</p>}
       <section className="communityReviews">
@@ -103,6 +105,44 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
 function Distribution({ title, values }: { title: string; values: Record<string, number> }) {
   return <article className="distributionCard"><h3>{title}</h3>{Object.entries(values).map(([key, value]) => <div className="distributionRow" key={key}><div><span>{labels[key] ?? key}</span><strong>{value.toFixed(0)}%</strong></div><div className="bar" role="progressbar" aria-label={labels[key] ?? key} aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${Math.min(100, value)}%` }} /></div></div>)}</article>;
 }
+const HIGHLIGHT_LIMIT = 3;
+
+/** Motivos mais citados pela comunidade, separados em elogios e críticas. */
+function CommunityHighlights({ reasons, total }: { reasons: AspectMentions[]; total: number }) {
+  if (total === 0 || reasons.length === 0) return null;
+  const top = (perception: "positive" | "negative") => reasons
+    .filter((item) => item[perception] > 0)
+    .sort((a, b) => b[perception] - a[perception] || getAspectLabel(a.aspect).localeCompare(getAspectLabel(b.aspect), "pt-BR"))
+    .slice(0, HIGHLIGHT_LIMIT)
+    .map((item) => ({ aspect: item.aspect, count: item[perception] }));
+  const columns = [
+    { perception: "positive" as const, title: "Mais elogiado", sign: "+", empty: "Nenhum elogio citado ainda.", items: top("positive") },
+    { perception: "negative" as const, title: "Mais criticado", sign: "−", empty: "Nenhuma crítica citada ainda.", items: top("negative") },
+  ];
+  return (
+    <section className="communityHighlights" aria-labelledby="community-highlights-title">
+      <h3 id="community-highlights-title">O que a comunidade destaca</h3>
+      <div className="highlightColumns">
+        {columns.map((column) => (
+          <div className={`highlightColumn highlightColumn--${column.perception}`} key={column.perception}>
+            <h4><span className="highlightSign" aria-hidden="true">{column.sign}</span>{column.title}</h4>
+            {column.items.length === 0 ? <p className="highlightEmpty">{column.empty}</p> : (
+              <ul>
+                {column.items.map(({ aspect, count }) => (
+                  <li key={aspect}>
+                    <div><span>{getAspectLabel(aspect)}</span><strong>{count} de {total}<span className="srOnly"> avaliações</span></strong></div>
+                    <div className="bar" aria-hidden="true"><span style={{ width: `${Math.round((count / total) * 100)}%` }} /></div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ReviewContent({ review }: { review: Review }) {
-  return <div className="reviewContent"><div className="reviewTags"><span>Recompra: {labels[review.repurchase_intent]}</span><span>Qualidade: {labels[review.quality]}</span><span>Expectativa: {labels[review.expectation]}</span><span>Custo-benefício: {labels[review.value_for_money]}</span></div>{review.comment && <p>“{review.comment}”</p>}</div>;
+  return <div className="reviewContent"><div className="reviewTags"><span>Recompra: {labels[review.repurchase_intent]}</span><span>Qualidade: {labels[review.quality]}</span><span>Expectativa: {labels[review.expectation]}</span><span>Custo-benefício: {labels[review.value_for_money]}</span></div>{review.reasons.length > 0 && <ul className="reasonTags" aria-label="Motivos">{review.reasons.map((reason) => <li className={`reasonTag reasonTag--${reason.perception}`} key={reason.aspect}><span aria-hidden="true">{reason.perception === "positive" ? "+" : "−"}</span> {getAspectLabel(reason.aspect)}<span className="srOnly">{reason.perception === "positive" ? " (positivo)" : " (negativo)"}</span></li>)}</ul>}{review.comment && <p>“{review.comment}”</p>}</div>;
 }

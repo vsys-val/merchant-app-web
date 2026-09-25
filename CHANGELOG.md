@@ -15,9 +15,12 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 - Painel administrativo em `/admin`: saúde e versões no ar, métricas de produto com meta, crescimento, catálogo, operação da API e erros do navegador, com tabela equivalente para cada gráfico e modo escuro.
 - Eventos de uso próprios (busca, detalhe, etapas da avaliação, cadastro de produto, criação de conta, carregamento e erros), sem dados pessoais e desligados com *Do Not Track*, em navegadores automatizados e fora do build de produção.
 - O commit do build é embutido no bundle e aparece no painel.
+- "O que a comunidade destaca" no detalhe do produto: os aspectos mais elogiados e mais criticados, com a contagem de avaliações.
+- Motivos de cada avaliação (ex.: "+ Sabor", "− Preço") visíveis na lista da comunidade e em "Sua experiência".
 
 ### Alterado
 
+- Os rótulos dos aspectos ficam em um único módulo, usado pelo formulário de avaliação, pelo detalhe e pelo painel.
 - O cliente HTTP aceita respostas `202 Accepted` sem corpo.
 
 ### Corrigido

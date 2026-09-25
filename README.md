@@ -20,7 +20,7 @@ O Merchant responde, no corredor do mercado, à pergunta *"eu compraria isto de 
 
 - Cadastro com confirmação de e-mail por código, login, recuperação de senha, persistência de sessão e saída.
 - Busca combinando nome, marca e categoria, ou por código de barras, com paginação e filtros na URL.
-- Detalhe do produto com indicadores da comunidade.
+- Detalhe do produto com indicadores da comunidade e os aspectos mais elogiados e criticados.
 - Cadastro de produtos com categoria, quantidade, unidade e GTIN opcional.
 - Criação, edição e exclusão da avaliação pessoal.
 - Área do usuário com produtos cadastrados e avaliações próprias.

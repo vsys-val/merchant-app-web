@@ -44,7 +44,7 @@ flowchart LR
 | Início | `/` · `HomeView` em `App.tsx` | US12 | RF14, RF15 | visitante · carregando · sem avaliações · com lembretes · erro · API offline | e2e `merchant.spec.ts`, `production.spec.ts` |
 | Modal de acesso | `AuthPanel` | US01, US02, US14, US15 | RF01, RF02, RF16–RF18 | login · cadastro · confirmação por código · reenvio com contagem de 60 s · esqueci a senha · nova senha · e-mail indisponível · erro da API | `AuthPanel.test.tsx`; e2e (teclado, foco, Esc, cadastro com código) |
 | Busca | `/search` · `ProductSearch` | US03, US04 | RF03, RF04 | sem busca · buscando · vazio (com os filtros aplicados) · resultados paginados · termo curto · código inválido · erro · restaurada da URL | `ProductSearch.test.tsx`; e2e (filtros combinados e volta do produto) |
-| Detalhe | `/products/:id` · `ProductDetailView` | US04, US05, US11 | RF05, RF11, RF12 | carregando · não encontrado · com/sem avaliação própria · comunidade vazia · paginação | `ProductDetailView.test.tsx`, e2e |
+| Detalhe | `/products/:id` · `ProductDetailView` | US04, US05, US11 | RF05, RF11, RF12, RN41 | carregando · não encontrado · com/sem avaliação própria · comunidade vazia · destaques só de elogios ou só de críticas · paginação | `ProductDetailView.test.tsx`, e2e |
 | Avaliação | `ReviewForm` | US09, US10 | RF08, RF09 | etapa 1 · etapa 2 · conferência · validação por etapa · erro ao salvar | cobertos pela API (T18–T21) |
 | Cadastro de produto | `/products/new` · `ProductForm` | US06 | RF06 | formulário · salvando · duplicata com atalho para o produto existente · erro de validação | `ProductForm.test.tsx`; API (T08–T11) |
 | Correção de produto | `/products/:id/edit` · `ProductEditView` + `ProductForm` | US07 | RF07 | carregando · bloqueado (avaliado por outra pessoa) · formulário preenchido · nada alterado · duplicata · bloqueio durante a edição · erro | `ProductEditView.test.tsx`; e2e (Meus produtos → corrigir → salvar) |
@@ -71,6 +71,8 @@ flowchart LR
 | Confirmação modal para excluir avaliação, com foco no "Cancelar" | Ação irreversível: o padrão seguro é não excluir | RN28 (sem histórico) |
 | Cor **e** ícone **e** texto no status de recompra | Não depender só de cor (acessibilidade) | `design-qa.md` |
 | Navegação inferior com 3 destinos | Alcance do polegar no celular; arquitetura de informação validada no protótipo | [Protótipo mobile](mobile-prototype.md) |
+| "O que a comunidade destaca" com **contagens** ("2 de 3") e não percentuais; no máximo 3 aspectos por lado | Com poucas avaliações, "67%" sugere uma precisão que não existe; 3 itens cabem no celular sem rolar | RN41, [ADR-0003](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0003-motivos-estruturados-obrigatorios.md) |
+| Motivos com sinal **+ / −**, cor e texto para leitor de tela ("positivo"/"negativo") | Não depender só de verde e vermelho | Acessibilidade |
 | Painel com **meta e estado** ao lado de cada métrica (ícone + texto, nunca só cor) | Um número sem referência não diz se está bom; as metas vêm da visão de produto | [ADR-0012](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0012-painel-e-instrumentacao-propria.md) |
 | Cada gráfico tem uma **tabela equivalente** e tooltip por teclado | Leitores de tela e quem precisa do número exato; o gráfico sozinho não basta | Acessibilidade |
 | Painel em largura total, fora da navegação do app | É uma ferramenta de trabalho no desktop, não um fluxo de compra; no celular vira uma coluna | US16 |

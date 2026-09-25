@@ -4,16 +4,10 @@ import { track } from "../../lib/analytics";
 import { useAuth } from "../auth/AuthContext";
 import { Review } from "./product-api";
 import { Aspect, createReview, ReviewInput, updateReview } from "./review-api";
+import { aspectOptions } from "./aspect-labels";
 import "./review-form.css";
 
-const aspects: Array<{ value: Aspect; label: string }> = [
-  { value: "taste", label: "Sabor" }, { value: "fragrance", label: "Cheiro ou fragrância" },
-  { value: "texture_consistency", label: "Textura ou consistência" }, { value: "effectiveness_performance", label: "Eficácia ou desempenho" },
-  { value: "quantity_yield", label: "Quantidade ou rendimento" }, { value: "ease_of_use_preparation", label: "Facilidade de uso ou preparo" },
-  { value: "packaging", label: "Embalagem" }, { value: "durability_preservation", label: "Durabilidade ou conservação" },
-  { value: "composition_ingredients", label: "Composição ou ingredientes" }, { value: "safety_tolerance", label: "Segurança ou tolerância" },
-  { value: "price", label: "Preço" }, { value: "other", label: "Outro" },
-];
+const aspects = aspectOptions;
 
 type Perception = "positive" | "negative";
 type ReasonState = Partial<Record<Aspect, Perception>>;

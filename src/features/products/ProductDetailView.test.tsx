@@ -51,6 +51,7 @@ const product = {
     quality: { high: 0, adequate: 0, low: 0 },
     expectation: { exceeded: 0, met: 0, not_met: 0 },
     value_for_money: { good: 0, fair: 0, poor: 0 },
+    reasons: [] as Array<{ aspect: string; positive: number; negative: number }>,
   },
   your_review: review,
 };
@@ -135,5 +136,79 @@ describe("ProductDetailView deletion confirmation", () => {
     const dialog = container.querySelector('[role="dialog"]');
     expect(dialog).not.toBeNull();
     expect(dialog?.querySelector('[role="alert"]')?.textContent).toBe("Falha de teste");
+  });
+});
+
+describe("ProductDetailView community reasons", () => {
+  let container: HTMLDivElement;
+  let root: Root;
+
+  beforeEach(() => {
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+
+  afterEach(() => {
+    act(() => root.unmount());
+    container.remove();
+  });
+
+  async function render(detail: typeof product, page: unknown = reviewsPage) {
+    mocks.getProductDetail.mockResolvedValue(detail);
+    mocks.getCommunityReviews.mockResolvedValue(page);
+    await act(async () => { root.render(<ProductDetailView productId={3} onBack={() => undefined} />); });
+  }
+
+  it("highlights the most praised and most criticized aspects", async () => {
+    await render({
+      ...product,
+      community_summary: {
+        ...product.community_summary,
+        total_reviews: 4,
+        reasons: [
+          { aspect: "taste", positive: 3, negative: 1 },
+          { aspect: "price", positive: 0, negative: 2 },
+          { aspect: "packaging", positive: 1, negative: 0 },
+          { aspect: "quantity_yield", positive: 1, negative: 0 },
+          { aspect: "fragrance", positive: 1, negative: 0 },
+        ],
+      },
+    });
+
+    const section = container.querySelector(".communityHighlights");
+    expect(section?.querySelector("h3")?.textContent).toBe("O que a comunidade destaca");
+    const [praised, criticized] = Array.from(section?.querySelectorAll(".highlightColumn") ?? []);
+    const rows = (column: Element) => Array.from(column.querySelectorAll("li")).map((item) => item.textContent);
+    expect(rows(praised)).toEqual([
+      "Sabor3 de 4 avaliações",
+      "Cheiro ou fragrância1 de 4 avaliações",
+      "Embalagem1 de 4 avaliações",
+    ]);
+    expect(rows(criticized)).toEqual(["Preço2 de 4 avaliações", "Sabor1 de 4 avaliações"]);
+  });
+
+  it("hides the highlights without community reviews and says when one side is empty", async () => {
+    await render(product);
+    expect(container.querySelector(".communityHighlights")).toBeNull();
+
+    act(() => root.unmount());
+    root = createRoot(container);
+    await render({
+      ...product,
+      community_summary: { ...product.community_summary, total_reviews: 1, reasons: [{ aspect: "taste", positive: 1, negative: 0 }] },
+    });
+    expect(container.querySelector(".highlightColumn--negative")?.textContent).toContain("Nenhuma crítica citada ainda.");
+  });
+
+  it("lists each review's reasons with their perception", async () => {
+    await render(product, {
+      ...reviewsPage,
+      total: 1,
+      items: [{ ...review, id: 8, author_name: "Ana", reasons: [{ aspect: "taste", perception: "positive" }, { aspect: "price", perception: "negative" }] }],
+    });
+    const card = container.querySelector(".reviewCard");
+    const tags = Array.from(card?.querySelectorAll(".reasonTag") ?? []).map((item) => item.textContent);
+    expect(tags).toEqual(["+ Sabor (positivo)", "− Preço (negativo)"]);
   });
 });
