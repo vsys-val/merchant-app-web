@@ -20,7 +20,7 @@ services:
         value: strict-origin-when-cross-origin
       - path: /*
         name: Permissions-Policy
-        value: camera=(), microphone=(), geolocation=()
+        value: camera=(self), microphone=(), geolocation=()
       - path: /*
         name: X-Content-Type-Options
         value: nosniff

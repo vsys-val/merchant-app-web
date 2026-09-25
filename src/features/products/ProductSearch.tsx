@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowLeft, CaretRight, MagnifyingGlass, Package, Plus } from "@phosphor-icons/react";
+import { ArrowLeft, Barcode, CaretRight, MagnifyingGlass, Package, Plus } from "@phosphor-icons/react";
+import { BarcodeScanner } from "../barcode/BarcodeScanner";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
 import { track } from "../../lib/analytics";
@@ -78,6 +79,7 @@ export function ProductSearch({
   const [brand, setBrand] = useState(initial.current?.filters.brand ?? "");
   const [category, setCategory] = useState<Category | undefined>(initial.current?.filters.category);
   const [barcode, setBarcode] = useState(initial.current?.filters.barcode ?? "");
+  const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState<SearchPage<ProductListItem> | null>(null);
   const [searched, setSearched] = useState<ProductFilters>({});
   const [error, setError] = useState("");
@@ -171,6 +173,7 @@ export function ProductSearch({
               <input id="barcode-search" value={barcode} onChange={(event) => setBarcode(event.target.value.replace(/\D/g, ""))} inputMode="numeric" maxLength={14} placeholder="Ex.: 7891234567890" required />
               <button type="submit" disabled={isSearching} aria-label="Executar busca">{isSearching ? <span className="loadingLabel">Buscando...</span> : <CaretRight size={24} />}</button>
             </div>
+            <button className="secondaryButton scanButton" type="button" onClick={() => setIsScanning(true)}><Barcode size={22} />Ler com a câmera</button>
           </>
         )}
       </form>
@@ -189,6 +192,13 @@ export function ProductSearch({
         <SearchResults result={result} filters={searched} disabled={isSearching} onSelect={onSelect} onPageChange={(page) => void runSearch(searched, page)} />
       )}
       <button className="primaryButton createProductAction" type="button" onClick={onCreate}><Plus size={20} />Cadastrar produto</button>
+      {isScanning && (
+        <BarcodeScanner
+          context="search"
+          onClose={() => setIsScanning(false)}
+          onDetected={(code) => { setIsScanning(false); setBarcode(code); void runSearch({ barcode: code }); }}
+        />
+      )}
     </section>
   );
 }
