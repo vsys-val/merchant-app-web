@@ -7,9 +7,9 @@ import { categoryLabels, getCategoryLabel } from "./category-labels";
 import {
   Category,
   filtersToParams,
-  Page,
   ProductFilters,
   ProductListItem,
+  SearchPage,
   searchProducts,
 } from "./product-api";
 import "./products.css";
@@ -78,7 +78,7 @@ export function ProductSearch({
   const [brand, setBrand] = useState(initial.current?.filters.brand ?? "");
   const [category, setCategory] = useState<Category | undefined>(initial.current?.filters.category);
   const [barcode, setBarcode] = useState(initial.current?.filters.barcode ?? "");
-  const [result, setResult] = useState<Page<ProductListItem> | null>(null);
+  const [result, setResult] = useState<SearchPage<ProductListItem> | null>(null);
   const [searched, setSearched] = useState<ProductFilters>({});
   const [error, setError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -107,6 +107,7 @@ export function ProductSearch({
         brand: Boolean(filters.brand?.trim()),
         category: filters.category ?? null,
         results: found.total,
+        approximate: Boolean(found.approximate),
         page,
       });
       setSearched(filters);
@@ -195,7 +196,7 @@ export function ProductSearch({
 function SearchResults({
   result, filters, disabled, onSelect, onPageChange,
 }: {
-  result: Page<ProductListItem>;
+  result: SearchPage<ProductListItem>;
   filters: ProductFilters;
   disabled: boolean;
   onSelect(productId: number): void;
@@ -211,7 +212,9 @@ function SearchResults({
   }
   return (
     <div className="results" aria-live="polite">
-      <div className="resultsHeader"><strong>{result.total} {result.total === 1 ? "produto" : "produtos"}</strong><span>{describeFilters(filters)}</span></div>
+      {result.approximate
+        ? <div className="approximateNotice" role="status"><strong>Nada exato para {describeFilters(filters)}.</strong><span>{result.total === 1 ? "Mostrando o mais parecido. Se não for este, cadastre o produto." : `Mostrando os ${result.total} mais parecidos. Se não for nenhum destes, cadastre o produto.`}</span></div>
+        : <div className="resultsHeader"><strong>{result.total} {result.total === 1 ? "produto" : "produtos"}</strong><span>{describeFilters(filters)}</span></div>}
       <div className="productGrid">
         {result.items.map((product) => <ProductCard key={product.id} product={product} onSelect={onSelect} />)}
       </div>

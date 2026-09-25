@@ -132,7 +132,7 @@ function Overview({ data }: { data: AdminOverview }) {
           <StatTile label="Buscas com resultado" value={pct(product.searches.with_results_pct)}
             goal={`Meta: ≥ ${product.searches.target_with_results_pct}%`}
             health={healthFor(product.searches.with_results_pct, product.searches.target_with_results_pct, "min")}
-            detail={`${numberFormat.format(product.searches.total)} buscas · ${pct(product.searches.barcode_pct)} por código`} />
+            detail={`${numberFormat.format(product.searches.total)} buscas · ${pct(product.searches.barcode_pct)} por código · ${pct(product.searches.approximate_pct ?? null)} só com parecidos`} />
           <StatTile label="Ativação · 1ª avaliação em até 7 dias" value={pct(product.activation.pct)}
             goal={`Meta: ≥ ${product.activation.target_pct}%`}
             health={healthFor(product.activation.pct, product.activation.target_pct, "min")}

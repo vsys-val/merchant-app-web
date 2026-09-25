@@ -23,7 +23,7 @@ export function overviewFixture(days = 7): AdminOverview {
     })),
     product: {
       north_star: { label: "Consultas…", value: 2.5, own_review_views: 10, weekly_active_users: 4, target: 2 },
-      searches: { total: 60, with_results_pct: 55.0, barcode_pct: 10.0, target_with_results_pct: 70 },
+      searches: { total: 60, with_results_pct: 55.0, barcode_pct: 10.0, approximate_pct: 15.0, target_with_results_pct: 70 },
       activation: { cohort: 8, activated: 4, pct: 50.0, target_pct: 40 },
       reviews_per_active_user: 1.5,
       review_funnel: {

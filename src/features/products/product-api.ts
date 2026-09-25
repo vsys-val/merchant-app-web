@@ -62,6 +62,8 @@ export interface AspectMentions { aspect: Aspect; positive: number; negative: nu
 
 export interface CommunityReview extends Review { author_name: string; }
 export interface Page<T> { items: T[]; page: number; page_size: number; total: number; }
+/** Na busca, `approximate` indica que nada contém o termo e os itens são só parecidos. */
+export interface SearchPage<T> extends Page<T> { approximate?: boolean; }
 /** Nome, marca e categoria combinam com E; o código de barras é exclusivo. */
 export interface ProductFilters {
   name?: string;
@@ -87,7 +89,7 @@ export function searchProducts(filters: ProductFilters, page = 1, token?: string
   const params = filtersToParams(filters, page);
   params.set("page", String(page));
   params.set("page_size", "20");
-  return apiRequest<Page<ProductListItem>>(`/api/v1/products?${params}`, {}, token);
+  return apiRequest<SearchPage<ProductListItem>>(`/api/v1/products?${params}`, {}, token);
 }
 
 export function getProductDetail(productId: number, token?: string | null) {
