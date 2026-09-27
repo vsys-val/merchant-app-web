@@ -8,6 +8,11 @@ services:
       - key: VITE_API_URL
         value: https://fastapi-merchant-app.onrender.com
     routes:
+      # A API na mesma origem do site (pré-requisito da sessão em cookie).
+      # Precisa vir antes da regra da SPA.
+      - type: rewrite
+        source: /api/*
+        destination: https://fastapi-merchant-app.onrender.com/api/*
       - type: rewrite
         source: /*
         destination: /index.html
