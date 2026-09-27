@@ -24,7 +24,11 @@ describe("BarcodeScanner", () => {
     document.body.append(container);
     root = createRoot(container);
     await act(async () => { root.render(<BarcodeScanner context="search" onDetected={onDetected} onClose={onClose} />); });
+    await nextTick();
   }
+
+  // A câmera só é aberta no ciclo seguinte à montagem.
+  const nextTick = () => act(() => new Promise<void>((resolve) => { setTimeout(resolve, 0); }));
 
   const text = () => container.querySelector(".scannerStatus")?.textContent;
   const button = (label: string) => Array.from(container.querySelectorAll("button")).find((item) => item.textContent === label);
@@ -61,8 +65,22 @@ describe("BarcodeScanner", () => {
     expect(mocks.track).toHaveBeenCalledWith("barcode_scan", { outcome: "denied", engine: null, context: "search" });
 
     await act(async () => button("Tentar de novo")!.click());
+    await nextTick();
     expect(mocks.startScanner).toHaveBeenCalledTimes(2);
     expect(text()).toBe("Aponte para o código de barras da embalagem.");
+  });
+
+  it("não abre a câmera quando é fechado antes do próximo ciclo", async () => {
+    mocks.startScanner.mockResolvedValue({ engine: "native", stop: mocks.stop });
+    container = document.createElement("div");
+    document.body.append(container);
+    root = createRoot(container);
+    // Montar e desmontar no mesmo ciclo, sem deixar o temporizador disparar.
+    act(() => { root.render(<BarcodeScanner context="search" onDetected={onDetected} onClose={onClose} />); });
+    act(() => root.unmount());
+    await nextTick();
+    expect(mocks.startScanner).not.toHaveBeenCalled();
+    root = createRoot(container);
   });
 
   it("fecha com Esc, desliga a câmera e registra o cancelamento", async () => {

@@ -1,0 +1,115 @@
+/*
+ * Layouts por dispositivo. O celular é a base (styles.css e o CSS de cada tela);
+ * aqui ficam só o tablet (≥ 768 px) e o desktop (≥ 1024 px). Os seletores partem
+ * de .appShell para prevalecer sobre as regras de celular sem depender da ordem
+ * de importação dos arquivos.
+ */
+
+.topNavigation, .searchIdle { display: none; }
+
+/* ───────────── Tablet: coluna mais larga, navegação inferior mantida ───────────── */
+@media (min-width: 768px) {
+  .appShell { width: min(100% - 48px, 760px); }
+  .bottomNavigation { width: min(100% - 48px, 760px); }
+  .appShell .appContent { padding: 26px 36px 116px; }
+  .appShell .homeHeader { padding: 34px 36px 0; }
+
+  .appShell .searchIdle { margin: 24px 0 0; padding: 22px; display: block; border: 1px dashed #d8d2e2; border-radius: 14px; color: var(--merchant-muted); font-size: .9rem; line-height: 1.5; text-align: center; }
+  .appShell .productGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+  .appShell .distributionGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .appShell .distributionCard h3 { min-height: 0; }
+  .appShell .accountList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+  .appShell .productFormPage .formGrid { grid-template-columns: 1fr 1fr; }
+  .appShell .productFormPage .formGrid--measure { grid-template-columns: 1fr 1fr 1.4fr; }
+  .appShell .productFormPage .fieldWide { grid-column: 1 / -1; }
+  .appShell .productFormPage .formActions { flex-direction: row; justify-content: flex-end; }
+  .appShell .productFormPage .formActions button { width: auto; min-width: 180px; }
+}
+
+/* ───────────── Desktop: página inteira, navegação no topo, várias colunas ───────────── */
+@media (min-width: 1024px) {
+  :root, body { background: var(--merchant-paper); }
+  .appShell { width: 100%; min-height: 100vh; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+  .appShell .homeHeader, .bottomNavigation { display: none; }
+
+  .topNavigation {
+    position: sticky; top: 0; z-index: 15;
+    min-height: 72px; padding: 0 max(40px, calc((100% - 1200px) / 2));
+    display: flex; align-items: center; gap: 32px;
+    border-bottom: 1px solid var(--merchant-line); background: rgba(252, 251, 249, .94); backdrop-filter: blur(10px);
+  }
+  .topBrand { padding: 0; display: flex; align-items: baseline; gap: 12px; border: 0; color: #291356; background: transparent; font-size: 1.5rem; font-weight: 800; letter-spacing: -.06em; }
+  .topBrand span { color: var(--merchant-muted); font-size: .82rem; font-weight: 500; letter-spacing: -.01em; }
+  .topNavigation nav { margin-left: auto; display: flex; gap: 4px; }
+  .topNavigation nav button, .topAccount { min-height: 44px; padding: 0 14px; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 11px; color: #5f586b; background: transparent; font-size: .9rem; font-weight: 700; }
+  .topNavigation nav button:hover, .topAccount:hover { color: var(--merchant-purple); background: #f3eff8; }
+  .topNavigation nav button.active { color: var(--merchant-purple); background: #eee8f6; }
+  .topAccount { padding-left: 8px; border: 1px solid var(--merchant-line); color: #3d3350; background: #fff; }
+  .topAccount svg { color: #7a6a8f; }
+  .topNavigation button { white-space: nowrap; }
+  .topAccount span { max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+
+  .appShell .appContent { max-width: 1280px; min-height: calc(100vh - 72px); margin: 0 auto; padding: 40px 40px 72px; }
+  .signOutButton { margin: 0 auto 48px; }
+
+  /* Início: busca em destaque e duas colunas de memória. */
+  .appShell .homeLayout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 48px; align-items: start; }
+  .appShell .homeSearch { grid-column: 1 / -1; margin-bottom: 20px; }
+  .appShell .searchLaunch { max-width: 760px; min-height: 64px; padding: 16px 20px; background: #fff; font-size: 1.1rem; }
+  .appShell .searchLaunch:hover { border-color: #bfb2d6; }
+  .appShell .memorySection > h1, .appShell .memorySection > h2 { font-size: 1.6rem; }
+  .appShell .recentSection { margin-top: 0; }
+  .appShell .memoryRow { min-height: 0; margin-top: 14px; padding: 18px; border: 1px solid var(--merchant-line); border-radius: 16px; background: #fff; }
+  .appShell .memoryRow:hover { border-color: #cbbfe0; box-shadow: 0 8px 22px rgba(41, 19, 86, .06); }
+  .appShell .visitorWelcome { grid-column: 1 / -1; min-height: 0; padding: 64px 32px; border: 1px solid var(--merchant-line); border-radius: 24px; background: #fff; }
+  .appShell .visitorWelcome h1 { max-width: 560px; font-size: 2.4rem; }
+
+  /* Busca: filtros à esquerda, resultados à direita. */
+  .appShell .productSearch { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 48px; align-items: start; }
+  .appShell .searchPanel { position: sticky; top: 104px; }
+  .appShell .pageHeader > button { display: none; }
+  .appShell .pageHeader h1 { font-size: 1.9rem; }
+  .appShell .categoryFilter { margin: 18px 0 0; padding: 0; flex-wrap: wrap; overflow: visible; }
+  .appShell .results { margin-top: 0; }
+  .appShell .searchIdle { margin-top: 0; padding: 48px 32px; }
+  .appShell .productGrid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+  .appShell .productCard { border: 1px solid var(--merchant-line); border-radius: 16px; background: #fff; }
+  .appShell .productCard:hover { border-color: #cbbfe0; box-shadow: 0 8px 22px rgba(41, 19, 86, .06); }
+  .appShell .productCardLink { min-height: 132px; padding: 16px; border-bottom: 0; }
+  .appShell .productCard .productPlaceholder { width: 76px; height: 96px; flex-basis: 76px; }
+  .appShell .createProductAction { width: auto; min-width: 220px; padding-inline: 22px; }
+
+  /* Detalhe: indicadores e comunidade à esquerda, sua experiência fixa à direita. */
+  .appShell .productHeading { margin-top: 16px; padding: 40px 44px; align-items: flex-end; }
+  .appShell .productHeading h1 { font-size: 2.6rem; }
+  .appShell .quantityBadge { width: 120px; height: 120px; }
+  .appShell .detailBody { display: grid; grid-template-columns: minmax(0, 1fr) 360px; column-gap: 40px; align-items: start; }
+  .appShell .detailBody > * { grid-column: 1; }
+  .appShell .detailBody > .yourReview { position: sticky; top: 104px; grid-column: 2; grid-row: 1 / span 8; margin-top: 32px; }
+  .appShell .detailBody > .communityReviews { margin-top: 20px; }
+  .appShell .reviewEditor { max-width: 760px; margin-inline: auto; }
+
+  /* Minha área: cartões em grade. */
+  .appShell .accountPage > .backButton { display: none; }
+  .appShell .accountHeading { margin-top: 0; padding: 36px 40px; }
+  .appShell .accountHeading h1 { font-size: 2.3rem; }
+  .appShell .accountTabs { width: auto; min-width: 380px; display: inline-grid; }
+  .appShell .accountList { gap: 14px; }
+  .appShell .accountCard { padding: 0 20px; border: 1px solid var(--merchant-line); border-radius: 16px; background: #fff; }
+  .appShell .accountCard > button:first-child { border-bottom: 0; }
+  .appShell .accountCard--editable { padding-bottom: 18px; }
+
+  /* Formulários: coluna central legível. */
+  .appShell .productFormPage { max-width: 820px; margin: 0 auto; }
+  .appShell .productFormPage h1 { font-size: 2.3rem; }
+  .appShell .productForm fieldset { padding: 24px 26px; }
+  .appShell .productForm .scanButton { width: auto; padding-inline: 18px; }
+  .appShell .pageState { min-height: 50vh; }
+}
+
+
+/* Desktop estreito (notebooks de 1024 px): o slogan sai para o menu caber numa linha. */
+@media (min-width: 1024px) and (max-width: 1179px) {
+  .topBrand span { display: none; }
+  .topNavigation { gap: 20px; }
+}

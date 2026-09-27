@@ -6,6 +6,8 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- Layouts próprios para tablet e computador: no computador, navegação no topo, busca com filtros à esquerda e resultados em grade, detalhe com "Sua experiência" fixa ao lado dos indicadores e início em duas colunas; no tablet, coluna mais larga com listas em duas colunas. O celular não muda.
+- Projeto de tablet no Playwright e teste de layout por dispositivo.
 - Busca combinando nome, marca e categoria, com chips de categoria e modo separado para código de barras.
 - Filtros da busca na URL: a busca é restaurada ao voltar de um produto, ao recarregar e ao abrir um link.
 - Confirmação de conta com código de 6 dígitos enviado por e-mail, com reenvio limitado a um por minuto.
@@ -31,6 +33,8 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 
 ### Corrigido
 
+- O computador exibia a coluna estreita do celular, com a navegação inferior.
+- O leitor de código de barras às vezes mostrava só quadros pretos ao abrir, porque a câmera era aberta duas vezes seguidas.
 - Em telas estreitas, o campo de busca e o botão voltam a ficar na mesma linha.
 - "(opcional)" deixa de quebrar linha nos rótulos de variante e código GTIN.
 

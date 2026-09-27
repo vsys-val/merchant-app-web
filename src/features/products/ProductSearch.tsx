@@ -148,6 +148,7 @@ export function ProductSearch({
 
   return (
     <section className="productSearch" aria-labelledby="search-title">
+      <div className="searchPanel">
       <header className="pageHeader"><button type="button" aria-label="Voltar ao início" onClick={onBack}><ArrowLeft size={24} /></button><h1 id="search-title">Buscar</h1></header>
       <div className="searchModes" role="group" aria-label="Pesquisar por">
         <button type="button" className={mode === "text" ? "active" : ""} aria-pressed={mode === "text"} onClick={() => changeMode("text")}>Produto e marca</button>
@@ -187,11 +188,15 @@ export function ProductSearch({
           ))}
         </div>
       )}
-      {error && <p className="searchError" role="alert">{error}</p>}
-      {result && (
-        <SearchResults result={result} filters={searched} disabled={isSearching} onSelect={onSelect} onPageChange={(page) => void runSearch(searched, page)} />
-      )}
-      <button className="primaryButton createProductAction" type="button" onClick={onCreate}><Plus size={20} />Cadastrar produto</button>
+      </div>
+      <div className="searchResultsPane">
+        {error && <p className="searchError" role="alert">{error}</p>}
+        {result && (
+          <SearchResults result={result} filters={searched} disabled={isSearching} onSelect={onSelect} onPageChange={(page) => void runSearch(searched, page)} />
+        )}
+        {!result && !error && <p className="searchIdle">Busque pelo nome, pela marca ou pelo código de barras, ou escolha uma categoria para explorar o catálogo.</p>}
+        <button className="primaryButton createProductAction" type="button" onClick={onCreate}><Plus size={20} />Cadastrar produto</button>
+      </div>
       {isScanning && (
         <BarcodeScanner
           context="search"

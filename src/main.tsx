@@ -4,6 +4,7 @@ import { App } from "./App";
 import { AuthProvider } from "./features/auth/AuthContext";
 import { startAnalytics } from "./lib/analytics";
 import "./styles.css";
+import "./responsive.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

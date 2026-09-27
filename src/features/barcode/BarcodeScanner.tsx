@@ -46,26 +46,32 @@ export function BarcodeScanner({ context, onDetected, onClose }: {
     let session: { stop(): void } | null = null;
     let active = true;
     setStatus("starting");
-    startScanner(video, (code) => {
-      if (!active) return;
-      navigator.vibrate?.(60);
-      finish("detected");
-      onDetected(code);
-    })
-      .then((started) => {
-        session = started;
-        engineRef.current = started.engine;
-        if (active) setStatus("scanning");
-        else started.stop();
-      })
-      .catch((caught: unknown) => {
+    // Abrir a câmera no próximo ciclo: uma montagem desfeita logo em seguida
+    // (StrictMode, abrir e fechar rápido) nunca chega a ligá-la. Duas aberturas
+    // seguidas do mesmo dispositivo fazem a segunda receber quadros pretos.
+    const timer = window.setTimeout(() => {
+      startScanner(video, (code) => {
         if (!active) return;
-        const reason = caught instanceof ScannerError ? caught.reason : "error";
-        setStatus(reason);
-        finish(reason);
-      });
+        navigator.vibrate?.(60);
+        finish("detected");
+        onDetected(code);
+      })
+        .then((started) => {
+          session = started;
+          engineRef.current = started.engine;
+          if (active) setStatus("scanning");
+          else started.stop();
+        })
+        .catch((caught: unknown) => {
+          if (!active) return;
+          const reason = caught instanceof ScannerError ? caught.reason : "error";
+          setStatus(reason);
+          finish(reason);
+        });
+    }, 0);
     return () => {
       active = false;
+      window.clearTimeout(timer);
       session?.stop();
     };
   }, [attempt]);

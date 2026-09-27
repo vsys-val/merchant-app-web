@@ -16,6 +16,8 @@ export default defineConfig({
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "mobile", use: { ...devices["Pixel 7"] } },
+    // Tablet em retrato, com toque, no Chromium (o mesmo motor dos outros projetos).
+    { name: "tablet", use: { ...devices["Desktop Chrome"], viewport: { width: 820, height: 1180 }, isMobile: true, hasTouch: true } },
   ],
   webServer: productionBaseUrl ? undefined : {
     command: "npm run dev -- --host 127.0.0.1 --port 4173",
