@@ -75,7 +75,8 @@ describe("BarcodeScanner", () => {
     container = document.createElement("div");
     document.body.append(container);
     root = createRoot(container);
-    await act(async () => { root.render(<BarcodeScanner context="search" onDetected={onDetected} onClose={onClose} />); });
+    // Montar e desmontar no mesmo ciclo, sem deixar o temporizador disparar.
+    act(() => { root.render(<BarcodeScanner context="search" onDetected={onDetected} onClose={onClose} />); });
     act(() => root.unmount());
     await nextTick();
     expect(mocks.startScanner).not.toHaveBeenCalled();
