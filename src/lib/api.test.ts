@@ -7,7 +7,7 @@ afterEach(() => {
 });
 
 describe("apiRequest", () => {
-  it("envia JSON e token Bearer e lê a resposta", async () => {
+  it("envia JSON com o cookie da sessão e o cabeçalho do cliente, sem token Bearer", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ id: 7 }), {
         status: 200,
@@ -19,11 +19,14 @@ describe("apiRequest", () => {
     await expect(apiRequest<{ id: number }>("/api/v1/test", {
       method: "POST",
       body: JSON.stringify({ name: "Café" }),
-    }, "jwt-token")).resolves.toEqual({ id: 7 });
+    })).resolves.toEqual({ id: 7 });
 
     const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
     const headers = options.headers as Headers;
-    expect(headers.get("Authorization")).toBe("Bearer jwt-token");
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/test");
+    expect(options.credentials).toBe("same-origin");
+    expect(headers.get("X-Merchant-Client")).toBe("web");
+    expect(headers.get("Authorization")).toBeNull();
     expect(headers.get("Content-Type")).toBe("application/json");
   });
 

@@ -35,7 +35,7 @@ function uptime(seconds: number | null) {
 }
 
 export function AdminDashboard({ onBack }: { onBack(): void }) {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const [days, setDays] = useState<(typeof PERIODS)[number]>(30);
   const [data, setData] = useState<AdminOverview | null>(null);
   const [error, setError] = useState("");
@@ -43,11 +43,11 @@ export function AdminDashboard({ onBack }: { onBack(): void }) {
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    if (!token || !user?.is_admin) return;
+    if (!user?.is_admin) return;
     const controller = new AbortController();
     setIsLoading(true);
     setError("");
-    getAdminOverview(days, token, controller.signal)
+    getAdminOverview(days, controller.signal)
       .then(setData)
       .catch((caught) => {
         if (controller.signal.aborted) return;
@@ -55,7 +55,7 @@ export function AdminDashboard({ onBack }: { onBack(): void }) {
       })
       .finally(() => !controller.signal.aborted && setIsLoading(false));
     return () => controller.abort();
-  }, [days, token, reloadKey, user?.is_admin]);
+  }, [days, reloadKey, user?.is_admin]);
 
   if (!user?.is_admin) {
     return (

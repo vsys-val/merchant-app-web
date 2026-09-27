@@ -16,7 +16,8 @@ const labels: Record<string, string> = {
 };
 
 export function ProductDetailView({ productId, onBack }: { productId: number; onBack(): void }) {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
+  const userId = user?.id;
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [reviews, setReviews] = useState<Page<CommunityReview> | null>(null);
   const [reviewPage, setReviewPage] = useState(1);
@@ -35,7 +36,7 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
   const deleteDialog = useModalDialog(closeDeleteConfirmation, Boolean(reviewPendingDeletion));
 
   async function load(page = 1) {
-    const [detail, reviewResult] = await Promise.all([getProductDetail(productId, token), getCommunityReviews(productId, page, token)]);
+    const [detail, reviewResult] = await Promise.all([getProductDetail(productId), getCommunityReviews(productId, page)]);
     setProduct(detail); setReviews(reviewResult); setReviewPage(page);
     return detail;
   }
@@ -49,18 +50,18 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
         community_reviews: detail.community_summary.total_reviews,
       }))
       .catch((caught) => setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar o produto."));
-  }, [productId, token]);
+  }, [productId, userId]);
 
   async function changeReviewPage(page: number) {
-    try { setReviews(await getCommunityReviews(productId, page, token)); setReviewPage(page); }
+    try { setReviews(await getCommunityReviews(productId, page)); setReviewPage(page); }
     catch (caught) { setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar as avaliações."); }
   }
 
   async function removeOwnReview(review: Review) {
-    if (!token) return;
+    if (!user) return;
     setDeleteError("");
     setIsDeletingReview(true);
-    try { await deleteReview(review.id, token); setReviewPendingDeletion(null); await load(); }
+    try { await deleteReview(review.id); setReviewPendingDeletion(null); await load(); }
     catch (caught) { setDeleteError(caught instanceof ApiError ? caught.message : "Não foi possível excluir a avaliação."); }
     finally { setIsDeletingReview(false); }
   }

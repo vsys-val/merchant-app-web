@@ -45,12 +45,15 @@ describe("analytics", () => {
     expect(sentBodies(fetchMock)[0].events).toHaveLength(10);
   });
 
-  it("identifica a pessoa só pelo token já existente", () => {
-    localStorage.setItem("merchant.access-token", "jwt-teste");
+  it("identifica a pessoa só pelo cookie de sessão, sem ler token", () => {
+    localStorage.setItem("merchant.access-token", "jwt-antigo");
     track("review_saved", { editing: false });
     flush({ keepalive: true });
     const init = fetchMock.mock.calls[0][1] as RequestInit;
-    expect((init.headers as Record<string, string>).Authorization).toBe("Bearer jwt-teste");
+    const headers = init.headers as Record<string, string>;
+    expect(headers.Authorization).toBeUndefined();
+    expect(headers["X-Merchant-Client"]).toBe("web");
+    expect(init.credentials).toBe("same-origin");
     expect(init.keepalive).toBe(true);
   });
 

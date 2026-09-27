@@ -38,7 +38,7 @@ export function AuthPanel({ onClose }: AuthPanelProps) {
   const [notice, setNotice] = useState("");
   const [cooldown, setCooldown] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, signInWithToken } = useAuth();
+  const { signIn, refreshUser } = useAuth();
   const { dialogRef, onKeyDown } = useModalDialog(onClose);
 
   useEffect(() => {
@@ -92,8 +92,9 @@ export function AuthPanel({ onClose }: AuthPanelProps) {
         setCooldown(RESEND_COOLDOWN_SECONDS);
         changeMode("verify", `Enviamos um código de 6 dígitos para ${email}.`);
       } else if (mode === "verify") {
-        const response = await verifyEmail(email, code);
-        signInWithToken(response.access_token);
+        // A API abre a sessão em cookie ao confirmar o código.
+        await verifyEmail(email, code);
+        await refreshUser();
         onClose();
       } else if (mode === "forgot") {
         await requestPasswordReset(email);

@@ -8,7 +8,7 @@ import { AuthPanel } from "./AuthPanel";
 
 const mocks = vi.hoisted(() => ({
   signIn: vi.fn(),
-  signInWithToken: vi.fn(),
+  refreshUser: vi.fn(),
   register: vi.fn(),
   verifyEmail: vi.fn(),
   resendVerification: vi.fn(),
@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("./AuthContext", () => ({
-  useAuth: () => ({ signIn: mocks.signIn, signInWithToken: mocks.signInWithToken }),
+  useAuth: () => ({ signIn: mocks.signIn, refreshUser: mocks.refreshUser }),
 }));
 
 vi.mock("./auth-api", () => ({
@@ -101,7 +101,7 @@ describe("AuthPanel account flows", () => {
     await submit();
 
     expect(mocks.verifyEmail).toHaveBeenCalledWith(EMAIL, "482913");
-    expect(mocks.signInWithToken).toHaveBeenCalledWith("verified-token");
+    expect(mocks.refreshUser).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
   });
 

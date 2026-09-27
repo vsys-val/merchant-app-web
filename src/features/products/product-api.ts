@@ -85,35 +85,35 @@ export function filtersToParams(filters: ProductFilters, page = 1) {
   return params;
 }
 
-export function searchProducts(filters: ProductFilters, page = 1, token?: string | null) {
+export function searchProducts(filters: ProductFilters, page = 1) {
   const params = filtersToParams(filters, page);
   params.set("page", String(page));
   params.set("page_size", "20");
-  return apiRequest<SearchPage<ProductListItem>>(`/api/v1/products?${params}`, {}, token);
+  return apiRequest<SearchPage<ProductListItem>>(`/api/v1/products?${params}`);
 }
 
-export function getProductDetail(productId: number, token?: string | null) {
-  return apiRequest<ProductDetail>(`/api/v1/products/${productId}`, {}, token);
+export function getProductDetail(productId: number) {
+  return apiRequest<ProductDetail>(`/api/v1/products/${productId}`);
 }
 
-export function getCommunityReviews(productId: number, page = 1, token?: string | null) {
+export function getCommunityReviews(productId: number, page = 1) {
   const params = new URLSearchParams({ page: String(page), page_size: "20" });
-  return apiRequest<Page<CommunityReview>>(`/api/v1/products/${productId}/reviews?${params}`, {}, token);
+  return apiRequest<Page<CommunityReview>>(`/api/v1/products/${productId}/reviews?${params}`);
 }
 
 /** Campos ausentes são mantidos; `null` em variante ou código remove o valor. */
 export type ProductPatchInput = Partial<ProductCreateInput>;
 
-export function updateProduct(productId: number, input: ProductPatchInput, token: string) {
+export function updateProduct(productId: number, input: ProductPatchInput) {
   return apiRequest<ProductPublic>(`/api/v1/products/${productId}`, {
     method: "PATCH",
     body: JSON.stringify(input),
-  }, token);
+  });
 }
 
-export function createProduct(input: ProductCreateInput, token: string) {
+export function createProduct(input: ProductCreateInput) {
   return apiRequest<ProductPublic>("/api/v1/products", {
     method: "POST",
     body: JSON.stringify(input),
-  }, token);
+  });
 }

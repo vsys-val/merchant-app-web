@@ -23,20 +23,20 @@ export interface ReviewInput {
   comment: string | null;
 }
 
-export function createReview(productId: number, input: ReviewInput, token: string) {
+export function createReview(productId: number, input: ReviewInput) {
   return apiRequest<Review>(`/api/v1/products/${productId}/reviews`, {
     method: "POST",
     body: JSON.stringify(input),
-  }, token);
+  });
 }
 
-export function updateReview(reviewId: number, input: ReviewInput, token: string) {
+export function updateReview(reviewId: number, input: ReviewInput) {
   return apiRequest<Review>(`/api/v1/reviews/${reviewId}`, {
     method: "PATCH",
     body: JSON.stringify(input),
-  }, token);
+  });
 }
 
-export function deleteReview(reviewId: number, token: string) {
-  return apiRequest<void>(`/api/v1/reviews/${reviewId}`, { method: "DELETE" }, token);
+export function deleteReview(reviewId: number) {
+  return apiRequest<void>(`/api/v1/reviews/${reviewId}`, { method: "DELETE" });
 }

@@ -9,7 +9,7 @@ import { ProductForm } from "./ProductForm";
 const mocks = vi.hoisted(() => ({ createProduct: vi.fn() }));
 
 vi.mock("../auth/AuthContext", () => ({
-  useAuth: () => ({ token: "test-token", user: { id: 1, name: "Pessoa teste" } }),
+  useAuth: () => ({ user: { id: 1, name: "Pessoa teste" } }),
 }));
 
 vi.mock("./product-api", () => ({ createProduct: mocks.createProduct }));

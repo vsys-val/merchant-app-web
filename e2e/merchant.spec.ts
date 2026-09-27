@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, Page, test } from "./fixtures/session";
 
 const review = {
   id: 7,
@@ -117,11 +117,14 @@ test("detalhe mostra o que a comunidade elogia e critica", async ({ page }) => {
 test("exclusão exige confirmação e atualiza o detalhe", async ({ page }) => {
   let deleted = false;
   let deleteRequests = 0;
-  await page.addInitScript(() => localStorage.setItem("merchant.access-token", "e2e-token"));
   await page.route("**/api/v1/users/me", (route) => route.fulfill({ json: { id: 1, name: "Pessoa teste", email: "qa@example.com" } }));
   await page.route("**/api/v1/products/3", (route) => route.fulfill({ json: { ...product, your_review: deleted ? null : review } }));
   await page.route("**/api/v1/products/3/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
   await page.route("**/api/v1/reviews/7", async (route) => {
+    // A sessão vai no cookie: nada de token no cabeçalho, e o cabeçalho do cliente protege contra CSRF.
+    const headers = route.request().headers();
+    expect(headers.authorization).toBeUndefined();
+    expect(headers["x-merchant-client"]).toBe("web");
     deleteRequests += 1;
     deleted = true;
     await route.fulfill({ status: 204, body: "" });
@@ -139,6 +142,34 @@ test("exclusão exige confirmação e atualiza o detalhe", async ({ page }) => {
   await expect(dialog).toBeHidden();
   await expect(page.getByText("Você ainda não avaliou este produto.")).toBeVisible();
   expect(deleteRequests).toBe(1);
+});
+
+test("quem entrou pela versão antiga troca o token salvo pelo cookie sem digitar a senha", async ({ page }) => {
+  const exchanges: (string | undefined)[] = [];
+  let exchanged = false;
+  await mockPublicApi(page);
+  await page.route("**/api/v1/users/me/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
+  await page.route("**/api/v1/auth/session", async (route) => {
+    exchanges.push(route.request().headers().authorization);
+    exchanged = true;
+    await route.fulfill({ status: 204, body: "" });
+  });
+  await page.route("**/api/v1/users/me", (route) => route.fulfill(
+    exchanged
+      ? { json: { id: 5, name: "Ana", email: "ana@example.com", email_verified: true } }
+      : { status: 401, json: { error: { code: "invalid_authentication", message: "Autenticação ausente, inválida ou expirada.", details: null } } },
+  ));
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem("legacy-seeded")) {
+      localStorage.setItem("merchant.access-token", "token-antigo");
+      sessionStorage.setItem("legacy-seeded", "1");
+    }
+  });
+
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Lembrete para você" })).toBeVisible();
+  expect(exchanges).toEqual(["Bearer token-antigo"]);
+  expect(await page.evaluate(() => localStorage.getItem("merchant.access-token"))).toBeNull();
 });
 
 test("cadastro exige o código enviado por e-mail antes de entrar", async ({ page }) => {
@@ -221,7 +252,6 @@ test("filtros combinados sobrevivem à ida ao produto e à volta", async ({ page
 test("responsável corrige o produto a partir de Meus produtos", async ({ page }) => {
   const patches: unknown[] = [];
   let current = { ...product, variant: null as string | null };
-  await page.addInitScript(() => localStorage.setItem("merchant.access-token", "e2e-token"));
   await page.route("**/api/v1/users/me", (route) => route.fulfill({ json: { id: 1, name: "Pessoa teste", email: "qa@example.com", email_verified: true } }));
   await page.route("**/api/v1/users/me/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
   await page.route("**/api/v1/users/me/products?**", (route) => route.fulfill({ json: { items: [current], page: 1, page_size: 20, total: 1 } }));

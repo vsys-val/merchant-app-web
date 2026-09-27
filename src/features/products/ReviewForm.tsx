@@ -14,7 +14,7 @@ type ReasonState = Partial<Record<Aspect, Perception>>;
 type Choice = { value: string; label: string };
 
 export function ReviewForm({ productId, initial, onCancel, onSaved }: { productId: number; initial?: Review | null; onCancel(): void; onSaved(): void }) {
-  const { token } = useAuth();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   useEffect(() => { track("review_step_viewed", { step, editing: Boolean(initial) }); }, [step]);
   const [repurchase, setRepurchase] = useState(initial?.repurchase_intent ?? "");
@@ -42,7 +42,7 @@ export function ReviewForm({ productId, initial, onCancel, onSaved }: { productI
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (step < 3) return nextStep();
-    if (!token) return setError("Sua sessão expirou. Entre novamente.");
+    if (!user) return setError("Sua sessão expirou. Entre novamente.");
     const input: ReviewInput = {
       repurchase_intent: repurchase as ReviewInput["repurchase_intent"], quality: quality as ReviewInput["quality"],
       expectation: expectation as ReviewInput["expectation"], value_for_money: valueForMoney as ReviewInput["value_for_money"],
@@ -50,7 +50,7 @@ export function ReviewForm({ productId, initial, onCancel, onSaved }: { productI
     };
     setError(""); setIsSubmitting(true);
     try {
-      if (initial) await updateReview(initial.id, input, token); else await createReview(productId, input, token);
+      if (initial) await updateReview(initial.id, input); else await createReview(productId, input);
       track("review_saved", { editing: Boolean(initial) });
       onSaved();
     }

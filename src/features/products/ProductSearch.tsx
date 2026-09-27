@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Barcode, CaretRight, MagnifyingGlass, Package, Plus } from "@phosphor-icons/react";
 import { BarcodeScanner } from "../barcode/BarcodeScanner";
-import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
 import { track } from "../../lib/analytics";
 import { categoryLabels, getCategoryLabel } from "./category-labels";
@@ -84,7 +83,6 @@ export function ProductSearch({
   const [searched, setSearched] = useState<ProductFilters>({});
   const [error, setError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const { token } = useAuth();
 
   async function runSearch(filters: ProductFilters, page = 1) {
     const problem = validate(filters);
@@ -100,7 +98,7 @@ export function ProductSearch({
     window.history.replaceState(null, "", `/search${query}`);
     onQueryChange?.(query);
     try {
-      const found = await searchProducts(filters, page, token);
+      const found = await searchProducts(filters, page);
       setResult(found);
       // Só indica quais filtros foram usados; o texto digitado não sai do navegador.
       track("search_performed", {

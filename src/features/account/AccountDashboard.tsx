@@ -22,7 +22,8 @@ export function AccountDashboard({
   onEditProduct(productId: number): void;
   onOpenAdmin?(): void;
 }) {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
+  const userId = user?.id;
   const [tab, setTab] = useState<Tab>("reviews");
   const [reviews, setReviews] = useState<Page<OwnReview> | null>(null);
   const [products, setProducts] = useState<Page<ProductPublic> | null>(null);
@@ -30,16 +31,16 @@ export function AccountDashboard({
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!token) return;
+    if (!userId) return;
     setError("");
     if (tab === "reviews") {
       setReviews(null);
-      getOwnReviews(token, page).then(setReviews).catch(handleError);
+      getOwnReviews(page).then(setReviews).catch(handleError);
     } else {
       setProducts(null);
-      getOwnProducts(token, page).then(setProducts).catch(handleError);
+      getOwnProducts(page).then(setProducts).catch(handleError);
     }
-  }, [tab, page, token]);
+  }, [tab, page, userId]);
 
   function handleError(caught: unknown) {
     setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar sua área.");
@@ -58,7 +59,7 @@ export function AccountDashboard({
     document.getElementById(`account-tab-${nextTab}`)?.focus();
   }
 
-  if (!user || !token) {
+  if (!user) {
     return <section className="accountState"><p>Sua sessão não está disponível.</p><button className="backButton" onClick={onBack}>Voltar ao início</button></section>;
   }
 

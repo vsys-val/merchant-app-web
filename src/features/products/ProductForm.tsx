@@ -57,7 +57,7 @@ export function ProductForm({
   onSaved(productId: number): void;
   onOpenExisting(productId: number): void;
 }) {
-  const { token } = useAuth();
+  const { user } = useAuth();
   const isEditing = initial !== undefined;
   const [name, setName] = useState(initial?.name ?? "");
   const [brand, setBrand] = useState(initial?.brand ?? "");
@@ -74,7 +74,7 @@ export function ProductForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!token) {
+    if (!user) {
       setError(isEditing ? "Entre na sua conta para corrigir o produto." : "Entre na sua conta para cadastrar um produto.");
       return;
     }
@@ -99,7 +99,7 @@ export function ProductForm({
       }
       setIsSubmitting(true);
       try {
-        const product = await updateProduct(initial.id, patch, token);
+        const product = await updateProduct(initial.id, patch);
         track("product_edit_saved", { fields: Object.keys(patch).length });
         onSaved(product.id);
       } catch (caught) {
@@ -114,7 +114,7 @@ export function ProductForm({
     setIsSubmitting(true);
     track("product_create_submitted", { barcode: input.barcode !== null });
     try {
-      const product = await createProduct(input, token);
+      const product = await createProduct(input);
       track("product_created", { category: product.category });
       onSaved(product.id);
     } catch (caught) {

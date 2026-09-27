@@ -8,7 +8,7 @@ import { overviewFixture } from "./overview-fixture";
 
 const mocks = vi.hoisted(() => ({ getAdminOverview: vi.fn(), user: { id: 1, name: "Admin", email: "a@example.com", email_verified: true, is_admin: true } }));
 
-vi.mock("../auth/AuthContext", () => ({ useAuth: () => ({ token: "admin-token", user: mocks.user }) }));
+vi.mock("../auth/AuthContext", () => ({ useAuth: () => ({ user: mocks.user }) }));
 vi.mock("./admin-api", () => ({ getAdminOverview: mocks.getAdminOverview }));
 
 describe("AdminDashboard", () => {
@@ -37,7 +37,7 @@ describe("AdminDashboard", () => {
   it("mostra os indicadores com a meta e o estado de cada um", async () => {
     await mount();
 
-    expect(mocks.getAdminOverview).toHaveBeenCalledWith(30, "admin-token", expect.any(AbortSignal));
+    expect(mocks.getAdminOverview).toHaveBeenCalledWith(30, expect.any(AbortSignal));
     expect(tile("North Star")?.querySelector(".statValue")?.textContent).toBe("2,5");
     expect(tile("North Star")?.textContent).toContain("Dentro da meta");
     expect(tile("Buscas com resultado")?.textContent).toContain("55%");
@@ -56,7 +56,7 @@ describe("AdminDashboard", () => {
     await mount();
     const seven = Array.from(container.querySelectorAll<HTMLButtonElement>(".adminFilters button")).find((button) => button.textContent === "Últimos 7 dias")!;
     await act(async () => seven.click());
-    expect(mocks.getAdminOverview).toHaveBeenLastCalledWith(7, "admin-token", expect.any(AbortSignal));
+    expect(mocks.getAdminOverview).toHaveBeenLastCalledWith(7, expect.any(AbortSignal));
     expect(seven.getAttribute("aria-pressed")).toBe("true");
   });
 

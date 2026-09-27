@@ -30,14 +30,15 @@ Os módulos de funcionalidade chamam pequenos adaptadores de API. Os componentes
 ## Estado e navegação
 
 - O estado de autenticação vive em `AuthProvider`.
-- O token é persistido no `localStorage` e enviado como Bearer token.
+- A sessão vive num cookie HttpOnly emitido pela API (`merchant_session`); o JavaScript nunca vê o token. Ao abrir, o app pergunta à API quem está conectado (`GET /users/me`).
+- Quem entrou por uma versão anterior tem o token do `localStorage` trocado pelo cookie (`POST /auth/session`) e apagado, sem digitar a senha de novo. "Sair" chama `POST /auth/logout`, que apaga o cookie.
 - Dados de telas ficam em estado local e são recarregados após mutações.
 - A navegação usa a History API, com rewrite do Render para `index.html`.
 - Rotas autenticadas mostram uma solicitação de login quando não há usuário.
 
 ## API e erros
 
-`apiRequest` centraliza URL, cabeçalhos, JSON, Bearer token, respostas sem conteúdo e o contrato de erro da API. Solicitações são canceladas após 15 segundos e sinais externos de cancelamento são preservados.
+`apiRequest` centraliza caminhos relativos, cabeçalhos (inclusive `X-Merchant-Client`, exigido pela API em escritas autenticadas por cookie), JSON, respostas sem conteúdo e o contrato de erro da API. Solicitações são canceladas após 15 segundos e sinais externos de cancelamento são preservados.
 
 As telas representam quatro estados explícitos quando aplicável: carregamento, sucesso, vazio e erro. Erros de ações em modal são apresentados no próprio modal.
 
@@ -69,9 +70,11 @@ O PWA oferece fallback do shell, não uma experiência de dados totalmente offli
 
 ## Segurança
 
-O Render configura CSP, política de referência, restrições de permissões e `nosniff`. A CSP permite apenas o app, a API publicada e as fontes declaradas.
+O Render configura CSP, política de referência, restrições de permissões e `nosniff`. A CSP permite conexões apenas com a própria origem (`connect-src 'self'`) e as fontes declaradas.
 
-O token em `localStorage` reduz complexidade no MVP, mas fica acessível a JavaScript executado na origem. A aplicação evita HTML arbitrário e aplica CSP; para um produto com maior exposição, cookies HttpOnly emitidos pelo backend são a evolução preferível.
+A API responde na mesma origem do site: o Render repassa `/api/*` e `/health` ao serviço da API. Como `onrender.com` está na Public Suffix List, um cookie emitido direto pelo subdomínio da API seria de terceiros para o site e bloqueado pelos navegadores; com o rewrite, ele é primário.
+
+O token de sessão fica num cookie `HttpOnly`, `SameSite=Lax`, `Secure` e restrito a `/api`: um script injetado não consegue lê-lo nem enviá-lo para fora. Contra CSRF, além do `SameSite`, a API recusa escritas autenticadas por cookie sem o cabeçalho `X-Merchant-Client`, que um formulário de outro site não consegue enviar. Decisão em [ADR-0016](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0016-sessao-em-cookie-httponly.md).
 
 ## Decisões e limites
 

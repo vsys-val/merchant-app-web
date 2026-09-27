@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures/session";
 import { writeBarcodeVideo } from "./fixtures/barcode-video";
 
 const GTIN = "7891000100103";
