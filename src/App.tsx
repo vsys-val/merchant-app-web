@@ -46,6 +46,7 @@ export function App() {
   return (
     <div className="appViewport">
       <div className="appShell">
+        <TopNavigation route={route} navigate={navigate} goSearch={goSearch} userName={user?.name ?? null} openAccount={() => user ? navigate("/account") : setShowAuth(true)} />
         {route.name === "home" && (
           <header className="homeHeader">
             <button className="wordmark" type="button" onClick={goHome} aria-label="Merchant — início">
@@ -86,9 +87,11 @@ function HomeView({ status, onSearch, onProduct, onLogin }: { status: ApiStatus;
     getOwnReviews(token, 1).then((page) => setReviews(page.items.slice(0, 3))).catch(() => setError("Não foi possível carregar suas avaliações agora."));
   }, [token]);
 
-  return <>
+  return <div className="homeLayout">
+    <div className="homeSearch">
     <button className="searchLaunch" type="button" onClick={onSearch}><MagnifyingGlass size={27} /><span>Busque produto, marca ou código</span></button>
     <div className={`connectionStatus connectionStatus--${status}`} aria-live="polite"><span />{status === "checking" ? "Conectando…" : status === "online" ? "Catálogo conectado" : "Catálogo temporariamente indisponível"}</div>
+    </div>
     {user ? <>
       <section className="memorySection">
         <h1>Lembrete para você</h1><p>Com base nas suas experiências anteriores</p>
@@ -106,7 +109,7 @@ function HomeView({ status, onSearch, onProduct, onLogin }: { status: ApiStatus;
       <p>Consulte o catálogo e entre para registrar suas experiências.</p>
       <button className="primaryButton" type="button" onClick={onLogin}>Entrar na minha conta</button>
     </section>}
-  </>;
+  </div>;
 }
 
 function MemoryRow({ review, onSelect }: { review: OwnReview; onSelect(id: number): void }) {
@@ -123,14 +126,35 @@ function EmptyMemory({ onSearch }: { onSearch(): void }) {
   return <div className="emptyState"><strong>Suas experiências vão aparecer aqui.</strong><span>Encontre um produto que você já experimentou.</span><button className="primaryButton" onClick={onSearch}>Buscar produto</button></div>;
 }
 
+const navItems = [
+  { key: "home", label: "Início", icon: House },
+  { key: "search", label: "Buscar", icon: MagnifyingGlass },
+  { key: "account", label: "Minhas avaliações", icon: ClockCounterClockwise },
+] as const;
+
+function activeSection(route: Route): string {
+  return route.name === "product" || route.name === "create-product" ? "search" : route.name === "edit-product" ? "account" : route.name;
+}
+
+/** Navegação do desktop: marca, destinos principais e conta no topo da página. */
+function TopNavigation({ route, navigate, goSearch, userName, openAccount }: { route: Route; navigate(path: string): void; goSearch(): void; userName: string | null; openAccount(): void }) {
+  const actions: Record<string, () => void> = { home: () => navigate("/"), search: goSearch, account: openAccount };
+  const active = activeSection(route);
+  return (
+    <header className="topNavigation">
+      <button className="topBrand" type="button" onClick={() => navigate("/")} aria-label="Merchant — início">Merchant<span>Suas compras, uma memória melhor</span></button>
+      <nav aria-label="Navegação principal">
+        {navItems.map(({ key, label, icon: Icon }) => <button key={key} type="button" className={active === key ? "active" : ""} aria-current={active === key ? "page" : undefined} onClick={actions[key]}><Icon size={20} /><span>{label}</span></button>)}
+      </nav>
+      <button className="topAccount" type="button" onClick={openAccount}><UserCircle size={30} weight="fill" /><span>{userName ?? "Entrar"}</span></button>
+    </header>
+  );
+}
+
 function BottomNavigation({ route, navigate, goSearch, requireAccount }: { route: Route; navigate(path: string): void; goSearch(): void; requireAccount(): void }) {
-  const items = [
-    { key: "home", label: "Início", icon: House, action: () => navigate("/") },
-    { key: "search", label: "Buscar", icon: MagnifyingGlass, action: goSearch },
-    { key: "account", label: "Minhas avaliações", icon: ClockCounterClockwise, action: requireAccount },
-  ];
-  const active = route.name === "product" || route.name === "create-product" ? "search" : route.name === "edit-product" ? "account" : route.name;
-  return <nav className="bottomNavigation" aria-label="Navegação principal">{items.map(({ key, label, icon: Icon, action }) => <button key={key} type="button" className={active === key ? "active" : ""} aria-current={active === key ? "page" : undefined} onClick={action}><Icon size={27} /><span>{label}</span></button>)}</nav>;
+  const actions: Record<string, () => void> = { home: () => navigate("/"), search: goSearch, account: requireAccount };
+  const active = activeSection(route);
+  return <nav className="bottomNavigation" aria-label="Navegação principal">{navItems.map(({ key, label, icon: Icon }) => <button key={key} type="button" className={active === key ? "active" : ""} aria-current={active === key ? "page" : undefined} onClick={actions[key]}><Icon size={27} /><span>{label}</span></button>)}</nav>;
 }
 
 function PageState({ children }: { children: ReactNode }) { return <section className="pageState" aria-live="polite">{children}</section>; }

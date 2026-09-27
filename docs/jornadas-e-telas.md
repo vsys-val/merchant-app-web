@@ -17,6 +17,23 @@ A [ideação](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/id
 | Objetivo | Chegar à resposta em poucos toques | Registrar com cuidado, sem erro |
 | Decisões de interface | Leitura sem login · busca em destaque na home · código de barras com teclado numérico · intenção de recompra já no card do resultado | Formulário em 3 etapas · validação por etapa · conferência antes de publicar · confirmação para excluir |
 
+## Um layout por dispositivo
+
+O celular continua sendo o dispositivo principal: é nele que a pessoa decide no corredor. Tablet e computador não herdam a coluna do celular. Cada um tem o seu layout, e todos usam as mesmas telas e dados.
+
+| Dispositivo | Largura | Navegação | Como as telas se organizam |
+|---|---|---|---|
+| Celular | até 767 px | barra inferior, ao alcance do polegar | uma coluna; cartões em lista |
+| Tablet | 768–1023 px | barra inferior | coluna de até 760 px; resultados e "Minha área" em duas colunas; indicadores em quatro colunas |
+| Computador | a partir de 1024 px | barra no topo com marca, destinos e conta | página inteira até 1280 px; **busca** com filtros fixos à esquerda e resultados em grade; **detalhe** com indicadores e comunidade à esquerda e "Sua experiência" fixa à direita; **início** em duas colunas; formulários centralizados |
+
+Os estilos de tablet e computador ficam em `src/responsive.css`. Nenhuma tela rola na horizontal em nenhuma largura, e isso é verificado pelo `e2e/layout.spec.ts` em celular, tablet e desktop.
+
+| Computador | Tablet |
+|---|---|
+| ![Busca no computador](evidence/desktop-search.png) | ![Busca no tablet](evidence/tablet-search.png) |
+| ![Detalhe do produto no computador](evidence/desktop-product.png) | ![Início no computador](evidence/desktop-home.png) |
+
 ## Mapa de navegação
 
 ```mermaid
@@ -78,6 +95,8 @@ flowchart LR
 | Alertas no topo do painel, com **o limite violado por extenso** | Quem abre o painel durante um incidente precisa saber primeiro o que está errado, e não procurar em gráficos | [ADR-0015](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0015-alertas-com-github-actions.md) |
 | Painel com **meta e estado** ao lado de cada métrica (ícone + texto, nunca só cor) | Um número sem referência não diz se está bom; as metas vêm da visão de produto | [ADR-0012](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0012-painel-e-instrumentacao-propria.md) |
 | Cada gráfico tem uma **tabela equivalente** e tooltip por teclado | Leitores de tela e quem precisa do número exato; o gráfico sozinho não basta | Acessibilidade |
+| No computador, navegação no **topo** e páginas em **colunas**; no celular e no tablet, barra **inferior** | O computador tem mouse, teclado e tela larga: a coluna estreita do celular desperdiçava espaço e escondia os resultados; no toque, a barra inferior fica ao alcance do polegar | Feedback de uso no desktop |
+| No computador, "Sua experiência" fica fixa ao lado dos indicadores da comunidade | Comparar a própria opinião com a da comunidade sem rolar é o valor central do detalhe | [ADR-0006](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0006-avaliacao-pessoal-separada.md) |
 | Painel em largura total, fora da navegação do app | É uma ferramenta de trabalho no desktop, não um fluxo de compra; no celular vira uma coluna | US16 |
 | Eventos só com escalares e sem texto digitado | Métricas sem coletar dados pessoais | RN36, RNF08 |
 | Leitor de código pela câmera em **tela cheia**, que fecha sozinho ao ler e já pesquisa | No corredor, a pessoa segura o produto com uma mão: menos toques, sem digitar 13 dígitos | [ADR-0014](https://github.com/vsys-val/fastapi-merchant-app/blob/main/docs/decisoes/0014-leitura-de-codigo-de-barras-pela-camera.md) |
@@ -94,7 +113,7 @@ A API oferece mais do que a interface usa hoje. As lacunas são deliberadas e es
 
 ## Critérios de qualidade de interface
 
-- Funciona de 320 px a desktop sem rolagem horizontal ([design-qa.md](../design-qa.md)).
+- Funciona de 320 px a desktop sem rolagem horizontal, com um layout próprio para celular, tablet e computador ([design-qa.md](../design-qa.md)).
 - Operável por teclado: modais com foco contido, `Esc` e retorno do foco; abas com setas.
 - Toda tela assíncrona trata carregando, vazio, sucesso e erro.
 - Mensagens de erro vêm da API em português e aparecem próximas à ação que falhou.

@@ -27,14 +27,14 @@ O Merchant responde, no corredor do mercado, à pergunta *"eu compraria isto de 
 - Painel administrativo com métricas de uso, catálogo, operação da API e erros do navegador.
 - URLs compartilháveis e rotas protegidas.
 - PWA com manifesto, instalação e fallback offline básico.
-- Interface responsiva, navegação por teclado e modais acessíveis.
+- Um layout para cada dispositivo: celular com navegação inferior, tablet com coluna larga e computador com navegação no topo e páginas em colunas; navegação por teclado e modais acessíveis.
 
 ## Stack
 
 - React 19 e TypeScript.
 - Vite 7.
 - Vitest 5 para testes unitários e de componentes.
-- Playwright para fluxos ponta a ponta em desktop e celular.
+- Playwright para fluxos ponta a ponta em desktop, tablet e celular.
 - GitHub Actions para integração contínua.
 - Render para hospedagem e deploy contínuo.
 

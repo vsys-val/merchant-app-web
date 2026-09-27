@@ -31,6 +31,15 @@ The visual hierarchy, product density, background, purple accent, search promine
 - Product registration: duplicate detection tested while preserving form values.
 - Console: no application-origin warnings or errors; browser-extension messages were excluded.
 
+## Tablet and desktop
+
+The 390 px column was originally reused at every width, so a computer showed a centered phone. Tablet (768–1023 px) and desktop (≥ 1024 px) now have their own layouts in `src/responsive.css`; the phone layout above is unchanged.
+
+- Desktop: sticky top navigation (brand, destinations, account) replaces the bottom bar; content up to 1280 px; search with a sticky filter panel and a results grid; product detail with "Sua experiência" pinned beside the community summary; two-column home; centered forms.
+- Tablet: bottom navigation kept for touch; a 760 px column with two-column results and account lists and four distribution cards.
+- Checked at 390, 820, 1024 and 1440 px on home, search, product detail, account and product form: no horizontal overflow. At 1024 px the tagline is hidden so the top navigation fits on one line.
+- Evidence: `docs/evidence/desktop-home.png`, `desktop-search.png`, `desktop-product.png`, `tablet-search.png`.
+
 ## Comparison history
 
 1. Initial pass: product images were blank in the embedded preview because the absolute image positioning escaped the clipping frame. Fixed by using the concept as a background crop.

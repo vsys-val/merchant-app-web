@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-O Merchant App Web é uma SPA React, mobile-first, distribuída como site estático e PWA. Regras de negócio, autenticação, validação e persistência pertencem à API FastAPI; o frontend compõe os fluxos e apresenta os dados.
+O Merchant App Web é uma SPA React, mobile-first, distribuída como site estático e PWA. O celular é a base dos estilos; tablet (≥ 768 px) e computador (≥ 1024 px) têm layouts próprios em `src/responsive.css`, com navegação no topo no computador. Regras de negócio, autenticação, validação e persistência pertencem à API FastAPI; o frontend compõe os fluxos e apresenta os dados.
 
 ```mermaid
 flowchart LR

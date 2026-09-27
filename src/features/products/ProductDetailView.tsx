@@ -74,6 +74,7 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
     <section className="detailPage">
       <button className="backButton" type="button" onClick={onBack}>← Voltar à busca</button>
       <header className="productHeading"><div><p className="eyebrow">{getCategoryLabel(product.category)}</p><h1>{product.name}</h1><p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p></div><div className="quantityBadge"><strong>{product.quantity}</strong><span>{product.unit}</span></div></header>
+      <div className="detailBody">
       <div className="summaryHeader"><div><p className="sectionNumber">01</p><h2>Resumo da comunidade</h2></div><p>Baseado em {product.community_summary.total_reviews} {product.community_summary.total_reviews === 1 ? "avaliação" : "avaliações"} de outras pessoas.</p></div>
       <div className="distributionGrid"><Distribution title="Compraria novamente?" values={product.community_summary.repurchase_intent} /><Distribution title="Qualidade" values={product.community_summary.quality} /><Distribution title="Expectativa" values={product.community_summary.expectation} /><Distribution title="Custo-benefício" values={product.community_summary.value_for_money} /></div>
       <CommunityHighlights reasons={product.community_summary.reasons ?? []} total={product.community_summary.total_reviews} />
@@ -84,6 +85,7 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
         {reviews.items.length === 0 ? <div className="emptyState"><strong>Ainda não há avaliações.</strong><span>Este produto está esperando sua primeira experiência.</span></div> : reviews.items.map((review) => <article className="reviewCard" key={review.id}><div className="reviewAuthor"><strong>{review.author_name}</strong><time dateTime={review.created_at}>{new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(new Date(review.created_at))}</time></div><ReviewContent review={review} /></article>)}
         {totalPages > 1 && <div className="pagination"><button disabled={reviewPage === 1} onClick={() => void changeReviewPage(reviewPage - 1)}>Anterior</button><button disabled={reviewPage === totalPages} onClick={() => void changeReviewPage(reviewPage + 1)}>Próxima</button></div>}
       </section>
+      </div>
       {reviewPendingDeletion && (
         <div className="deleteConfirmBackdrop">
           <section ref={deleteDialog.dialogRef} className="deleteConfirmDialog" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="delete-review-title" aria-describedby="delete-review-description" onKeyDown={deleteDialog.onKeyDown}>
