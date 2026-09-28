@@ -10,7 +10,11 @@ function loadServiceWorker() {
     skipWaiting: vi.fn(),
     clients: { claim: vi.fn() },
   };
-  const caches = { open: vi.fn(), match: vi.fn(() => Promise.resolve(undefined)), keys: vi.fn() };
+  const caches = {
+    open: vi.fn(() => Promise.resolve({ put: vi.fn(() => Promise.resolve()) })),
+    match: vi.fn(() => Promise.resolve(undefined)),
+    keys: vi.fn(() => Promise.resolve([])),
+  };
   new Function("self", "caches", "fetch", source)(self, caches, vi.fn(() => Promise.resolve(new Response("ok"))));
   return { fetch: listeners.fetch, caches };
 }
