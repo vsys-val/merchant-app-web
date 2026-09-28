@@ -27,6 +27,8 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- A sessão sai do `localStorage` e passa a viver num cookie HttpOnly emitido pela API; o JavaScript não tem mais acesso ao token. Quem já estava conectado continua conectado: o token antigo é trocado pelo cookie e apagado. "Sair da conta" encerra a sessão na API.
+- A API é chamada na mesma origem do site (rewrite do Render e proxy do Vite); a CSP restringe conexões a `'self'` e `VITE_API_URL` deixa de existir.
 - `Permissions-Policy` libera a câmera para a própria origem (`camera=(self)`).
 - Os rótulos dos aspectos ficam em um único módulo, usado pelo formulário de avaliação, pelo detalhe e pelo painel.
 - O cliente HTTP aceita respostas `202 Accepted` sem corpo.

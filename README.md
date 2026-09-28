@@ -50,7 +50,7 @@ npm ci
 npm run dev
 ```
 
-`VITE_API_URL` define a origem da API. O arquivo de exemplo aponta para a API pública.
+O site chama a API por caminhos relativos (`/api/...` e `/health`), na mesma origem. Em desenvolvimento, o Vite repassa essas rotas para `VITE_API_PROXY_TARGET` (a API pública por padrão; use `http://localhost:8000` para a API local). Em produção, o Render faz o mesmo com regras de rewrite. É isso que mantém o cookie de sessão primário.
 
 ## Verificações
 
@@ -105,7 +105,6 @@ A interface envia eventos de uso para a própria API, sem ferramentas de terceir
 - Não há edição de perfil nem imagens de produtos. Confirmação de conta e recuperação de senha dependem de o backend ter um provedor de e-mail configurado.
 - Produtos podem ser corrigidos pelo responsável, mas ainda não excluídos pela interface.
 - O modo offline cobre o shell já visitado; operações e dados dependem da API.
-- A sessão usa token no `localStorage`, uma opção simples para o MVP que exige disciplina contra XSS e deve ser reavaliada antes de ampliar o risco da aplicação.
 
 ## Colaboração e segurança
 

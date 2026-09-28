@@ -65,6 +65,18 @@ export function confirmPasswordReset(email: string, code: string, newPassword: s
   });
 }
 
-export function getCurrentUser(token: string) {
-  return apiRequest<User>("/api/v1/users/me", {}, token);
+export function getCurrentUser() {
+  return apiRequest<User>("/api/v1/users/me");
+}
+
+/** Troca um token salvo por versões antigas do site pelo cookie de sessão. */
+export function exchangeLegacyToken(token: string) {
+  return apiRequest<void>("/api/v1/auth/session", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function logout() {
+  return apiRequest<void>("/api/v1/auth/logout", { method: "POST" });
 }

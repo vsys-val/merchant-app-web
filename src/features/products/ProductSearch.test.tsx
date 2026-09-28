@@ -8,7 +8,6 @@ import { parseSearchQuery, ProductSearch } from "./ProductSearch";
 
 const mocks = vi.hoisted(() => ({ searchProducts: vi.fn() }));
 
-vi.mock("../auth/AuthContext", () => ({ useAuth: () => ({ token: null }) }));
 vi.mock("./product-api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("./product-api")>()),
   searchProducts: mocks.searchProducts,
@@ -88,7 +87,6 @@ describe("ProductSearch filters", () => {
     expect(mocks.searchProducts).toHaveBeenLastCalledWith(
       { name: "detergente", brand: "Limpol", category: "cleaning" },
       1,
-      null,
     );
     expect(chip("Limpeza").getAttribute("aria-pressed")).toBe("true");
     expect(window.location.search).toBe("?name=detergente&brand=Limpol&category=cleaning");
@@ -99,10 +97,10 @@ describe("ProductSearch filters", () => {
   it("permite navegar só por categoria e voltar para todas", async () => {
     await mount();
     await act(async () => chip("Bebidas").click());
-    expect(mocks.searchProducts).toHaveBeenLastCalledWith({ name: "", brand: "", category: "beverages" }, 1, null);
+    expect(mocks.searchProducts).toHaveBeenLastCalledWith({ name: "", brand: "", category: "beverages" }, 1);
 
     await act(async () => chip("Todas").click());
-    expect(mocks.searchProducts).toHaveBeenLastCalledWith({ name: "", brand: "", category: undefined }, 1, null);
+    expect(mocks.searchProducts).toHaveBeenLastCalledWith({ name: "", brand: "", category: undefined }, 1);
     expect(window.location.search).toBe("?all=1");
   });
 
@@ -128,7 +126,7 @@ describe("ProductSearch filters", () => {
 
     fill(container.querySelector<HTMLInputElement>("#barcode-search")!, "7891234567895");
     await submit();
-    expect(mocks.searchProducts).toHaveBeenLastCalledWith({ barcode: "7891234567895" }, 1, null);
+    expect(mocks.searchProducts).toHaveBeenLastCalledWith({ barcode: "7891234567895" }, 1);
   });
 
   it("restaura a busca da URL ao voltar para a tela", async () => {
@@ -139,7 +137,6 @@ describe("ProductSearch filters", () => {
     expect(mocks.searchProducts).toHaveBeenCalledWith(
       { name: "cafe", brand: undefined, category: "food", barcode: undefined },
       2,
-      null,
     );
   });
 

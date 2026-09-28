@@ -1,5 +1,4 @@
-import { readToken } from "../features/auth/auth-storage";
-import { API_URL } from "./api";
+import { CLIENT_HEADER } from "./api";
 
 /**
  * Eventos de uso próprios, sem terceiros.
@@ -67,12 +66,11 @@ export function flush(options: { keepalive?: boolean } = {}): void {
   if (queue.length === 0) return;
   const events = queue.slice(0, 20);
   queue = queue.slice(20);
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = readToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
-  void fetch(`${API_URL}/api/v1/events`, {
+  // O cookie de sessão vai junto; o cabeçalho do cliente é exigido pela API em escritas com cookie.
+  void fetch("/api/v1/events", {
     method: "POST",
-    headers,
+    headers: { "Content-Type": "application/json", [CLIENT_HEADER]: "web" },
+    credentials: "same-origin",
     body: JSON.stringify({ session_id: sessionId(), events }),
     keepalive: options.keepalive,
   }).catch(() => {

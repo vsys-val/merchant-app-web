@@ -22,17 +22,18 @@ export function ProductEditView({
   onSaved(productId: number): void;
   onOpenExisting(productId: number): void;
 }) {
-  const { token } = useAuth();
+  const { user } = useAuth();
+  const userId = user?.id;
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     setProduct(null);
     setError("");
-    getProductDetail(productId, token)
+    getProductDetail(productId)
       .then(setProduct)
       .catch((caught) => setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar o produto."));
-  }, [productId, token]);
+  }, [productId, userId]);
 
   if (error) {
     return <section className="detailState"><p role="alert">{error}</p><button type="button" onClick={onBack}>Voltar</button></section>;

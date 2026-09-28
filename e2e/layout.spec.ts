@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, Page, test } from "./fixtures/session";
 
 /**
  * Cada dispositivo tem o seu layout: celular e tablet com navegação inferior,
@@ -21,7 +21,6 @@ const detail = {
 };
 
 async function signedIn(page: Page) {
-  await page.addInitScript(() => localStorage.setItem("merchant.access-token", "e2e-token"));
   await page.route("**/health", (route) => route.fulfill({ json: { status: "ok", database: "available" } }));
   await page.route("**/api/v1/users/me", (route) => route.fulfill({ json: { id: 1, name: "Ana", email: "ana@example.com", email_verified: true } }));
   await page.route("**/api/v1/users/me/reviews?**", (route) => route.fulfill({ json: { items: [{ ...review, product: product(1, "Café torrado") }], page: 1, page_size: 20, total: 1 } }));

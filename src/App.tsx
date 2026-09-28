@@ -71,21 +71,22 @@ export function App() {
 
         {route.name !== "create-product" && route.name !== "edit-product" && <BottomNavigation route={route} navigate={navigate} goSearch={goSearch} requireAccount={() => user ? navigate("/account") : setShowAuth(true)} />}
       </div>
-      {user && route.name === "account" && <button className="signOutButton" type="button" onClick={() => { signOut(); goHome(); }}>Sair da conta</button>}
+      {user && route.name === "account" && <button className="signOutButton" type="button" onClick={() => { void signOut(); goHome(); }}>Sair da conta</button>}
       {showAuth && <AuthPanel onClose={() => setShowAuth(false)} />}
     </div>
   );
 }
 
 function HomeView({ status, onSearch, onProduct, onLogin }: { status: ApiStatus; onSearch(): void; onProduct(id: number): void; onLogin(): void }) {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
+  const userId = user?.id;
   const [reviews, setReviews] = useState<OwnReview[] | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!token) { setReviews(null); return; }
-    getOwnReviews(token, 1).then((page) => setReviews(page.items.slice(0, 3))).catch(() => setError("Não foi possível carregar suas avaliações agora."));
-  }, [token]);
+    if (!userId) { setReviews(null); return; }
+    getOwnReviews(1).then((page) => setReviews(page.items.slice(0, 3))).catch(() => setError("Não foi possível carregar suas avaliações agora."));
+  }, [userId]);
 
   return <div className="homeLayout">
     <div className="homeSearch">

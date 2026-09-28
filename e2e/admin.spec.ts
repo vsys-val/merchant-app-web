@@ -1,8 +1,7 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, Page, test } from "./fixtures/session";
 import { overviewFixture } from "../src/features/admin/overview-fixture";
 
 async function signInAs(page: Page, isAdmin: boolean) {
-  await page.addInitScript(() => localStorage.setItem("merchant.access-token", "e2e-token"));
   await page.route("**/api/v1/users/me", (route) => route.fulfill({
     json: { id: 1, name: "Admin", email: "admin@example.com", email_verified: true, is_admin: isAdmin },
   }));

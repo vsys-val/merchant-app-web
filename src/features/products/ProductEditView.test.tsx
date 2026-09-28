@@ -9,7 +9,7 @@ import { buildProductPatch } from "./ProductForm";
 
 const mocks = vi.hoisted(() => ({ getProductDetail: vi.fn(), updateProduct: vi.fn() }));
 
-vi.mock("../auth/AuthContext", () => ({ useAuth: () => ({ token: "owner-token" }) }));
+vi.mock("../auth/AuthContext", () => ({ useAuth: () => ({ user: { id: 1, name: "Dona do produto" } }) }));
 vi.mock("./product-api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("./product-api")>()),
   getProductDetail: mocks.getProductDetail,
@@ -101,7 +101,7 @@ describe("ProductEditView", () => {
       fill("Variante", "Limão");
       await submit();
 
-      expect(mocks.updateProduct).toHaveBeenCalledWith(7, { variant: "Limão" }, "owner-token");
+      expect(mocks.updateProduct).toHaveBeenCalledWith(7, { variant: "Limão" });
       expect(onSaved).toHaveBeenCalledWith(7);
     });
 

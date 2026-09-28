@@ -22,6 +22,14 @@ test("produção conecta à API e mantém a jornada pública principal", async (
   await api.dispose();
   expect(apiReady, "A API deve responder ao health check").toBe(true);
 
+  // O site repassa /api e /health à API na mesma origem: sem isso, a sessão em cookie não funciona.
+  const proxiedHealth = await page.request.get("/health");
+  expect(proxiedHealth.ok(), "O site deve repassar /health à API").toBe(true);
+  expect(await proxiedHealth.json()).toMatchObject({ status: "healthy" });
+  const proxiedSession = await page.request.get("/api/v1/users/me");
+  expect(proxiedSession.status(), "O site deve repassar /api à API").toBe(401);
+  expect((await proxiedSession.json()).error.code).toBe("invalid_authentication");
+
   await page.goto("/");
   await expect(page.getByText("Catálogo conectado", { exact: true })).toBeVisible({ timeout: 30_000 });
 

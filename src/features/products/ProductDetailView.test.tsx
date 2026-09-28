@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../auth/AuthContext", () => ({
-  useAuth: () => ({ token: "test-token", user: { id: 1, name: "Pessoa teste" } }),
+  useAuth: () => ({ user: { id: 1, name: "Pessoa teste" } }),
 }));
 
 vi.mock("./product-api", () => ({
@@ -122,7 +122,7 @@ describe("ProductDetailView deletion confirmation", () => {
     mocks.getProductDetail.mockResolvedValue({ ...product, your_review: null });
     await act(async () => { button("Excluir avaliação").click(); });
 
-    expect(mocks.deleteReview).toHaveBeenCalledWith(7, "test-token");
+    expect(mocks.deleteReview).toHaveBeenCalledWith(7);
     expect(mocks.getProductDetail).toHaveBeenCalledTimes(2);
     expect(container.querySelector('[role="dialog"]')).toBeNull();
     expect(container.textContent).toContain("Você ainda não avaliou este produto.");

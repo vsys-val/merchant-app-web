@@ -90,6 +90,6 @@ export interface AdminOverview {
   };
 }
 
-export function getAdminOverview(days: number, token: string, signal?: AbortSignal) {
-  return apiRequest<AdminOverview>(`/api/v1/admin/overview?days=${days}`, { signal }, token);
+export function getAdminOverview(days: number, signal?: AbortSignal) {
+  return apiRequest<AdminOverview>(`/api/v1/admin/overview?days=${days}`, { signal });
 }

@@ -1,5 +1,8 @@
-const API_URL =
-  import.meta.env.VITE_API_URL ?? "https://fastapi-merchant-app.onrender.com";
+// Caminhos relativos: a API responde na mesma origem do site (rewrite do Render em
+// produção, proxy do Vite em desenvolvimento). É o que mantém o cookie de sessão
+// HttpOnly primário. Não há variável para apontar a outra origem, de propósito.
+/** Cabeçalho exigido pela API em escritas autenticadas por cookie (proteção CSRF). */
+export const CLIENT_HEADER = "X-Merchant-Client";
 const REQUEST_TIMEOUT_MS = 15_000;
 
 export type ApiStatus = "checking" | "online" | "offline";
@@ -27,13 +30,12 @@ export class ApiError extends Error {
 export async function apiRequest<T>(
   path: string,
   options: RequestInit = {},
-  token?: string | null,
 ): Promise<T> {
   const headers = new Headers(options.headers);
   headers.set("Accept", "application/json");
 
   if (options.body) headers.set("Content-Type", "application/json");
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  headers.set(CLIENT_HEADER, "web");
 
   const controller = new AbortController();
   let didTimeOut = false;
@@ -48,9 +50,10 @@ export async function apiRequest<T>(
 
   let response: Response;
   try {
-    response = await fetch(`${API_URL}${path}`, {
+    response = await fetch(path, {
       ...options,
       headers,
+      credentials: "same-origin",
       signal: controller.signal,
     });
   } catch (caught) {
@@ -97,4 +100,3 @@ export async function checkApiHealth(signal?: AbortSignal): Promise<boolean> {
   }
 }
 
-export { API_URL };
