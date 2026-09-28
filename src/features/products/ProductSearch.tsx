@@ -1,9 +1,10 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Barcode, CaretRight, MagnifyingGlass, Package, Plus } from "@phosphor-icons/react";
+import { ArrowLeft, Barcode, CaretRight, MagnifyingGlass, Plus } from "@phosphor-icons/react";
 import { BarcodeScanner } from "../barcode/BarcodeScanner";
 import { ApiError } from "../../lib/api";
 import { track } from "../../lib/analytics";
 import { categoryLabels, getCategoryLabel } from "./category-labels";
+import { ProductImage } from "./ProductImage";
 import {
   Category,
   filtersToParams,
@@ -196,10 +197,10 @@ export function ProductSearch({
         <button className="primaryButton createProductAction" type="button" onClick={onCreate}><Plus size={20} />Cadastrar produto</button>
         {/* Atribuição exigida pela licença ODbL do catálogo inicial (ADR-0017 da API). */}
         <p className="dataCredit">
-          Parte do catálogo vem do{" "}
-          <a href="https://openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a>,
-          sob a licença{" "}
-          <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">ODbL</a>.
+          Parte do catálogo e das fotos vem do{" "}
+          <a href="https://openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a>: dados sob{" "}
+          <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">ODbL</a>, fotos sob{" "}
+          <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.pt-br" target="_blank" rel="noopener noreferrer">CC BY-SA</a>.
         </p>
       </div>
       {isScanning && (
@@ -256,7 +257,7 @@ function ProductCard({ product, onSelect }: { product: ProductListItem; onSelect
   return (
     <article className="productCard">
       <button className="productCardLink" type="button" onClick={() => onSelect(product.id)} aria-label={`Ver detalhes de ${product.name}`}>
-        <span className="productPlaceholder"><Package size={34} weight="duotone" /></span>
+        <ProductImage product={product} size="thumb" />
         <span className="productCardCopy"><strong>{product.name}</strong><span>{product.brand}{product.variant ? ` · ${product.variant}` : ""} · {product.quantity} {product.unit}</span><span className="productCategory">{getCategoryLabel(product.category)}</span>{product.your_repurchase_intent ? <span className={`intent intent--${product.your_repurchase_intent}`}>{intentLabels[product.your_repurchase_intent]}</span> : product.community_summary.total_reviews > 0 ? <span className={`intent intent--${leadingIntent}`}>{intentLabels[leadingIntent]} · {distribution[leadingIntent].toFixed(0)}%</span> : <span className="unreviewed">Ainda sem avaliações</span>}</span>
         <CaretRight size={19} />
       </button>

@@ -8,6 +8,7 @@ import { useAuth } from "./features/auth/AuthContext";
 import { ProductDetailView } from "./features/products/ProductDetailView";
 import { ProductEditView } from "./features/products/ProductEditView";
 import { ProductForm } from "./features/products/ProductForm";
+import { ProductImage } from "./features/products/ProductImage";
 import { ProductSearch } from "./features/products/ProductSearch";
 import { ApiStatus, checkApiHealth } from "./lib/api";
 import { Route, useRouter } from "./lib/router";
@@ -118,7 +119,7 @@ function MemoryRow({ review, onSelect }: { review: OwnReview; onSelect(id: numbe
   const Icon = intent === "yes" ? CheckCircle : intent === "no" ? XCircle : MinusCircle;
   const label = intent === "yes" ? "Você compraria novamente" : intent === "no" ? "Você não compraria novamente" : "Talvez compraria novamente";
   return <button className="memoryRow" type="button" onClick={() => onSelect(review.product.id)}>
-    <span className="productPlaceholder"><Package size={34} weight="duotone" /></span>
+    <ProductImage product={review.product} size="thumb" />
     <span className="memoryCopy"><strong>{review.product.name}</strong><span>{review.product.brand} · {review.product.quantity} {review.product.unit}</span><span className={`intentBadge intentBadge--${intent}`}><Icon size={21} weight="fill" />{label}</span>{review.comment && <span className="memoryComment">{review.comment}</span>}</span>
   </button>;
 }

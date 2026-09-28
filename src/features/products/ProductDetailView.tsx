@@ -9,6 +9,7 @@ import { AspectMentions, CommunityReview, getCommunityReviews, getProductDetail,
 import { deleteReview } from "./review-api";
 import { ReviewForm } from "./ReviewForm";
 import "./products.css";
+import { ProductImage } from "./ProductImage";
 
 const labels: Record<string, string> = {
   yes: "Sim", maybe: "Talvez", no: "Não", high: "Alta", adequate: "Adequada", low: "Baixa",
@@ -75,6 +76,13 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
     <section className="detailPage">
       <button className="backButton" type="button" onClick={onBack}>← Voltar à busca</button>
       <header className="productHeading"><div><p className="eyebrow">{getCategoryLabel(product.category)}</p><h1>{product.name}</h1><p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p></div><div className="quantityBadge"><strong>{product.quantity}</strong><span>{product.unit}</span></div></header>
+      {product.image_url && (
+        <figure className="productPhoto">
+          <ProductImage product={product} size="hero" />
+          {/* Fotos do Open Food Facts são CC BY-SA: o crédito fica junto da imagem. */}
+          <figcaption>Foto: <a href="https://openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a> (CC BY-SA)</figcaption>
+        </figure>
+      )}
       <div className="detailBody">
       <div className="summaryHeader"><div><p className="sectionNumber">01</p><h2>Resumo da comunidade</h2></div><p>Baseado em {product.community_summary.total_reviews} {product.community_summary.total_reviews === 1 ? "avaliação" : "avaliações"} de outras pessoas.</p></div>
       <div className="distributionGrid"><Distribution title="Compraria novamente?" values={product.community_summary.repurchase_intent} /><Distribution title="Qualidade" values={product.community_summary.quality} /><Distribution title="Expectativa" values={product.community_summary.expectation} /><Distribution title="Custo-benefício" values={product.community_summary.value_for_money} /></div>

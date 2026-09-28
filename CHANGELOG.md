@@ -6,7 +6,8 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
-- Crédito ao Open Food Facts (licença ODbL) na busca: o catálogo inicial de ~500 produtos vem dessa base.
+- Fotos das embalagens do catálogo inicial (Open Food Facts) na busca, nos lembretes e no detalhe, com ícone da categoria quando não há foto ou ela não carrega.
+- Crédito ao Open Food Facts na busca (dados sob ODbL, fotos sob CC BY-SA) e sob a foto no detalhe.
 - Layouts próprios para tablet e computador: no computador, navegação no topo, busca com filtros à esquerda e resultados em grade, detalhe com "Sua experiência" fixa ao lado dos indicadores e início em duas colunas; no tablet, coluna mais larga com listas em duas colunas. O celular não muda.
 - Projeto de tablet no Playwright e teste de layout por dispositivo.
 - Busca combinando nome, marca e categoria, com chips de categoria e modo separado para código de barras.
@@ -30,6 +31,7 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 
 - A sessão sai do `localStorage` e passa a viver num cookie HttpOnly emitido pela API; o JavaScript não tem mais acesso ao token. Quem já estava conectado continua conectado: o token antigo é trocado pelo cookie e apagado. "Sair da conta" encerra a sessão na API.
 - A API é chamada na mesma origem do site (rewrite do Render e proxy do Vite); a CSP restringe conexões a `'self'` e `VITE_API_URL` deixa de existir.
+- A CSP libera imagens só dos servidores de fotos do Open Food Facts, Open Beauty Facts e Open Products Facts.
 - `Permissions-Policy` libera a câmera para a própria origem (`camera=(self)`).
 - Os rótulos dos aspectos ficam em um único módulo, usado pelo formulário de avaliação, pelo detalhe e pelo painel.
 - O cliente HTTP aceita respostas `202 Accepted` sem corpo.

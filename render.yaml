@@ -19,7 +19,7 @@ services:
     headers:
       - path: /*
         name: Content-Security-Policy
-        value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+        value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data: https://images.openfoodfacts.org https://images.openbeautyfacts.org https://images.openproductsfacts.org; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
