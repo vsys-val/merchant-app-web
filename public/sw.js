@@ -1,4 +1,6 @@
-const CACHE_NAME = "merchant-shell-v2";
+// v3: a v2 guardou respostas da API (/api/*) depois que ela passou para a mesma
+// origem do site; trocar o nome apaga esse cache na ativação.
+const CACHE_NAME = "merchant-shell-v3";
 const APP_SHELL = ["/index.html", "/manifest.webmanifest", "/icon.svg", "/maskable-icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -18,6 +20,10 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+  // A API responde na mesma origem (rewrite do Render): dados e sessão nunca
+  // vão para o cache, senão a busca mostraria resultados velhos e a conta de
+  // quem saiu continuaria gravada no aparelho.
+  if (url.pathname.startsWith("/api/") || url.pathname === "/health") return;
 
   if (event.request.mode === "navigate") {
     event.respondWith(

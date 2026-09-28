@@ -45,3 +45,27 @@ test("produção conecta à API e mantém a jornada pública principal", async (
   await page.getByRole("button", { name: "Executar busca" }).click();
   await expect(page.getByText("Nenhum produto encontrado.", { exact: true })).toBeVisible({ timeout: 30_000 });
 });
+
+test("produção mostra as fotos do catálogo inicial", async ({ page }) => {
+  const blocked: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") blocked.push(message.text());
+  });
+  page.on("requestfailed", (request) => {
+    if (request.url().includes("openfoodfacts") || request.url().includes("openbeautyfacts")) {
+      blocked.push(`${request.url()} → ${request.failure()?.errorText}`);
+    }
+  });
+
+  await page.goto("/search?name=nescau");
+  const card = page.locator(".productCard").first();
+  await expect(card).toBeVisible({ timeout: 60_000 });
+  // O catálogo inicial tem foto em 96% dos produtos; "nescau" só traz produtos com foto.
+  const photo = page.locator(".productCard img").first();
+  await expect(photo, `Nenhuma foto na busca. Erros: ${blocked.join(" | ")}`).toBeVisible({ timeout: 30_000 });
+  await expect.poll(
+    () => photo.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0),
+    { message: `A foto não carregou. Erros: ${blocked.join(" | ")}`, timeout: 30_000 },
+  ).toBe(true);
+  expect(blocked.filter((text) => /Content Security Policy|openfoodfacts/i.test(text))).toEqual([]);
+});
