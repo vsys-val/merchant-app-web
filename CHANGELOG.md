@@ -27,6 +27,11 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 - Painel: aberturas do leitor, leituras concluídas e parcela sem câmera disponível.
 - Painel: alertas da última hora em "Saúde agora" (banco, erros 5xx, p95 da busca e erros no navegador), com a lista dos guarda-corpos violados.
 
+### Corrigido
+
+- O service worker deixava de lado a API só quando ela estava em outra origem. Com a API na mesma origem (sessão em cookie), ele passou a guardar respostas de `/api/*`: buscas e produtos voltavam desatualizados, e os dados da conta ficavam no aparelho. Agora `/api/*` e `/health` nunca passam pelo cache, e o cache antigo é apagado na atualização (`merchant-shell-v3`).
+- Teste de fumaça em produção confere que as fotos do catálogo carregam, e falha se a CSP bloquear os servidores de imagem.
+
 ### Alterado
 
 - A sessão sai do `localStorage` e passa a viver num cookie HttpOnly emitido pela API; o JavaScript não tem mais acesso ao token. Quem já estava conectado continua conectado: o token antigo é trocado pelo cookie e apagado. "Sair da conta" encerra a sessão na API.
