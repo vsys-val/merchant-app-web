@@ -102,7 +102,7 @@ A interface envia eventos de uso para a própria API, sem ferramentas de terceir
 
 ## Limites atuais
 
-- Não há edição de perfil nem imagens de produtos. Confirmação de conta e recuperação de senha dependem de o backend ter um provedor de e-mail configurado.
+- Não há edição de perfil. Só os produtos do catálogo inicial têm foto (do Open Food Facts); quem cadastra ainda não envia imagem. Confirmação de conta e recuperação de senha dependem de o backend ter um provedor de e-mail configurado.
 - Produtos podem ser corrigidos pelo responsável, mas ainda não excluídos pela interface.
 - O modo offline cobre o shell já visitado; operações e dados dependem da API.
 

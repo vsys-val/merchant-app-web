@@ -65,6 +65,8 @@
 .productCardLink { width: 100%; min-height: 132px; padding: 13px 0; display: flex; align-items: center; flex-direction: row; gap: 14px; border-bottom: 1px solid var(--merchant-line); }.productCardCopy { min-width: 0; display: flex; flex: 1; flex-direction: column; gap: 5px; }.productCardCopy > strong { color: #1a1528; font-size: 1rem; letter-spacing: -.025em; line-height: 1.25; }.productCardCopy > span:not(.intent):not(.productCategory):not(.unreviewed) { color: var(--merchant-muted); font-size: .78rem; }.productCategory { align-self: flex-start; padding: 5px 8px; border-radius: 6px; color: #695b79; background: #f0ecf5; font-size: .68rem; }.productCardLink > svg { flex: 0 0 auto; color: #887d92; }
 .productCard .productPlaceholder { height: 102px; }.intent { align-self: flex-start; margin: 2px 0 0; padding: 6px 8px; border-radius: 8px; font-size: .69rem; }.unreviewed { color: #82788f; font-size: .74rem; }
 .createProductAction { width: 100%; min-height: 48px; margin-top: 22px; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.dataCredit { margin: 14px 0 0; color: var(--merchant-muted); font-size: .8rem; text-align: center; }
+.dataCredit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .pagination { justify-content: space-between; }.pagination button { min-height: 42px; }
 .detailPage > .backButton { width: 44px; height: 44px; padding: 0; overflow: hidden; color: transparent; font-size: 0; }.detailPage > .backButton::before { color: #3e354a; font-size: 1.35rem; content: "←"; }
 .productHeading { margin-top: 9px; padding: 25px 22px; align-items: flex-start; border-radius: 18px; background: #241538; }.productHeading h1 { margin: 8px 0 9px; color: #fff; font-family: inherit; font-size: 1.85rem; letter-spacing: -.045em; line-height: 1.12; }.productHeading > div > p:last-child { font-size: .88rem; }.quantityBadge { width: 76px; height: 76px; border-radius: 15px; }.quantityBadge strong { font-size: 1.35rem; }
@@ -112,3 +114,11 @@
 /* Busca sem resultado exato: itens parecidos, com aviso explícito. */
 .approximateNotice { margin-bottom: 12px; padding: 12px 14px; display: grid; gap: 3px; border: 1px solid #f1dfae; border-radius: 12px; color: #6b4a00; background: #fff8e6; font-size: .8rem; line-height: 1.4; }
 .approximateNotice strong { color: #4d3500; font-size: .88rem; }
+
+/* Fotos das embalagens (ADR-0018 da API) e ícone da categoria quando não há foto. */
+.productImage { display: grid; place-items: center; overflow: hidden; border-radius: 12px; color: #806e91; background: #f1edf5; }
+.productImage img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.productImage--hero { width: min(100%, 220px); aspect-ratio: 1; margin: 0 auto; }
+.productPhoto { margin: 4px 0 18px; display: grid; justify-items: center; gap: 6px; }
+.productPhoto figcaption { color: var(--merchant-muted); font-size: .75rem; }
+.productPhoto figcaption a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
