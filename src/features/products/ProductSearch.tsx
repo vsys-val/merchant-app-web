@@ -194,6 +194,13 @@ export function ProductSearch({
         )}
         {!result && !error && <p className="searchIdle">Busque pelo nome, pela marca ou pelo código de barras, ou escolha uma categoria para explorar o catálogo.</p>}
         <button className="primaryButton createProductAction" type="button" onClick={onCreate}><Plus size={20} />Cadastrar produto</button>
+        {/* Atribuição exigida pela licença ODbL do catálogo inicial (ADR-0017 da API). */}
+        <p className="dataCredit">
+          Parte do catálogo vem do{" "}
+          <a href="https://openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a>,
+          sob a licença{" "}
+          <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">ODbL</a>.
+        </p>
       </div>
       {isScanning && (
         <BarcodeScanner

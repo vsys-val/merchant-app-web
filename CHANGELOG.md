@@ -6,6 +6,7 @@ Este projeto segue [Semantic Versioning](https://semver.org/).
 
 ### Adicionado
 
+- Crédito ao Open Food Facts (licença ODbL) na busca: o catálogo inicial de ~500 produtos vem dessa base.
 - Layouts próprios para tablet e computador: no computador, navegação no topo, busca com filtros à esquerda e resultados em grade, detalhe com "Sua experiência" fixa ao lado dos indicadores e início em duas colunas; no tablet, coluna mais larga com listas em duas colunas. O celular não muda.
 - Projeto de tablet no Playwright e teste de layout por dispositivo.
 - Busca combinando nome, marca e categoria, com chips de categoria e modo separado para código de barras.
