@@ -256,17 +256,18 @@ function SearchResults({
 }
 
 function ProductCard({ product, onSelect }: { product: ProductListItem; onSelect(productId: number): void }) {
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null);
   const distribution = product.community_summary.repurchase_intent;
   const leadingIntent = (Object.keys(distribution) as Array<keyof typeof distribution>)
     .reduce((best, current) => distribution[current] > distribution[best] ? current : best, "yes");
   return (
     <article className="productCard">
       <button className="productCardLink" type="button" onClick={() => onSelect(product.id)} aria-label={`Ver detalhes de ${product.name}`}>
-        <ProductImage product={product} size="thumb" />
+        <ProductImage product={product} size="thumb" onImageError={() => setFailedPhotoUrl(product.image_url ?? null)} />
         <span className="productCardCopy"><strong>{product.name}</strong><span>{product.brand}{product.variant ? ` · ${product.variant}` : ""} · {product.quantity} {product.unit}</span><span className="productCategory">{getCategoryLabel(product.category)}</span>{product.your_repurchase_intent ? <span className={`intent intent--${product.your_repurchase_intent}`}>{intentLabels[product.your_repurchase_intent]}</span> : product.community_summary.total_reviews > 0 ? <span className={`intent intent--${leadingIntent}`}>{intentLabels[leadingIntent]} · {distribution[leadingIntent].toFixed(0)}%</span> : <span className="unreviewed">Ainda sem avaliações</span>}</span>
         <CaretRight size={19} />
       </button>
-      <ProductAttribution product={product} variant="compact" />
+      {failedPhotoUrl !== product.image_url && <ProductAttribution product={product} variant="compact" />}
     </article>
   );
 }

@@ -176,4 +176,18 @@ describe("ProductSearch filters", () => {
     expect(container.textContent).not.toContain("Nada para “cafe”");
   });
 
+  it("remove crédito da foto quando o cartão mostra o fallback", async () => {
+    mocks.searchProducts.mockResolvedValue({ ...emptyPage, total: 1, items: [{
+      id: 5, name: "Arroz", brand: "Marca", variant: null, quantity: 1, unit: "un", category: "food", barcode: null,
+      image_url: "https://images.openfoodfacts.org/images/products/123/front.jpg", image_source: "Open Food Facts", image_license: "CC-BY-SA",
+      community_summary: { total_reviews: 0, repurchase_intent: { yes: 0, maybe: 0, no: 0 } }, your_repurchase_intent: null,
+    }] });
+    await mount("/search?name=arroz");
+    expect(container.querySelector(".productAttribution")).not.toBeNull();
+    const image = container.querySelector(".productCard img")!;
+    await act(async () => image.dispatchEvent(new Event("error")));
+    expect(container.querySelector(".productAttribution")).toBeNull();
+    expect(container.querySelector(".productCardLink")).not.toBeNull();
+  });
+
 });

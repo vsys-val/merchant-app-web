@@ -136,13 +136,14 @@ function HomeView({ status, onSearch, onProduct, onLogin }: { status: ApiStatus;
 }
 
 function MemoryRow({ review, onSelect }: { review: OwnReview; onSelect(id: number): void }) {
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null);
   const intent = review.repurchase_intent;
   const Icon = intent === "yes" ? CheckCircle : intent === "no" ? XCircle : MinusCircle;
   const label = intent === "yes" ? "Você compraria novamente" : intent === "no" ? "Você não compraria novamente" : "Talvez compraria novamente";
   return <div><button className="memoryRow" type="button" onClick={() => onSelect(review.product.id)}>
-    <ProductImage product={review.product} size="thumb" />
+    <ProductImage product={review.product} size="thumb" onImageError={() => setFailedPhotoUrl(review.product.image_url ?? null)} />
     <span className="memoryCopy"><strong>{review.product.name}</strong><span>{review.product.brand} · {review.product.quantity} {review.product.unit}</span><span className={`intentBadge intentBadge--${intent}`}><Icon size={21} weight="fill" />{label}</span>{review.comment && <span className="memoryComment">{review.comment}</span>}</span>
-  </button><ProductAttribution product={review.product} variant="compact" /></div>;
+  </button>{failedPhotoUrl !== review.product.image_url && <ProductAttribution product={review.product} variant="compact" />}</div>;
 }
 
 function EmptyMemory({ onSearch }: { onSearch(): void }) {

@@ -110,7 +110,6 @@ function ProductDetailSession({ productId, onBack }: { productId: number; onBack
       {product.image_url && (
         <figure className="productPhoto">
           <ProductImage product={product} size="hero" onImageError={() => setFailedPhotoUrl(product.image_url ?? null)} />
-          {/* Fotos do Open Food Facts são CC BY-SA: o crédito fica junto da imagem. */}
           {failedPhotoUrl !== product.image_url && <ProductAttribution product={product} />}
         </figure>
       )}
