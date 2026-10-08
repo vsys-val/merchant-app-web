@@ -13,10 +13,11 @@ function loadServiceWorker() {
   const caches = {
     open: vi.fn(() => Promise.resolve({ put: vi.fn(() => Promise.resolve()) })),
     match: vi.fn(() => Promise.resolve(undefined)),
-    keys: vi.fn(() => Promise.resolve([])),
+    delete: vi.fn(() => Promise.resolve(true)),
+    keys: vi.fn(() => Promise.resolve(["merchant-shell-v2", "merchant-shell-v3", "merchant-shell-v4", "another-app"])),
   };
   new Function("self", "caches", "fetch", source)(self, caches, vi.fn(() => Promise.resolve(new Response("ok"))));
-  return { fetch: listeners.fetch, caches };
+  return { fetch: listeners.fetch, activate: listeners.activate, caches, self };
 }
 
 function fetchEvent(url: string, mode: RequestMode = "cors") {
@@ -50,7 +51,12 @@ describe("service worker", () => {
     expect(event.respondWith).toHaveBeenCalled();
   });
 
-  it("troca o nome do cache para apagar as respostas da API guardadas pela versão anterior", () => {
-    expect(source).toMatch(/CACHE_NAME = "merchant-shell-v3"/);
+  it("ativa a atualização removendo caches antigos e suas respostas privadas", async () => {
+    const { activate, caches, self } = loadServiceWorker();
+    const event = { waitUntil: vi.fn() };
+    activate(event);
+    await event.waitUntil.mock.calls[0][0];
+    expect(caches.delete.mock.calls).toEqual([["merchant-shell-v2"], ["merchant-shell-v3"]]);
+    expect(self.clients.claim).toHaveBeenCalledOnce();
   });
 });

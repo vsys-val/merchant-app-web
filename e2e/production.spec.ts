@@ -1,27 +1,23 @@
-import { expect, request as playwrightRequest, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-const apiUrl = "https://fastapi-merchant-app.onrender.com";
+// Production checks are opt-in and read-only. Fail early rather than accidentally
+// calling real infrastructure from the local mocked suite.
+test.skip(!process.env.PLAYWRIGHT_BASE_URL, "Set PLAYWRIGHT_BASE_URL for production smoke");
+test.describe.configure({ timeout: 360_000 });
+
+async function warmApi(page: import("@playwright/test").Page) {
+  // Four bounded attempts fit inside the enclosing test timeout, including UI checks.
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    try {
+      const response = await page.request.get("/health", { timeout: 35_000 });
+      if (response.ok()) return;
+    } catch { /* A sleeping service can need another request. */ }
+  }
+  throw new Error("Same-origin API health unavailable after four bounded attempts");
+}
 
 test("produção conecta à API e mantém a jornada pública principal", async ({ page }) => {
-  const api = await playwrightRequest.newContext();
-  let apiReady = false;
-
-  for (let attempt = 1; attempt <= 6; attempt += 1) {
-    try {
-      const response = await api.get(`${apiUrl}/health`, { timeout: 60_000 });
-      if (response.ok()) {
-        apiReady = true;
-        break;
-      }
-    } catch {
-      // O plano gratuito pode precisar de uma tentativa extra para acordar.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 10_000));
-  }
-
-  await api.dispose();
-  expect(apiReady, "A API deve responder ao health check").toBe(true);
-
+  await warmApi(page);
   // O site repassa /api e /health à API na mesma origem: sem isso, a sessão em cookie não funciona.
   const proxiedHealth = await page.request.get("/health");
   expect(proxiedHealth.ok(), "O site deve repassar /health à API").toBe(true);
@@ -47,17 +43,23 @@ test("produção conecta à API e mantém a jornada pública principal", async (
 });
 
 test("produção mostra as fotos do catálogo inicial", async ({ page }) => {
+  await warmApi(page);
   const blocked: string[] = [];
   page.on("console", (message) => {
     if (message.type() === "error") blocked.push(message.text());
   });
   page.on("requestfailed", (request) => {
-    if (request.url().includes("openfoodfacts") || request.url().includes("openbeautyfacts")) {
+    if (/images\.open(food|beauty|products)facts\.org/.test(request.url())) {
       blocked.push(`${request.url()} → ${request.failure()?.errorText}`);
     }
   });
 
-  await page.goto("/search?name=nescau");
+  const document = await page.goto("/search?name=nescau");
+  const csp = document?.headers()["content-security-policy"] ?? "";
+  const imagePolicy = csp.split(";").map((directive) => directive.trim()).find((directive) => directive.startsWith("img-src ")) ?? "";
+  for (const provider of ["openfoodfacts", "openbeautyfacts", "openproductsfacts"]) {
+    expect(imagePolicy, `Published CSP must allow ${provider}; repository YAML alone is not deployment evidence`).toContain(`https://images.${provider}.org`);
+  }
   const card = page.locator(".productCard").first();
   await expect(card).toBeVisible({ timeout: 60_000 });
   // O catálogo inicial tem foto em 96% dos produtos; "nescau" só traz produtos com foto.
@@ -67,5 +69,5 @@ test("produção mostra as fotos do catálogo inicial", async ({ page }) => {
     () => photo.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0),
     { message: `A foto não carregou. Erros: ${blocked.join(" | ")}`, timeout: 30_000 },
   ).toBe(true);
-  expect(blocked.filter((text) => /Content Security Policy|openfoodfacts/i.test(text))).toEqual([]);
+  expect(blocked.filter((text) => /Content Security Policy|open(food|beauty|products)facts/i.test(text))).toEqual([]);
 });

@@ -54,6 +54,7 @@ export async function apiRequest<T>(
       ...options,
       headers,
       credentials: "same-origin",
+      cache: "no-store",
       signal: controller.signal,
     });
   } catch (caught) {

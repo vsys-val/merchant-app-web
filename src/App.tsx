@@ -8,6 +8,7 @@ import { useAuth } from "./features/auth/AuthContext";
 import { ProductDetailView } from "./features/products/ProductDetailView";
 import { ProductEditView } from "./features/products/ProductEditView";
 import { ProductForm } from "./features/products/ProductForm";
+import { ProductAttribution } from "./features/products/ProductAttribution";
 import { ProductImage } from "./features/products/ProductImage";
 import { ProductSearch } from "./features/products/ProductSearch";
 import { ApiStatus, checkApiHealth } from "./lib/api";
@@ -18,6 +19,8 @@ export function App() {
   const [showAuth, setShowAuth] = useState(false);
   // Última busca, para voltar a ela a partir do produto ou da navegação.
   const [lastSearch, setLastSearch] = useState("");
+  const [signOutError, setSignOutError] = useState("");
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const { user, isLoading, signOut } = useAuth();
   const { route, navigate } = useRouter();
 
@@ -31,6 +34,20 @@ export function App() {
   const goSearch = () => navigate(`/search${lastSearch}`);
   const openProduct = (productId: number) => navigate(`/products/${productId}`);
   const protectedRoute = route.name === "account" || route.name === "create-product" || route.name === "edit-product" || route.name === "admin";
+
+  async function handleSignOut() {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    setSignOutError("");
+    try {
+      await signOut();
+      goHome();
+    } catch {
+      setSignOutError("Não foi possível sair da conta. Verifique sua conexão e tente novamente.");
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
 
   // O painel ocupa a tela inteira, fora da coluna do app.
   if (route.name === "admin") {
@@ -62,8 +79,8 @@ export function App() {
         <main className="appContent">
           {isLoading && protectedRoute ? <PageState>Verificando sua sessão…</PageState> :
            protectedRoute && !user ? <ProtectedPrompt onBack={goHome} onLogin={() => setShowAuth(true)} /> :
-           route.name === "home" ? <HomeView status={status} onSearch={() => navigate("/search")} onProduct={openProduct} onLogin={() => setShowAuth(true)} /> :
-           route.name === "search" ? <ProductSearch onBack={goHome} onSelect={openProduct} onCreate={() => user ? navigate("/products/new") : setShowAuth(true)} onQueryChange={setLastSearch} /> :
+           route.name === "home" ? <HomeView key={user?.id ?? "visitor"} status={status} onSearch={() => navigate("/search")} onProduct={openProduct} onLogin={() => setShowAuth(true)} /> :
+           route.name === "search" ? <ProductSearch key={user?.id ?? "visitor"} onBack={goHome} onSelect={openProduct} onCreate={() => user ? navigate("/products/new") : setShowAuth(true)} onQueryChange={setLastSearch} /> :
            route.name === "account" && user ? <AccountDashboard onBack={goHome} onSelectProduct={openProduct} onEditProduct={(productId) => navigate(`/products/${productId}/edit`)} onOpenAdmin={() => navigate("/admin")} /> :
            route.name === "create-product" && user ? <ProductForm onCancel={goSearch} onSaved={openProduct} onOpenExisting={openProduct} /> :
            route.name === "edit-product" && user ? <ProductEditView productId={route.productId} onBack={() => navigate("/account")} onSaved={openProduct} onOpenExisting={openProduct} /> :
@@ -72,7 +89,7 @@ export function App() {
 
         {route.name !== "create-product" && route.name !== "edit-product" && <BottomNavigation route={route} navigate={navigate} goSearch={goSearch} requireAccount={() => user ? navigate("/account") : setShowAuth(true)} />}
       </div>
-      {user && route.name === "account" && <button className="signOutButton" type="button" onClick={() => { void signOut(); goHome(); }}>Sair da conta</button>}
+      {user && route.name === "account" && <div>{signOutError && <p role="alert">{signOutError}</p>}<button className="signOutButton" type="button" disabled={isSigningOut} onClick={() => void handleSignOut()}>{isSigningOut ? "Saindo…" : "Sair da conta"}</button></div>}
       {showAuth && <AuthPanel onClose={() => setShowAuth(false)} />}
     </div>
   );
@@ -85,8 +102,12 @@ function HomeView({ status, onSearch, onProduct, onLogin }: { status: ApiStatus;
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!userId) { setReviews(null); return; }
-    getOwnReviews(1).then((page) => setReviews(page.items.slice(0, 3))).catch(() => setError("Não foi possível carregar suas avaliações agora."));
+    let active = true;
+    setReviews(null);
+    setError("");
+    if (!userId) return;
+    getOwnReviews(1).then((page) => { if (active) setReviews(page.items.slice(0, 3)); }).catch(() => { if (active) setError("Não foi possível carregar suas avaliações agora."); });
+    return () => { active = false; };
   }, [userId]);
 
   return <div className="homeLayout">
@@ -118,10 +139,10 @@ function MemoryRow({ review, onSelect }: { review: OwnReview; onSelect(id: numbe
   const intent = review.repurchase_intent;
   const Icon = intent === "yes" ? CheckCircle : intent === "no" ? XCircle : MinusCircle;
   const label = intent === "yes" ? "Você compraria novamente" : intent === "no" ? "Você não compraria novamente" : "Talvez compraria novamente";
-  return <button className="memoryRow" type="button" onClick={() => onSelect(review.product.id)}>
+  return <div><button className="memoryRow" type="button" onClick={() => onSelect(review.product.id)}>
     <ProductImage product={review.product} size="thumb" />
     <span className="memoryCopy"><strong>{review.product.name}</strong><span>{review.product.brand} · {review.product.quantity} {review.product.unit}</span><span className={`intentBadge intentBadge--${intent}`}><Icon size={21} weight="fill" />{label}</span>{review.comment && <span className="memoryComment">{review.comment}</span>}</span>
-  </button>;
+  </button><ProductAttribution product={review.product} variant="compact" /></div>;
 }
 
 function EmptyMemory({ onSearch }: { onSearch(): void }) {

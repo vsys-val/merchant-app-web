@@ -12,23 +12,25 @@ const CATEGORY_ICONS = {
 } satisfies Record<Category, typeof Package>;
 
 /**
- * Foto da embalagem (Open Food Facts, CC BY-SA) ou ícone da categoria.
+ * Foto da embalagem ou ícone da categoria.
  *
- * A foto vem direto dos servidores do Open Food Facts: carrega sob demanda e
+ * A foto vem direto do provedor: carrega sob demanda e
  * sem enviar a página de origem. Se falhar, volta para o ícone.
  */
 export function ProductImage({
   product,
   size,
+  onImageError,
 }: {
   product: { name: string; brand: string; category: Category; image_url?: string | null };
   size: "thumb" | "hero";
+  onImageError?: () => void;
 }) {
-  const [failed, setFailed] = useState(false);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const Icon = CATEGORY_ICONS[product.category] ?? Package;
   const pixels = size === "thumb" ? 76 : 220;
 
-  if (!product.image_url || failed) {
+  if (!product.image_url || failedUrl === product.image_url) {
     return (
       <span className={`productImage productImage--${size} productImage--empty${size === "thumb" ? " productPlaceholder" : ""}`} aria-hidden="true">
         <Icon size={size === "thumb" ? 34 : 64} weight="duotone" />
@@ -45,7 +47,7 @@ export function ProductImage({
         loading="lazy"
         decoding="async"
         referrerPolicy="no-referrer"
-        onError={() => setFailed(true)}
+        onError={() => { setFailedUrl(product.image_url ?? null); onImageError?.(); }}
       />
     </span>
   );

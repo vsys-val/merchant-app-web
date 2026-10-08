@@ -1,6 +1,6 @@
-// v3: a v2 guardou respostas da API (/api/*) depois que ela passou para a mesma
-// origem do site; trocar o nome apaga esse cache na ativação.
-const CACHE_NAME = "merchant-shell-v3";
+// v4: remove caches antigos do Merchant (inclusive dados da API da v2),
+// preservando caches pertencentes a outras aplicações na mesma origem.
+const CACHE_NAME = "merchant-shell-v4";
 const APP_SHELL = ["/index.html", "/manifest.webmanifest", "/icon.svg", "/maskable-icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -11,7 +11,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key.startsWith("merchant-shell-") && key !== CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });

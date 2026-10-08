@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../../lib/api";
 import { useModalDialog } from "../../lib/useModalDialog";
@@ -9,6 +9,7 @@ import { AspectMentions, CommunityReview, getCommunityReviews, getProductDetail,
 import { deleteReview } from "./review-api";
 import { ReviewForm } from "./ReviewForm";
 import "./products.css";
+import { ProductAttribution } from "./ProductAttribution";
 import { ProductImage } from "./ProductImage";
 
 const labels: Record<string, string> = {
@@ -18,7 +19,13 @@ const labels: Record<string, string> = {
 
 export function ProductDetailView({ productId, onBack }: { productId: number; onBack(): void }) {
   const { user } = useAuth();
-  const userId = user?.id;
+  return <ProductDetailSession key={`${productId}:${user?.id ?? "visitor"}`} productId={productId} onBack={onBack} />;
+}
+
+function ProductDetailSession({ productId, onBack }: { productId: number; onBack(): void }) {
+  const { user } = useAuth();
+  const requestVersion = useRef(0);
+  const mounted = useRef(true);
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [reviews, setReviews] = useState<Page<CommunityReview> | null>(null);
   const [reviewPage, setReviewPage] = useState(1);
@@ -27,6 +34,7 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
   const [isDeletingReview, setIsDeletingReview] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [error, setError] = useState("");
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null);
 
   function closeDeleteConfirmation() {
     if (isDeletingReview) return;
@@ -37,39 +45,62 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
   const deleteDialog = useModalDialog(closeDeleteConfirmation, Boolean(reviewPendingDeletion));
 
   async function load(page = 1) {
-    const [detail, reviewResult] = await Promise.all([getProductDetail(productId), getCommunityReviews(productId, page)]);
-    setProduct(detail); setReviews(reviewResult); setReviewPage(page);
-    return detail;
+    const version = ++requestVersion.current;
+    try {
+      const [detail, reviewResult] = await Promise.all([getProductDetail(productId), getCommunityReviews(productId, page)]);
+      if (!mounted.current || version !== requestVersion.current) return null;
+      if (detail.id !== productId) throw new Error("Produto inesperado na resposta.");
+      setError(""); setProduct(detail); setReviews(reviewResult); setReviewPage(page);
+      return detail;
+    } catch (caught) {
+      if (!mounted.current || version !== requestVersion.current) return null;
+      throw caught;
+    }
   }
 
   useEffect(() => {
+    mounted.current = true;
     setError(""); setProduct(null); setEditingReview(false);
     load()
-      .then((detail) => track("product_viewed", {
+      .then((detail) => detail && track("product_viewed", {
         product_id: detail.id,
         own_review: detail.your_review !== null,
         community_reviews: detail.community_summary.total_reviews,
       }))
-      .catch((caught) => setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar o produto."));
-  }, [productId, userId]);
+      .catch((caught) => { if (mounted.current) setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar o produto."); });
+    return () => { mounted.current = false; requestVersion.current += 1; };
+  }, [productId]);
 
   async function changeReviewPage(page: number) {
-    try { setReviews(await getCommunityReviews(productId, page)); setReviewPage(page); }
-    catch (caught) { setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar as avaliações."); }
+    const version = ++requestVersion.current;
+    setError("");
+    try {
+      const result = await getCommunityReviews(productId, page);
+      if (!mounted.current || version !== requestVersion.current) return;
+      setReviews(result); setReviewPage(page);
+    } catch (caught) {
+      if (mounted.current && version === requestVersion.current) setError(caught instanceof ApiError ? caught.message : "Não foi possível carregar as avaliações.");
+    }
   }
 
   async function removeOwnReview(review: Review) {
-    if (!user) return;
+    if (!user || product?.id !== productId || product.your_review?.id !== review.id || isDeletingReview) return;
     setDeleteError("");
     setIsDeletingReview(true);
-    try { await deleteReview(review.id); setReviewPendingDeletion(null); await load(); }
-    catch (caught) { setDeleteError(caught instanceof ApiError ? caught.message : "Não foi possível excluir a avaliação."); }
-    finally { setIsDeletingReview(false); }
+    try {
+      await deleteReview(review.id);
+      if (!mounted.current) return;
+      setReviewPendingDeletion(null);
+      setProduct(null);
+      await load().catch(() => { if (mounted.current) setError("Avaliação excluída, mas não foi possível atualizar o produto. Reabra o produto para tentar novamente."); });
+    }
+    catch (caught) { if (mounted.current) setDeleteError(caught instanceof ApiError ? caught.message : "Não foi possível excluir a avaliação."); }
+    finally { if (mounted.current) setIsDeletingReview(false); }
   }
 
   if (error && !product) return <section className="detailState"><p role="alert">{error}</p><button onClick={onBack}>Voltar à busca</button></section>;
   if (!product || !reviews) return <section className="detailState" aria-live="polite">Carregando produto…</section>;
-  if (editingReview && user) return <section className="detailPage"><button className="backButton" type="button" onClick={() => setEditingReview(false)}>← Voltar ao produto</button><ReviewForm productId={productId} initial={product.your_review} onCancel={() => setEditingReview(false)} onSaved={() => { setEditingReview(false); void load(); }} /></section>;
+  if (editingReview && user) return <section className="detailPage"><button className="backButton" type="button" onClick={() => setEditingReview(false)}>← Voltar ao produto</button><ReviewForm productId={productId} initial={product.your_review} onCancel={() => setEditingReview(false)} onSaved={() => { if (!mounted.current) return; setEditingReview(false); setProduct(null); void load().catch(() => { if (mounted.current) setError("Avaliação salva, mas não foi possível atualizar o produto. Reabra o produto para tentar novamente."); }); }} /></section>;
 
   const totalPages = Math.max(1, Math.ceil(reviews.total / reviews.page_size));
   return (
@@ -78,9 +109,9 @@ export function ProductDetailView({ productId, onBack }: { productId: number; on
       <header className="productHeading"><div><p className="eyebrow">{getCategoryLabel(product.category)}</p><h1>{product.name}</h1><p>{product.brand}{product.variant ? ` · ${product.variant}` : ""}</p></div><div className="quantityBadge"><strong>{product.quantity}</strong><span>{product.unit}</span></div></header>
       {product.image_url && (
         <figure className="productPhoto">
-          <ProductImage product={product} size="hero" />
+          <ProductImage product={product} size="hero" onImageError={() => setFailedPhotoUrl(product.image_url ?? null)} />
           {/* Fotos do Open Food Facts são CC BY-SA: o crédito fica junto da imagem. */}
-          <figcaption>Foto: <a href="https://openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a> (CC BY-SA)</figcaption>
+          {failedPhotoUrl !== product.image_url && <ProductAttribution product={product} />}
         </figure>
       )}
       <div className="detailBody">

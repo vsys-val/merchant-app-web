@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -52,12 +53,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const requestVersion = useRef(0);
+  // Cookie mutations must reach the server in order (login cannot finish after logout).
+  const mutationQueue = useRef<Promise<void>>(Promise.resolve());
+  const enqueueMutation = useCallback((operation: () => Promise<void>) => {
+    const pending = mutationQueue.current.catch(() => undefined).then(operation);
+    mutationQueue.current = pending;
+    return pending;
+  }, []);
+
   useEffect(() => {
+    const version = ++requestVersion.current;
     let active = true;
     migrateLegacyToken()
       .then(loadUser)
       .then((loaded) => {
-        if (active) setUser(loaded);
+        if (active && version === requestVersion.current) setUser(loaded);
       })
       .finally(() => {
         if (active) setIsLoading(false);
@@ -68,22 +79,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshUser = useCallback(async () => {
-    setUser(await getCurrentUser());
+    const version = ++requestVersion.current;
+    const loaded = await getCurrentUser();
+    if (version === requestVersion.current) setUser(loaded);
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    await loginRequest({ email, password });
-    setUser(await getCurrentUser());
-  }, []);
+  const signIn = useCallback((email: string, password: string) => {
+    requestVersion.current += 1;
+    return enqueueMutation(async () => {
+      const version = ++requestVersion.current;
+      await loginRequest({ email, password });
+      const loaded = await getCurrentUser();
+      if (version === requestVersion.current) setUser(loaded);
+    });
+  }, [enqueueMutation]);
 
-  const signOut = useCallback(async () => {
-    try {
+  const signOut = useCallback(() => {
+    requestVersion.current += 1;
+    return enqueueMutation(async () => {
+      // Keep the account visible unless the server confirms that its cookie is revoked.
       await logoutRequest();
-    } catch {
-      // Sem rede, o cookie expira sozinho; a interface sai da conta de qualquer forma.
-    }
-    setUser(null);
-  }, []);
+      // Invalidate reads started while logout was in flight as well.
+      requestVersion.current += 1;
+      setUser(null);
+    });
+  }, [enqueueMutation]);
 
   const value = useMemo(
     () => ({ user, isLoading, signIn, refreshUser, signOut }),

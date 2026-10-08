@@ -81,9 +81,62 @@ describe("sessão em cookie", () => {
     expect(auth.user).toEqual(ANA);
     expect(localStorage.length).toBe(0);
 
-    mocks.logout.mockRejectedValue(new Error("sem rede"));
+    mocks.logout.mockResolvedValue(undefined);
     await act(() => auth.signOut());
     expect(mocks.logout).toHaveBeenCalled();
     expect(auth.user).toBeNull();
   });
+  it("preserva a conta e propaga falha quando o servidor não confirma logout", async () => {
+    mocks.getCurrentUser.mockResolvedValue(ANA);
+    mocks.logout.mockRejectedValue(new Error("sem rede"));
+    await mount();
+    await act(async () => { await expect(auth.signOut()).rejects.toThrow("sem rede"); });
+    expect(auth.user).toEqual(ANA);
+  });
+
+  it("ignora atualização de conta que chega depois do logout", async () => {
+    mocks.getCurrentUser.mockResolvedValue(ANA);
+    mocks.logout.mockResolvedValue(undefined);
+    await mount();
+    let resolve!: (user: typeof ANA) => void;
+    mocks.getCurrentUser.mockReturnValue(new Promise((done) => { resolve = done; }));
+    let refresh!: Promise<void>;
+    await act(async () => { refresh = auth.refreshUser(); });
+    await act(async () => auth.signOut());
+    await act(async () => { resolve(ANA); await refresh; });
+    expect(auth.user).toBeNull();
+  });
+
+  it("aguarda o login pendente antes de revogar o cookie", async () => {
+    mocks.getCurrentUser.mockResolvedValue(ANA);
+    mocks.logout.mockResolvedValue(undefined);
+    await mount();
+    let resolve!: () => void;
+    mocks.login.mockReturnValue(new Promise<void>((done) => { resolve = done; }));
+    let login!: Promise<void>;
+    let logout!: Promise<void>;
+    await act(async () => { login = auth.signIn("ana@example.com", "senha"); });
+    await act(async () => { logout = auth.signOut(); });
+    expect(mocks.logout).not.toHaveBeenCalled();
+    await act(async () => { resolve(); await login; await logout; });
+    expect(mocks.logout).toHaveBeenCalledTimes(1);
+    expect(auth.user).toBeNull();
+  });
+
+  it("ignora leitura iniciada durante logout que retorna depois da confirmação", async () => {
+    mocks.getCurrentUser.mockResolvedValue(ANA);
+    await mount();
+    let resolveLogout!: () => void;
+    mocks.logout.mockReturnValue(new Promise<void>((done) => { resolveLogout = done; }));
+    let logout!: Promise<void>;
+    await act(async () => { logout = auth.signOut(); });
+    let resolveUser!: (user: typeof ANA) => void;
+    mocks.getCurrentUser.mockReturnValue(new Promise((done) => { resolveUser = done; }));
+    let refresh!: Promise<void>;
+    await act(async () => { refresh = auth.refreshUser(); });
+    await act(async () => { resolveLogout(); await logout; });
+    await act(async () => { resolveUser(ANA); await refresh; });
+    expect(auth.user).toBeNull();
+  });
+
 });

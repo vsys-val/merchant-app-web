@@ -155,4 +155,25 @@ describe("ProductSearch filters", () => {
     expect(container.querySelector(".resultsHeader")).toBeNull();
     expect(container.textContent).toContain("Arroz integral");
   });
+  it("descarta a busca pendente ao mudar de modo", async () => {
+    let resolve!: (page: typeof emptyPage) => void;
+    mocks.searchProducts.mockReturnValue(new Promise((done) => { resolve = done; }));
+    await mount("/search?name=cafe");
+    await act(async () => Array.from(container.querySelectorAll("button")).find((button) => button.textContent === "Código de barras")!.click());
+    await act(async () => { resolve(emptyPage); });
+    expect(container.querySelector(".emptyState")).toBeNull();
+    expect(container.querySelector<HTMLButtonElement>('[aria-label="Executar busca"]')?.disabled).toBe(false);
+  });
+
+  it("mantém somente o resultado da consulta mais recente", async () => {
+    let resolve!: (page: typeof emptyPage) => void;
+    mocks.searchProducts.mockReturnValueOnce(new Promise((done) => { resolve = done; })).mockResolvedValue(emptyPage);
+    await mount("/search?name=cafe");
+    await act(async () => { fill(nameInput(), "leite"); });
+    await submit();
+    await act(async () => { resolve(emptyPage); });
+    expect(container.textContent).toContain("Nada para “leite”");
+    expect(container.textContent).not.toContain("Nada para “cafe”");
+  });
+
 });
