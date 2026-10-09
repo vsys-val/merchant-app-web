@@ -25,9 +25,17 @@ describe("apiRequest", () => {
     const headers = options.headers as Headers;
     expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/test");
     expect(options.credentials).toBe("same-origin");
+    expect(options.cache).toBe("no-store");
     expect(headers.get("X-Merchant-Client")).toBe("web");
     expect(headers.get("Authorization")).toBeNull();
     expect(headers.get("Content-Type")).toBe("application/json");
+  });
+
+  it("não permite que chamadas GET reutilizem cache HTTP mesmo com opção do chamador", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 7 }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await apiRequest("/api/v1/users/me", { cache: "force-cache" });
+    expect(fetchMock.mock.calls[0][1].cache).toBe("no-store");
   });
 
   it("converte o erro estruturado do backend em ApiError", async () => {

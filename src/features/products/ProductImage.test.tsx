@@ -26,6 +26,16 @@ describe("ProductImage", () => {
     expect(image.getAttribute("referrerpolicy")).toBe("no-referrer");
   });
 
+  it("tenta a nova URL depois que a foto anterior falhou", () => {
+    const product = { name: "Suco", brand: "Marca", category: "beverages" as const, image_url: PHOTO };
+    act(() => root.render(<ProductImage product={product} size="hero" />));
+    act(() => container.querySelector("img")!.dispatchEvent(new Event("error")));
+    expect(container.querySelector("img")).toBeNull();
+    const nextPhoto = PHOTO.replace("12.400", "13.400");
+    act(() => root.render(<ProductImage product={{ ...product, image_url: nextPhoto }} size="hero" />));
+    expect(container.querySelector("img")?.getAttribute("src")).toBe(nextPhoto);
+  });
+
   it("usa o ícone da categoria quando não há foto", () => {
     act(() => root.render(<ProductImage product={{ name: "Detergente", brand: "Ypê", category: "cleaning", image_url: null }} size="thumb" />));
     expect(container.querySelector("img")).toBeNull();

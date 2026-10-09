@@ -11,7 +11,7 @@ const summary = {
   expectation: { exceeded: 0, met: 0, not_met: 0 },
   value_for_money: { good: 0, fair: 0, poor: 0 },
 };
-const withPhoto = { id: 1, name: "Biscoito Recheado", brand: "Nestlé", variant: null, quantity: 140, unit: "g", category: "food", barcode: "7891000100103", image_url: PHOTO };
+const withPhoto = { id: 1, name: "Biscoito Recheado", brand: "Nestlé", variant: null, quantity: 140, unit: "g", category: "food", barcode: "7891000100103", image_url: PHOTO, source: "Open Food Facts", source_url: "https://world.openfoodfacts.org/product/7891000100103", image_source: "Open Food Facts", image_license: "CC BY-SA 3.0", image_license_url: "https://creativecommons.org/licenses/by-sa/3.0/" };
 const withoutPhoto = { id: 2, name: "Detergente Neutro", brand: "Ypê", variant: null, quantity: 500, unit: "ml", category: "cleaning", barcode: null, image_url: null };
 
 test("fotos do catálogo aparecem na busca e no detalhe, com ícone quando falta", async ({ page }) => {
@@ -37,12 +37,25 @@ test("fotos do catálogo aparecem na busca e no detalhe, com ícone quando falta
   const withoutPhotoCard = page.locator(".productCard", { hasText: "Detergente Neutro" });
   await expect(withoutPhotoCard.locator("img")).toHaveCount(0);
   await expect(withoutPhotoCard.locator(".productImage--empty svg")).toBeVisible();
-  await expect(page.getByText(/fotos sob/)).toBeVisible();
+  await expect(page.getByText(/Consulte a origem e a licença/)).toBeVisible();
 
   await page.getByRole("button", { name: "Ver detalhes de Biscoito Recheado" }).click();
   await expect(page.locator(".productPhoto img")).toBeVisible();
-  await expect(page.locator(".productPhoto figcaption")).toHaveText("Foto: Open Food Facts (CC BY-SA)");
+  await expect(page.locator(".productPhoto figcaption")).toHaveText("Foto: Open Food Facts (CC BY-SA 3.0)");
   // A foto é pedida sem revelar de qual página veio.
   expect(photoRequests.length).toBeGreaterThan(0);
   expect(photoRequests.every((referer) => referer === undefined)).toBe(true);
+});
+
+
+test("falha do provedor mantém detalhe e avaliação acessíveis com ícone", async ({ page }) => {
+  await page.route("https://images.openfoodfacts.org/**", (route) => route.abort("failed"));
+  await page.route("**/health", (route) => route.fulfill({ json: { status: "healthy", database: "available" } }));
+  await page.route("**/api/v1/products/1", (route) => route.fulfill({ json: { ...withPhoto, community_summary: summary, your_review: null } }));
+  await page.route("**/api/v1/products/1/reviews?**", (route) => route.fulfill({ json: { items: [], page: 1, page_size: 20, total: 0 } }));
+  await page.goto("/products/1");
+  await expect(page.locator(".productPhoto .productImage--empty svg")).toBeVisible();
+  await expect(page.locator(".productPhoto img")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Biscoito Recheado", exact: true })).toBeVisible();
+  await expect(page.locator(".productPhoto figcaption")).toHaveCount(0);
 });

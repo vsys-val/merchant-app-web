@@ -7,13 +7,14 @@ import { ProductDetailView } from "./ProductDetailView";
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 const mocks = vi.hoisted(() => ({
+  user: { id: 1, name: "Pessoa teste" } as { id: number; name: string } | null,
   deleteReview: vi.fn(),
   getCommunityReviews: vi.fn(),
   getProductDetail: vi.fn(),
 }));
 
 vi.mock("../auth/AuthContext", () => ({
-  useAuth: () => ({ user: { id: 1, name: "Pessoa teste" } }),
+  useAuth: () => ({ user: mocks.user }),
 }));
 
 vi.mock("./product-api", () => ({
@@ -22,7 +23,7 @@ vi.mock("./product-api", () => ({
 }));
 
 vi.mock("./review-api", () => ({ deleteReview: mocks.deleteReview }));
-vi.mock("./ReviewForm", () => ({ ReviewForm: () => null }));
+vi.mock("./ReviewForm", () => ({ ReviewForm: ({ onSaved }: { onSaved(): void }) => <button onClick={onSaved}>Salvar teste</button> }));
 
 const review = {
   id: 7,
@@ -128,6 +129,24 @@ describe("ProductDetailView deletion confirmation", () => {
     expect(container.textContent).toContain("Você ainda não avaliou este produto.");
   });
 
+  it("mostra falha de recarga após exclusão confirmada sem manter ações antigas", async () => {
+    await act(async () => button("Excluir").click());
+    mocks.getProductDetail.mockRejectedValue(new Error("offline"));
+    await act(async () => button("Excluir avaliação").click());
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("Avaliação excluída");
+    expect(container.textContent).not.toContain(review.comment);
+  });
+
+  it("mostra falha de recarga após salvar sem oferecer ações para a avaliação antiga", async () => {
+    await act(async () => button("Editar").click());
+    mocks.getProductDetail.mockRejectedValue(new Error("offline"));
+    await act(async () => button("Salvar teste").click());
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("Avaliação salva");
+    expect(container.textContent).not.toContain(review.comment);
+    expect(container.textContent).not.toContain("Excluir");
+  });
+
   it("shows deletion failures inside the confirmation dialog", async () => {
     mocks.deleteReview.mockRejectedValue(new ApiError("Falha de teste", 503));
     await act(async () => { button("Excluir").click(); });
@@ -210,5 +229,43 @@ describe("ProductDetailView community reasons", () => {
     const card = container.querySelector(".reviewCard");
     const tags = Array.from(card?.querySelectorAll(".reasonTag") ?? []).map((item) => item.textContent);
     expect(tags).toEqual(["+ Sabor (positivo)", "− Preço (negativo)"]);
+  });
+});
+
+
+describe("ProductDetailView request identity", () => {
+  let container: HTMLDivElement;
+  let root: Root;
+  beforeEach(() => {
+    mocks.user = { id: 1, name: "Pessoa teste" };
+    container = document.createElement("div");
+    document.body.append(container);
+    root = createRoot(container);
+    mocks.getCommunityReviews.mockResolvedValue(reviewsPage);
+  });
+  afterEach(() => { act(() => root.unmount()); container.remove(); mocks.user = { id: 1, name: "Pessoa teste" }; });
+
+  it("não exibe produto antigo quando sua resposta chega após a navegação", async () => {
+    let resolve!: (detail: typeof product) => void;
+    mocks.getProductDetail.mockReturnValueOnce(new Promise((done) => { resolve = done; }))
+      .mockResolvedValue({ ...product, id: 4, name: "Produto novo", your_review: null });
+    await act(async () => root.render(<ProductDetailView productId={3} onBack={() => undefined} />));
+    await act(async () => root.render(<ProductDetailView productId={4} onBack={() => undefined} />));
+    await act(async () => { resolve(product); });
+    expect(container.querySelector("h1")?.textContent).toBe("Produto novo");
+    expect(container.textContent).not.toContain(review.comment);
+  });
+
+  it("remove formulário e avaliação pessoal imediatamente ao mudar de conta", async () => {
+    mocks.getProductDetail.mockResolvedValue(product);
+    await act(async () => root.render(<ProductDetailView productId={3} onBack={() => undefined} />));
+    await act(async () => Array.from(container.querySelectorAll("button")).find((button) => button.textContent === "Excluir")!.click());
+    expect(container.querySelector('[role="dialog"]')).not.toBeNull();
+    mocks.user = { id: 2, name: "Outra pessoa" };
+    mocks.getProductDetail.mockReturnValue(new Promise(() => {}));
+    await act(async () => root.render(<ProductDetailView productId={3} onBack={() => undefined} />));
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+    expect(container.textContent).not.toContain(review.comment);
+    expect(container.textContent).toContain("Carregando produto");
   });
 });

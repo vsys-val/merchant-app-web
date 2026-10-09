@@ -4,6 +4,7 @@ import { BarcodeScanner } from "../barcode/BarcodeScanner";
 import { ApiError } from "../../lib/api";
 import { track } from "../../lib/analytics";
 import { categoryLabels, getCategoryLabel } from "./category-labels";
+import { ProductAttribution } from "./ProductAttribution";
 import { ProductImage } from "./ProductImage";
 import {
   Category,
@@ -85,7 +86,12 @@ export function ProductSearch({
   const [error, setError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
+  const requestVersion = useRef(0);
+
   async function runSearch(filters: ProductFilters, page = 1) {
+    const version = ++requestVersion.current;
+    setResult(null);
+    setIsSearching(false);
     const problem = validate(filters);
     if (problem) {
       setError(problem);
@@ -100,6 +106,7 @@ export function ProductSearch({
     onQueryChange?.(query);
     try {
       const found = await searchProducts(filters, page);
+      if (version !== requestVersion.current) return;
       setResult(found);
       // Só indica quais filtros foram usados; o texto digitado não sai do navegador.
       track("search_performed", {
@@ -113,14 +120,16 @@ export function ProductSearch({
       });
       setSearched(filters);
     } catch (caught) {
+      if (version !== requestVersion.current) return;
       setError(caught instanceof ApiError ? caught.message : "Não foi possível pesquisar agora.");
     } finally {
-      setIsSearching(false);
+      if (version === requestVersion.current) setIsSearching(false);
     }
   }
 
   useEffect(() => {
     if (initial.current) void runSearch(initial.current.filters, initial.current.page);
+    return () => { requestVersion.current += 1; };
     // Executa só a busca restaurada da URL ao abrir a tela.
   }, []);
 
@@ -140,6 +149,8 @@ export function ProductSearch({
   }
 
   function changeMode(next: Mode) {
+    requestVersion.current += 1;
+    setIsSearching(false);
     setMode(next);
     setResult(null);
     setError("");
@@ -195,13 +206,7 @@ export function ProductSearch({
         )}
         {!result && !error && <p className="searchIdle">Busque pelo nome, pela marca ou pelo código de barras, ou escolha uma categoria para explorar o catálogo.</p>}
         <button className="primaryButton createProductAction" type="button" onClick={onCreate}><Plus size={20} />Cadastrar produto</button>
-        {/* Atribuição exigida pela licença ODbL do catálogo inicial (ADR-0017 da API). */}
-        <p className="dataCredit">
-          Parte do catálogo e das fotos vem do{" "}
-          <a href="https://openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a>: dados sob{" "}
-          <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">ODbL</a>, fotos sob{" "}
-          <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.pt-br" target="_blank" rel="noopener noreferrer">CC BY-SA</a>.
-        </p>
+        <p className="dataCredit">Catálogo inicial: dados do <a href="https://openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a>, <a href="https://openbeautyfacts.org" target="_blank" rel="noopener noreferrer">Open Beauty Facts</a> e <a href="https://openproductsfacts.org" target="_blank" rel="noopener noreferrer">Open Products Facts</a> sob <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">ODbL</a>. Consulte a origem e a licença de cada foto junto do produto.</p>
       </div>
       {isScanning && (
         <BarcodeScanner
@@ -251,16 +256,18 @@ function SearchResults({
 }
 
 function ProductCard({ product, onSelect }: { product: ProductListItem; onSelect(productId: number): void }) {
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null);
   const distribution = product.community_summary.repurchase_intent;
   const leadingIntent = (Object.keys(distribution) as Array<keyof typeof distribution>)
     .reduce((best, current) => distribution[current] > distribution[best] ? current : best, "yes");
   return (
     <article className="productCard">
       <button className="productCardLink" type="button" onClick={() => onSelect(product.id)} aria-label={`Ver detalhes de ${product.name}`}>
-        <ProductImage product={product} size="thumb" />
+        <ProductImage product={product} size="thumb" onImageError={() => setFailedPhotoUrl(product.image_url ?? null)} />
         <span className="productCardCopy"><strong>{product.name}</strong><span>{product.brand}{product.variant ? ` · ${product.variant}` : ""} · {product.quantity} {product.unit}</span><span className="productCategory">{getCategoryLabel(product.category)}</span>{product.your_repurchase_intent ? <span className={`intent intent--${product.your_repurchase_intent}`}>{intentLabels[product.your_repurchase_intent]}</span> : product.community_summary.total_reviews > 0 ? <span className={`intent intent--${leadingIntent}`}>{intentLabels[leadingIntent]} · {distribution[leadingIntent].toFixed(0)}%</span> : <span className="unreviewed">Ainda sem avaliações</span>}</span>
         <CaretRight size={19} />
       </button>
+      {failedPhotoUrl !== product.image_url && <ProductAttribution product={product} variant="compact" />}
     </article>
   );
 }

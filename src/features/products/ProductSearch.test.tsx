@@ -155,4 +155,39 @@ describe("ProductSearch filters", () => {
     expect(container.querySelector(".resultsHeader")).toBeNull();
     expect(container.textContent).toContain("Arroz integral");
   });
+  it("descarta a busca pendente ao mudar de modo", async () => {
+    let resolve!: (page: typeof emptyPage) => void;
+    mocks.searchProducts.mockReturnValue(new Promise((done) => { resolve = done; }));
+    await mount("/search?name=cafe");
+    await act(async () => Array.from(container.querySelectorAll("button")).find((button) => button.textContent === "Código de barras")!.click());
+    await act(async () => { resolve(emptyPage); });
+    expect(container.querySelector(".emptyState")).toBeNull();
+    expect(container.querySelector<HTMLButtonElement>('[aria-label="Executar busca"]')?.disabled).toBe(false);
+  });
+
+  it("mantém somente o resultado da consulta mais recente", async () => {
+    let resolve!: (page: typeof emptyPage) => void;
+    mocks.searchProducts.mockReturnValueOnce(new Promise((done) => { resolve = done; })).mockResolvedValue(emptyPage);
+    await mount("/search?name=cafe");
+    await act(async () => { fill(nameInput(), "leite"); });
+    await submit();
+    await act(async () => { resolve(emptyPage); });
+    expect(container.textContent).toContain("Nada para “leite”");
+    expect(container.textContent).not.toContain("Nada para “cafe”");
+  });
+
+  it("remove crédito da foto quando o cartão mostra o fallback", async () => {
+    mocks.searchProducts.mockResolvedValue({ ...emptyPage, total: 1, items: [{
+      id: 5, name: "Arroz", brand: "Marca", variant: null, quantity: 1, unit: "un", category: "food", barcode: null,
+      image_url: "https://images.openfoodfacts.org/images/products/123/front.jpg", image_source: "Open Food Facts", image_license: "CC-BY-SA",
+      community_summary: { total_reviews: 0, repurchase_intent: { yes: 0, maybe: 0, no: 0 } }, your_repurchase_intent: null,
+    }] });
+    await mount("/search?name=arroz");
+    expect(container.querySelector(".productAttribution")).not.toBeNull();
+    const image = container.querySelector(".productCard img")!;
+    await act(async () => image.dispatchEvent(new Event("error")));
+    expect(container.querySelector(".productAttribution")).toBeNull();
+    expect(container.querySelector(".productCardLink")).not.toBeNull();
+  });
+
 });

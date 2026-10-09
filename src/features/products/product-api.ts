@@ -16,8 +16,13 @@ export interface ProductPublic {
   unit: "g" | "ml" | "un";
   category: Category;
   barcode: string | null;
-  /** Foto da embalagem no Open Food Facts; só o catálogo inicial tem. */
+  /** Foto e procedência verificadas do catálogo; ausentes em APIs antigas. */
   image_url?: string | null;
+  source?: string | null;
+  source_url?: string | null;
+  image_source?: string | null;
+  image_license?: string | null;
+  image_license_url?: string | null;
 }
 
 export interface ProductCreateInput {
